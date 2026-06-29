@@ -1,0 +1,227 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+}
+
+.login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffc400, #00aeea);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-box {
+    width: 380px;
+    background: white;
+    border-radius: 22px;
+    padding: 34px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.22);
+}
+
+.login-logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #00aeea;
+    margin-bottom: 20px;
+}
+
+.login-box h1 {
+    margin: 0 0 20px;
+}
+
+label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    border: 1px solid #d5dbe5;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 15px;
+}
+
+button, .new-booking {
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    background: #00aeea;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.login-box button {
+    width: 100%;
+    margin-top: 22px;
+}
+
+.error {
+    background: #ffe1e1;
+    color: #9b0000;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.demo-note {
+    color: #777;
+    text-align: center;
+}
+
+.topbar {
+    height: 66px;
+    background: #ffc400;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 22px;
+}
+
+.brand {
+    font-size: 26px;
+    font-weight: bold;
+    color: white;
+    min-width: 280px;
+}
+
+.brand span {
+    background: #222;
+    font-size: 13px;
+    padding: 4px 7px;
+    border-radius: 4px;
+}
+
+.search {
+    max-width: 440px;
+    background: white;
+}
+
+.logout {
+    margin-left: auto;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 66px);
+}
+
+.sidebar {
+    width: 210px;
+    background: white;
+    border-right: 1px solid #e0e4eb;
+    padding: 14px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 14px 12px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+    background: #fff2b4;
+    color: #008fc2;
+}
+
+.content {
+    flex: 1;
+    padding: 28px;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 34px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 18px;
+}
+
+.card,
+.panel {
+    background: white;
+    border: 1px solid #dfe4ec;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.04);
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.number {
+    font-size: 42px;
+    margin: 18px 0;
+}
+
+.card a {
+    color: #00aeea;
+    font-weight: bold;
+}
+
+.panel {
+    margin-top: 24px;
+}
+
+.beach-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    align-items: center;
+}
+
+.beach-toolbar input {
+    max-width: 180px;
+}
+
+.beach-map-empty {
+    margin-top: 22px;
+    height: 520px;
+    border-radius: 20px;
+    background:
+        linear-gradient(#67c9e9 0 110px, transparent 110px),
+        linear-gradient(135deg, #f4dc7a, #f8e8a6);
+    border: 1px solid #d4d9e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar {
+        width: 150px;
+    }
+
+    .brand {
+        min-width: 190px;
+        font-size: 20px;
+    }
+}
