@@ -636,6 +636,151 @@ body.read-only .actions-cell {
   }
 }
 
+/* ── Guida / documentazione ── */
+.guide-doc {
+  max-width: 920px;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.guide-toc {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0 24px;
+}
+
+.guide-toc h3 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.guide-toc ol {
+  margin: 0;
+  padding-left: 20px;
+  columns: 2;
+  column-gap: 24px;
+}
+
+.guide-toc a {
+  color: #0084ff;
+  text-decoration: none;
+}
+
+.guide-toc a:hover {
+  text-decoration: underline;
+}
+
+.guide-section {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.guide-section:last-child {
+  border-bottom: none;
+}
+
+.guide-section h3 {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guide-section h3 i {
+  color: #0084ff;
+  width: 22px;
+  text-align: center;
+}
+
+.guide-section h4 {
+  font-size: 0.95rem;
+  color: #475569;
+  margin: 14px 0 8px;
+}
+
+.guide-section p {
+  margin: 0 0 10px;
+  color: #444;
+}
+
+.guide-section ul,
+.guide-section ol {
+  margin: 8px 0 12px;
+  padding-left: 22px;
+  color: #444;
+}
+
+.guide-section li {
+  margin-bottom: 6px;
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin: 10px 0 14px;
+}
+
+.guide-table th,
+.guide-table td {
+  border: 1px solid #e8e8e8;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.guide-table th {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.guide-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.guide-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.guide-badge.read { background: #e8f4fd; color: #0066cc; }
+.guide-badge.write { background: #f0fff4; color: #276749; }
+.guide-badge.admin { background: #fef3c7; color: #92400e; }
+
+.guide-tip {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+}
+
+.guide-warn {
+  background: #fff5f5;
+  border-left: 4px solid #e53e3e;
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .guide-toc ol {
+    columns: 1;
+  }
+}
+
 /* ── Móvil pequeño ── */
 @media (max-width: 480px) {
   body {
