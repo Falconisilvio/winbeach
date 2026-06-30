@@ -170,6 +170,59 @@ window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina, opts
 //=========================================================
 // CONFIGURAZIONE GRAFICI CHART.JS
 //=========================================================
+function chartLegendPosition() {
+    return window.innerWidth < 768 ? "bottom" : "right";
+}
+
+function mergeChartOptions(extra = {}) {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const text = dark ? "#94a3b8" : "#666666";
+    const grid = dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+    const base = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: chartLegendPosition(),
+                labels: { color: text },
+            },
+        },
+        scales: {
+            x: { ticks: { color: text }, grid: { color: grid } },
+            y: { ticks: { color: text }, grid: { color: grid }, beginAtZero: false },
+        },
+    };
+    return {
+        ...base,
+        ...extra,
+        plugins: {
+            ...base.plugins,
+            ...extra.plugins,
+            legend: { ...base.plugins.legend, ...extra.plugins?.legend },
+        },
+        scales: {
+            x: { ...base.scales.x, ...extra.scales?.x },
+            y: { ...base.scales.y, ...extra.scales?.y },
+        },
+    };
+}
+
+function refreshAllChartsTheme() {
+    ["chartPayment", "chartChannel", "chartLine1", "chartLine2"].forEach((id) => {
+        const c = Chart.getChart(id);
+        if (!c) return;
+        const dark = document.documentElement.getAttribute("data-theme") === "dark";
+        const text = dark ? "#94a3b8" : "#666666";
+        const grid = dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+        if (c.options.plugins?.legend?.labels) c.options.plugins.legend.labels.color = text;
+        ["x", "y"].forEach((axis) => {
+            if (c.options.scales?.[axis]?.ticks) c.options.scales[axis].ticks.color = text;
+            if (c.options.scales?.[axis]?.grid) c.options.scales[axis].grid.color = grid;
+        });
+        c.update();
+    });
+}
+
 function createPaymentChart() {
     new Chart(document.getElementById("chartPayment"), {
         type: "doughnut",
@@ -177,12 +230,7 @@ function createPaymentChart() {
             labels: ["Interamente saldate", "Parzialmente saldate", "Da saldare"],
             datasets: [{ data: [53, 20, 9], backgroundColor: ["#0084FF", "#74B9FF", "#A5D8FF"], borderWidth: 0 }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: "70%",
-            plugins: { legend: { position: window.innerWidth < 768 ? "bottom" : "right" } }
-        }
+        options: mergeChartOptions({ cutout: "70%" }),
     });
 }
 
@@ -193,12 +241,7 @@ function createChannelChart() {
             labels: ["Prenotazioni Offline", "Prenotazioni Widget", "Prenotazioni Portale"],
             datasets: [{ data: [62, 30, 20], backgroundColor: ["#F39C12", "#F1C40F", "#FDEBD0"], borderWidth: 0 }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: "70%",
-            plugins: { legend: { position: window.innerWidth < 768 ? "bottom" : "right" } }
-        }
+        options: mergeChartOptions({ cutout: "70%" }),
     });
 }
 
@@ -221,7 +264,7 @@ function createPresenceChart() {
             labels: labels,
             datasets: [{ label: "Presenze", data: labels.map(() => 0), borderColor: "#0084FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        options: mergeChartOptions({ plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }),
     });
 }
 
@@ -236,9 +279,14 @@ function createArrivalChart() {
                 { label: "Partenze", data: labels.map(() => 0), borderColor: "#A5A5A5", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true } } }
+        options: mergeChartOptions({ plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true } } }),
     });
 }
+
+window.addEventListener("winbeach-theme-change", refreshAllChartsTheme);
+window.addEventListener("message", (e) => {
+    if (e.data?.type === "winbeach-theme-change") refreshAllChartsTheme();
+});
 
 window.addEventListener("message", function (e) {
     if (e.data?.type === "winbeach-navigate" && e.data.page) {

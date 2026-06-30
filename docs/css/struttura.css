@@ -1,3 +1,6 @@
+@import url('theme.css');
+@import url('dark-mode.css');
+
 :root {
   --sand: #e8d4a8;
   --sand-dark: #c9b07a;

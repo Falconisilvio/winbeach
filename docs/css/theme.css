@@ -1,0 +1,67 @@
+/* WinBeach — design tokens (light / dark) */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --wb-bg: #f4f6fa;
+  --wb-surface: #ffffff;
+  --wb-surface-2: #f8f9fa;
+  --wb-surface-3: #f1f3f5;
+  --wb-surface-hover: #eef2f7;
+  --wb-text: #222222;
+  --wb-text-secondary: #555555;
+  --wb-text-muted: #888888;
+  --wb-border: #e0e0e0;
+  --wb-border-light: #f0f0f0;
+  --wb-accent: #0084ff;
+  --wb-accent-soft: #e8f4fd;
+  --wb-accent-hover: #f0f7ff;
+  --wb-input-bg: #ffffff;
+  --wb-input-border: #dddddd;
+  --wb-shadow: rgba(0, 0, 0, 0.08);
+  --wb-shadow-sm: rgba(0, 0, 0, 0.04);
+  --wb-overlay: rgba(0, 0, 0, 0.45);
+  --wb-topbar: #ffcc00;
+  --wb-topbar-text: #333333;
+  --wb-topbar-control: rgba(255, 255, 255, 0.7);
+  --wb-sidebar-active-bg: #fff9e6;
+  --wb-menu-active: #e8f0fe;
+  --wb-chart-text: #666666;
+  --wb-chart-grid: rgba(0, 0, 0, 0.06);
+  --wb-banner-bg: #fff8e6;
+  --wb-banner-text: #7a5b00;
+  --wb-banner-border: #ffe08a;
+  --wb-meta-theme: #0084ff;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --wb-bg: #0f1419;
+  --wb-surface: #1a2332;
+  --wb-surface-2: #243044;
+  --wb-surface-3: #2d3a4f;
+  --wb-surface-hover: #324158;
+  --wb-text: #e8edf4;
+  --wb-text-secondary: #b8c5d6;
+  --wb-text-muted: #8b9cb3;
+  --wb-border: #3d4f66;
+  --wb-border-light: #2d3a4f;
+  --wb-accent: #4dabff;
+  --wb-accent-soft: #1e3a5f;
+  --wb-accent-hover: #243752;
+  --wb-input-bg: #243044;
+  --wb-input-border: #4a5d78;
+  --wb-shadow: rgba(0, 0, 0, 0.4);
+  --wb-shadow-sm: rgba(0, 0, 0, 0.25);
+  --wb-overlay: rgba(0, 0, 0, 0.7);
+  --wb-topbar: #1a2e4a;
+  --wb-topbar-text: #e8edf4;
+  --wb-topbar-control: rgba(36, 48, 68, 0.9);
+  --wb-sidebar-active-bg: #2d3a28;
+  --wb-menu-active: #1e3a5f;
+  --wb-chart-text: #94a3b8;
+  --wb-chart-grid: rgba(255, 255, 255, 0.08);
+  --wb-banner-bg: #3d3520;
+  --wb-banner-text: #f0d78c;
+  --wb-banner-border: #5c4d2a;
+  --wb-meta-theme: #1a2332;
+}

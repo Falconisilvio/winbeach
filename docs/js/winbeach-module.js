@@ -128,6 +128,9 @@ export function initModule(loadFn) {
     if (e.data?.type === 'winbeach-lang-change') {
       import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
     }
+    if (e.data?.type === 'winbeach-theme-change') {
+      import('./winbeach-theme.js').then((m) => m.setTheme(e.data.theme, { broadcast: false })).catch(() => {});
+    }
   });
   window.addEventListener('winbeach-lang-change', () => {
     import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
@@ -135,6 +138,9 @@ export function initModule(loadFn) {
   window.addEventListener('storage', (e) => {
     if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles' || e.key === 'winbeach_session' || e.key === 'winbeach-app-lang') {
       boot();
+    }
+    if (e.key === 'winbeach_theme') {
+      import('./winbeach-theme.js').then((m) => m.setTheme(e.newValue, { broadcast: false })).catch(() => {});
     }
   });
   document.addEventListener('DOMContentLoaded', boot);
