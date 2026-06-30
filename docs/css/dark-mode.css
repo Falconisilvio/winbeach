@@ -603,3 +603,100 @@
 [data-theme="dark"] .tavoli-page .tavolo-card:not(.occupato) {
   border-left-color: #4ade80;
 }
+
+/* Cassa ristorante (POS) */
+[data-theme="dark"] .pointsale-page .cassa-header {
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .pointsale-page .cassa-header h2 {
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] .pointsale-page .cat-btn {
+  background: var(--wb-surface-2);
+  border-color: var(--wb-border);
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] .pointsale-page .cat-btn:hover {
+  background: var(--wb-surface-hover);
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .pointsale-page .cat-btn.active {
+  background: var(--wb-accent);
+  border-color: var(--wb-accent);
+  color: #fff;
+}
+
+[data-theme="dark"] .pointsale-page .articolo-card {
+  background: var(--wb-surface);
+  border-color: var(--wb-border);
+  box-shadow: 0 1px 3px var(--wb-shadow-sm);
+}
+
+[data-theme="dark"] .pointsale-page .articolo-card:hover {
+  background: var(--wb-surface-hover);
+  border-color: var(--wb-accent);
+}
+
+[data-theme="dark"] .pointsale-page .articolo-card .name {
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] .pointsale-page .articolo-card .price {
+  color: #4ade80;
+}
+
+[data-theme="dark"] .pointsale-page .comanda-section {
+  background: var(--wb-surface);
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .pointsale-page .comanda-title {
+  background: var(--wb-surface-2);
+  color: var(--wb-text);
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .pointsale-page .xbrowse-container {
+  background: var(--wb-surface);
+}
+
+[data-theme="dark"] .pointsale-page .xbrowse th {
+  background: var(--wb-surface-2) !important;
+  color: var(--wb-text-muted) !important;
+  border-color: var(--wb-border-light);
+}
+
+[data-theme="dark"] .pointsale-page .xbrowse td {
+  background: var(--wb-surface) !important;
+  color: var(--wb-text) !important;
+  border-color: var(--wb-border-light);
+}
+
+[data-theme="dark"] .pointsale-page .xbrowse tr:hover td {
+  background: var(--wb-surface-hover) !important;
+}
+
+[data-theme="dark"] .pointsale-page .comanda-totali {
+  background: var(--wb-surface-2);
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .pointsale-page .tot-row {
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] .pointsale-page .xbrowse td .btn-del {
+  color: #f87171;
+}
+
+[data-theme="dark"] .pointsale-page .btn-invia {
+  background: #22c55e;
+}
+
+[data-theme="dark"] .pointsale-page .btn-invia:hover {
+  background: #16a34a;
+}

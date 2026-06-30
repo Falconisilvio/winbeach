@@ -108,6 +108,7 @@ body.tavoli-page {
 body.pointsale-page {
   background: var(--wb-bg);
   padding: 20px;
+  min-height: 100vh;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -115,6 +116,12 @@ body.pointsale-page {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, sans-serif;
   color: var(--wb-text);
+  box-sizing: border-box;
+}
+
+.pointsale-page .prodotti-section,
+.pointsale-page .main-container {
+  background: transparent;
 }
 
 .pointsale-page .cassa-header {
