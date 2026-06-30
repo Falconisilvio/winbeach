@@ -3,7 +3,7 @@ export const en = {
     lang: 'en',
     title: 'Guide — WinBeach Web',
     header: '<i class="fa-solid fa-circle-question" style="color:#0984e3"></i> WinBeach Web Guide',
-    subtitle: 'Complete operational manual — Beach Manager on GitHub Pages with githubDB database.',
+    subtitle: 'Complete operational manual — Beach Manager on GitHub Pages on GitHub Pages.',
   },
   html: `
     <nav class="guide-toc" aria-label="Table of contents">
@@ -12,7 +12,7 @@ export const en = {
         <li><a href="#intro">Introduction</a></li>
         <li><a href="#accesso">Access and security</a></li>
         <li><a href="#navigazione">Navigation</a></li>
-        <li><a href="#multi-bd">Multi-facility and githubDB</a></li>
+        <li><a href="#multi-bd">Multi-facility and data storage</a></li>
         <li><a href="#dashboard">Dashboard</a></li>
         <li><a href="#spiaggia">Beach</a></li>
         <li><a href="#booking">Booking and reservations</a></li>
@@ -43,7 +43,7 @@ export const en = {
       <h4>Main features</h4>
       <ul>
         <li>Operational dashboard with real-time KPIs (arrivals, departures, occupancy, revenue)</li>
-        <li>Full CRUD on 24+ tables via <strong>githubDB</strong></li>
+        <li>Full CRUD on 24+ tables via <strong>cloud database</strong></li>
         <li>Interactive beach layout (Structure editor)</li>
         <li>Multi-facility: multiple beach establishments with separate databases</li>
         <li>User authentication with roles (read-only / write / admin)</li>
@@ -73,8 +73,8 @@ export const en = {
           </tbody>
         </table>
       </div>
-      <h4>GitHub token (writes to githubDB)</h4>
-      <p>Changes are sent to the githubDB repository via GitHub Actions. A <strong>Personal Access Token</strong> with <code>repo</code> permission on the database fork is required.</p>
+      <h4>GitHub token (writes to the database)</h4>
+      <p>Changes are sent to the data repository via GitHub Actions. A <strong>Personal Access Token</strong> with <code>repo</code> permission on the database fork is required.</p>
       <ol>
         <li>Log in as <strong>admin</strong></li>
         <li>Go to <strong>Switch facility</strong> → edit profile → Token field</li>
@@ -86,7 +86,7 @@ export const en = {
       <h4>Dual protection on writes</h4>
       <ul>
         <li><strong>Level 1 — User:</strong> valid session + Operator or Administrator role</li>
-        <li><strong>Level 2 — githubDB:</strong> GitHub token with write access to the data repo</li>
+        <li><strong>Level 2 — Database:</strong> GitHub token with write access to the data repo</li>
       </ul>
     </section>
 
@@ -115,19 +115,19 @@ export const en = {
       <h4>Text menu (left)</h4>
       <p>Groups operational modules: <em>Arrivals and departures</em>, <em>Facility statistics</em>, <em>Logs and flows</em>, <em>Counters</em>, <em>Warehouse</em>, and the <em>Settings</em> submenu.</p>
       <h4>Facility selector (top bar)</h4>
-      <p>Dropdown with all configured profiles. Switching facility reloads data from the respective githubDB database.</p>
-      <h4>githubDB status bar</h4>
-      <p>Every module shows <code>facility name · status</code>: <em>idle</em>, <em>loading</em>, <em>ok</em>, <em>error</em>. Indicates whether read/write to githubDB succeeded.</p>
+      <p>Dropdown with all configured profiles. Switching facility reloads data from the respective database.</p>
+      <h4>Connection status bar</h4>
+      <p>Every module shows <code>facility name · status</code>: <em>idle</em>, <em>loading</em>, <em>ok</em>, <em>error</em>. Indicates whether read/write to the database succeeded.</p>
     </section>
 
     <!-- 4. MULTI-BD -->
     <section class="guide-section" id="multi-bd">
-      <h3><i class="fa-solid fa-database"></i> 4. Multi-facility and githubDB</h3>
-      <p>Each facility corresponds to a JSON file in the githubDB repository, e.g. <code>data/winbeach.json</code>, <code>data/winbeach-lido-sud.json</code>.</p>
+      <h3><i class="fa-solid fa-database"></i> 4. Multi-facility and data storage</h3>
+      <p>Each facility corresponds to a JSON file in the data repository, e.g. <code>data/winbeach.json</code>, <code>data/winbeach-lido-sud.json</code>.</p>
       <h4>Profile configuration</h4>
       <ul>
         <li><strong>Facility name</strong> — label shown in the app</li>
-        <li><strong>Owner / Repo</strong> — e.g. <code>FiveTechSoft/githubdb</code></li>
+        <li><strong>Owner / Repo</strong> — e.g. <code>owner/repo-name</code></li>
         <li><strong>Branch</strong> — usually <code>main</code></li>
         <li><strong>DB file</strong> — name without <code>.json</code></li>
         <li><strong>Token</strong> — one per profile, stored in the browser</li>
@@ -144,7 +144,7 @@ export const en = {
     <!-- 5. DASHBOARD -->
     <section class="guide-section" id="dashboard">
       <h3><i class="fa-solid fa-house"></i> 5. Dashboard</h3>
-      <p>Daily overview of the active facility. Figures update automatically from githubDB (<code>dashboard-stats.js</code>).</p>
+      <p>Daily overview of the active facility. Figures update automatically from the database (<code>dashboard-stats.js</code>).</p>
       <h4>KPI cards</h4>
       <ul>
         <li><strong>Arrivals / Departures</strong> — reservations with start/end date equal to today</li>
@@ -274,7 +274,7 @@ export const en = {
         <li><strong>Cancellation log</strong> — cancelled reservations with optional penalty</li>
         <li><strong>Cash flows</strong> — financial movements (see Cash register section)</li>
       </ul>
-      <p>All logs are persisted in githubDB and can be viewed read-only by any user.</p>
+      <p>All logs are persisted in the database and can be viewed read-only by any user.</p>
     </section>
 
     <!-- 15. COUNTERS -->
@@ -318,7 +318,7 @@ export const en = {
         <li>Set rows/columns and walkway column</li>
         <li>Select tool: element, tassa (sector), numbering</li>
         <li>Click cells to assign type and sector</li>
-        <li><strong>Load from DB</strong> — reads <code>celle</code> from githubDB</li>
+        <li><strong>Load from DB</strong> — reads <code>celle</code> from the database</li>
         <li><strong>Save to DB</strong> — saves layout (requires login + token)</li>
       </ol>
       <p>Special elements: <em>Sea</em> (front rows), <em>Walkway</em> (central column), not numbered.</p>
@@ -331,7 +331,7 @@ export const en = {
       <ul>
         <li><strong>New</strong> — adds a facility with its own DB</li>
         <li><strong>Activate</strong> — switches data context across the app</li>
-        <li><strong>Test connection</strong> — verifies githubDB read access</li>
+        <li><strong>Test connection</strong> — verifies database read access</li>
         <li><strong>Demo profiles</strong> — creates 3 preloaded establishments</li>
       </ul>
       <p>Edit profiles and tokens: <span class="guide-badge admin">Administrator</span> only.</p>
@@ -363,7 +363,7 @@ export const en = {
         <li><strong>Stripe transfers</strong> — payouts to bank account (<code>trasferimenti_stripe</code>)</li>
       </ul>
       <div class="guide-tip">
-        Real Stripe payments require a server backend. In this web version the modules record and display demo/historical data in githubDB.
+        Real Stripe payments require a server backend. In this web version the modules record and display demo/historical data in the database.
       </div>
     </section>
 
@@ -383,7 +383,7 @@ export const en = {
     <!-- 22. FAQ -->
     <section class="guide-section" id="faq">
       <h3><i class="fa-solid fa-life-ring"></i> 22. FAQ and troubleshooting</h3>
-      <h4>«Illegal invocation» or githubDB fetch error</h4>
+      <h4>«Illegal invocation» or data connection error</h4>
       <p>Error fixed in the client: reload with Ctrl+Shift+R. If it persists, clear the browser cache.</p>
       <h4>Cannot save / buttons hidden</h4>
       <ol>
@@ -392,7 +392,7 @@ export const en = {
         <li>Is the <strong>GitHub token</strong> configured in the active profile?</li>
       </ol>
       <h4>Slow save</h4>
-      <p>Normal: githubDB uses GitHub Actions (~10–30 s). Wait for the confirmation message in the status bar.</p>
+      <p>Normal: Synchronization uses GitHub Actions (~10–30 s). Wait for the confirmation message in the status bar.</p>
       <h4>Data not updated after edit</h4>
       <p>GitHub CDN may take 1–2 minutes. Use <strong>Reload</strong> in the module or switch profile and return.</p>
       <h4>Dashboard showing zeros</h4>
@@ -408,15 +408,15 @@ export const en = {
       <ul>
         <li>Static frontend: HTML, CSS, JavaScript ES modules</li>
         <li>Hosting: GitHub Pages (branch <code>gh-pages</code>, folder <code>docs</code>)</li>
-        <li>Database: <a href="https://github.com/FiveTechSoft/githubdb">githubDB</a> — JSON + SQL via Actions</li>
+        <li>Database: <a href="https://github.com/owner/repo-name">Data repository</a> — JSON + SQL via Actions</li>
         <li>App repo: <code>Falconisilvio/winbeach</code></li>
-        <li>Data repo: <code>FiveTechSoft/githubdb</code></li>
+        <li>Data repo: <code>owner/repo-name</code></li>
       </ul>
-      <h4>githubDB tables (winbeach)</h4>
+      <h4>Database tables (winbeach)</h4>
       <p><code>config</code>, <code>celle</code>, <code>clienti</code>, <code>prenotazioni</code>, <code>elementi</code>, <code>settori</code>, <code>listini</code>, <code>tariffe</code>, <code>servizi</code>, <code>movimenti_cassa</code>, <code>log_sconti</code>, <code>log_cancellazioni</code>, <code>log_modifiche</code>, <code>contatori_albergo</code>, <code>voucher</code>, <code>articoli</code>, <code>movimenti_magazzino</code>, <code>utenti</code>, <code>azienda</code>, <code>capitaneria</code>, <code>esercizi</code>, <code>pagamenti_stripe</code>, <code>trasferimenti_stripe</code>, <code>attivita</code></p>
       <h4>Key files</h4>
       <ul>
-        <li><code>js/winbeach-db.js</code> — githubDB connection, multi-profile</li>
+        <li><code>js/winbeach-db.js</code> — database connection, multi-profile</li>
         <li><code>js/winbeach-auth.js</code> — login and permissions</li>
         <li><code>js/winbeach-module.js</code> — module utilities and read-only</li>
         <li><code>js/table-crud.js</code> — generic CRUD factory</li>
