@@ -5,16 +5,13 @@ import {
   loadClientiFromDb,
   saveClienteToDb,
   deleteClienteFromDb,
-  onProfileChange,
 } from './winbeach-db.js';
 import { applyReadOnlyMode, onAuthChange } from './winbeach-auth.js';
+import { t } from './app-i18n.js';
+import { $, escapeHtml, initModule } from './winbeach-module.js';
 
 let clienti = [];
 let editingId = null;
-
-function $(id) {
-  return document.getElementById(id);
-}
 
 function fullName(c) {
   return [c.nome, c.cognome].filter(Boolean).join(' ').trim() || '—';
@@ -27,7 +24,7 @@ function updateStatus() {
   const profile = getActiveProfile();
   const prefix = profile ? `${profile.name} · ` : '';
   el.className = `db-status ${state}`;
-  el.textContent = message ? prefix + message : prefix + 'Listo';
+  el.textContent = message ? prefix + message : prefix + t('common.ready');
 }
 
 function getFiltered() {
@@ -57,7 +54,7 @@ function renderTable() {
       <td>${fullName(c)}</td>
       <td>${c.email || '—'}</td>
       <td>${c.telefono || '—'}</td>
-      <td>${c.note ? `<span class="badge badge-blue">${escapeHtml(c.note)}</span>` : '<span class="badge badge-green">Attivo</span>'}</td>
+      <td>${c.note ? `<span class="badge badge-blue">${escapeHtml(c.note)}</span>` : `<span class="badge badge-green">${t('badge.attivo')}</span>`}</td>
       <td class="actions-cell">
         <button type="button" class="btn btn-secondary btn-sm" data-edit="${c.id}"><i class="fa-solid fa-pen"></i></button>
         <button type="button" class="btn btn-danger btn-sm" data-delete="${c.id}"><i class="fa-solid fa-trash"></i></button>
@@ -75,14 +72,6 @@ function renderTable() {
   });
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 function openModal(id = null) {
   editingId = id;
   const modal = $('cliente-modal');
@@ -90,14 +79,14 @@ function openModal(id = null) {
 
   if (id) {
     const c = clienti.find((x) => x.id === id);
-    title.textContent = 'Modifica cliente';
+    title.textContent = t('clienti.edit');
     $('f-nome').value = c?.nome || '';
     $('f-cognome').value = c?.cognome || '';
     $('f-email').value = c?.email || '';
     $('f-telefono').value = c?.telefono || '';
     $('f-note').value = c?.note || '';
   } else {
-    title.textContent = 'Nuovo cliente';
+    title.textContent = t('clienti.new');
     $('cliente-form').reset();
   }
 
@@ -146,12 +135,12 @@ async function saveCliente(e) {
   }
 
   $('btn-save').disabled = true;
-  $('btn-save').textContent = 'Salvataggio…';
+  $('btn-save').textContent = t('common.saving');
 
   const result = await saveClienteToDb(cliente, clienti);
   updateStatus();
   $('btn-save').disabled = false;
-  $('btn-save').textContent = 'Salva';
+  $('btn-save').textContent = t('common.save');
 
   if (!result.ok) {
     alert(result.error || 'Errore nel salvataggio');
@@ -170,7 +159,7 @@ async function removeCliente(id) {
     alert('Configura il token GitHub prima di eliminare.');
     return;
   }
-  if (!confirm('Eliminare questo cliente?')) return;
+  if (!confirm(t('common.confirmDelete'))) return;
 
   const result = await deleteClienteFromDb(id);
   updateStatus();
@@ -182,6 +171,8 @@ async function removeCliente(id) {
 }
 
 function bindEvents() {
+  if (window.__clientiBound) return;
+  window.__clientiBound = true;
   $('btn-nuovo').addEventListener('click', () => openModal());
   $('btn-reload').addEventListener('click', loadData);
   $('search-input').addEventListener('input', renderTable);
@@ -193,9 +184,8 @@ function bindEvents() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+initModule(async () => {
   bindEvents();
-  onProfileChange(loadData);
   onAuthChange(() => { applyReadOnlyMode(); });
   applyReadOnlyMode();
   await loadData();

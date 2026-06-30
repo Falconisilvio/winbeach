@@ -68,20 +68,13 @@
     </p>
     <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="login.readonly">Continua in sola lettura</span></a>
   </div>
+  <script type="module" src="js/app-i18n.js"></script>
   <script type="module" src="js/login.js"></script>
   <script type="module">
     import { initThemeUi } from './js/winbeach-theme.js';
-    import { APP_LANGS, setAppLang, getAppLang, applyI18n } from './js/app-i18n.js';
+    import { initPageI18n } from './js/page-i18n.js';
     initThemeUi();
-    const sel = document.getElementById('login-lang');
-    APP_LANGS.forEach(({ code, label }) => {
-      const o = document.createElement('option');
-      o.value = code; o.textContent = label;
-      sel.appendChild(o);
-    });
-    sel.value = getAppLang();
-    sel.addEventListener('change', () => setAppLang(sel.value));
-    applyI18n(document);
+    initPageI18n();
   </script>
 </body>
 </html>

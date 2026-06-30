@@ -72,9 +72,11 @@
 
     let carrello = [];
 
+    function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
+
     window.addEventListener('load', function () {
-      const t = localStorage.getItem('tavoloSelezionato') || 'Vendita al Banco';
-      document.getElementById('lbl-tavolo').innerText = t;
+      const tbl = localStorage.getItem('tavoloSelezionato') || wbT('pos.counter');
+      document.getElementById('lbl-tavolo').innerText = tbl;
       caricaArticoli('Ristorante');
     });
 
@@ -128,11 +130,21 @@
     }
 
     function inviaComanda() {
-      if (carrello.length === 0) return alert('Comanda vuota!');
-      alert('Comanda inviata in Cucina!');
+      if (carrello.length === 0) return alert(wbT('pos.empty'));
+      alert(wbT('pos.sent'));
       carrello = [];
       aggiornaXBrowse();
     }
+
+    window.addEventListener('winbeach-lang-change', () => import('../js/page-i18n.js').then((m) => m.applyPageI18n()));
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === 'winbeach-lang-change') import('../js/page-i18n.js').then((m) => m.applyPageI18n());
+    });
+  </script>
+  <script type="module" src="../js/app-i18n.js"></script>
+  <script type="module">
+    import { initPageI18n } from '../js/page-i18n.js';
+    initPageI18n();
   </script>
 </body>
 </html>

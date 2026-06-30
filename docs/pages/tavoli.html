@@ -30,22 +30,26 @@
   <div class="sala-grid" id="zona-gazebo"></div>
 
   <script>
+    function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
+
     function generaMappaTavoli() {
       const interna = document.getElementById('zona-interna');
       const terrazza = document.getElementById('zona-terrazza');
       const giardino = document.getElementById('zona-giardino');
       const gazebo = document.getElementById('zona-gazebo');
+      [interna, terrazza, giardino, gazebo].forEach((z) => { if (z) z.innerHTML = ''; });
 
       for (let i = 1; i <= 50; i++) {
         const isOccupato = Math.random() < 0.35;
         const statoClasse = isOccupato ? 'occupato' : '';
-        const statoTesto = isOccupato ? 'In corso' : 'Libero';
+        const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
         const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+        const nome = `${wbT('tavoli.table')} ${i}`;
 
         const tavoloHTML = `
-          <div class="tavolo-card ${statoClasse}" onclick="selezionaTavolo('Tavolo ${i}')">
+          <div class="tavolo-card ${statoClasse}" onclick="selezionaTavolo('${nome.replace(/'/g, "\\'")}')">
             <i class="fa-solid ${icona}"></i>
-            <h3>Tavolo ${i}</h3>
+            <h3>${nome}</h3>
             <small>${statoTesto}</small>
           </div>`;
 
@@ -61,7 +65,19 @@
       window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
     }
 
+    window.addEventListener('winbeach-lang-change', () => { generaMappaTavoli(); import('../js/page-i18n.js').then((m) => m.applyPageI18n()); });
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === 'winbeach-lang-change') {
+        generaMappaTavoli();
+        import('../js/page-i18n.js').then((m) => m.applyPageI18n());
+      }
+    });
     window.onload = generaMappaTavoli;
+  </script>
+  <script type="module" src="../js/app-i18n.js"></script>
+  <script type="module">
+    import { initPageI18n } from '../js/page-i18n.js';
+    initPageI18n();
   </script>
 </body>
 </html>

@@ -3,9 +3,10 @@ import {
   savePrenotazioneToDb, deletePrenotazioneFromDb, onProfileChange,
   loadTable, calcImportoFromTariffe, findPrenotazioneOverlap,
 } from './winbeach-db.js';
+import { t } from './app-i18n.js';
 import {
   $, formatDate, formatEuro, todayIso, clienteLabel,
-  statoPrenBadge, pagamentoBadge,
+  statoPrenBadge, pagamentoBadge, initModule,
 } from './winbeach-module.js';
 import { exportTableCsv } from './winbeach-export.js';
 import { printTableReport } from './winbeach-pdf.js';
@@ -23,11 +24,13 @@ const EXPORT_COLS = [
 ];
 
 let prenotazioni = [], clienti = [], celle = [], tariffe = [], editingId = null;
-const STATI = [
-  { id: 'confermata', label: 'Confermata' },
-  { id: 'in_attesa', label: 'In attesa' },
-  { id: 'cancellata', label: 'Cancellata' },
-];
+function statiOptions() {
+  return [
+    { id: 'confermata', label: t('filter.confirmed') },
+    { id: 'in_attesa', label: t('filter.pending') },
+    { id: 'cancellata', label: t('filter.cancelled') },
+  ];
+}
 
 function updateStatus() {
   const el = $('db-status');
@@ -35,7 +38,7 @@ function updateStatus() {
   const { state, message } = getDbStatus();
   const profile = getActiveProfile();
   el.className = `db-status ${state}`;
-  el.textContent = (profile ? `${profile.name} · ` : '') + (message || 'Pronto');
+  el.textContent = (profile ? `${profile.name} · ` : '') + (message || t('common.ready'));
 }
 
 function updateStats() {
@@ -68,7 +71,7 @@ function renderTable() {
       <td>${clienteLabel(p.cliente)}</td>
       <td>${formatDate(p.data_inizio)}</td>
       <td>${formatDate(p.data_fine)}</td>
-      <td>${p.cella ? `Post. ${p.cella}` : '—'}</td>
+      <td>${p.cella ? `${t('common.spot')} ${p.cella}` : '—'}</td>
       <td>${formatEuro(p.importo)}</td>
       <td>${pagamentoBadge(p.stato_pagamento)}</td>
       <td>${statoPrenBadge(p.stato)}</td>
@@ -91,7 +94,7 @@ function calcPrice() {
 
 function fillClienteSelect(selectedId = null) {
   const sel = $('f-cliente');
-  sel.innerHTML = '<option value="">— Seleziona —</option>';
+  sel.innerHTML = `<option value="">${t('common.select')}</option>`;
   clienti.forEach((c) => {
     const o = document.createElement('option');
     o.value = c.id; o.textContent = clienteLabel(c);
@@ -102,7 +105,7 @@ function fillClienteSelect(selectedId = null) {
 
 function fillCellaSelect(selectedCella = null) {
   const sel = $('f-cella');
-  sel.innerHTML = '<option value="">— Nessuna —</option>';
+  sel.innerHTML = `<option value="">${t('common.none')}</option>`;
   celle.filter((c) => c.cella > 0 && c.attivo).sort((a, b) => a.cella - b.cella).forEach((c) => {
     const o = document.createElement('option');
     o.value = c.cella;
@@ -115,10 +118,10 @@ function fillCellaSelect(selectedCella = null) {
 function openModal(id = null) {
   editingId = id;
   fillClienteSelect(); fillCellaSelect();
-  $('f-stato').innerHTML = STATI.map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
+  $('f-stato').innerHTML = statiOptions().map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
   if (id) {
     const p = prenotazioni.find((x) => x.id === id);
-    $('modal-title').textContent = 'Modifica prenotazione';
+    $('modal-title').textContent = t('booking.edit');
     fillClienteSelect(p?.cliente_id); fillCellaSelect(p?.cella);
     $('f-inizio').value = p?.data_inizio?.slice(0, 10) || '';
     $('f-fine').value = p?.data_fine?.slice(0, 10) || '';
@@ -131,7 +134,7 @@ function openModal(id = null) {
     $('f-ora').value = p?.ora_arrivo || '';
     $('f-importo').dataset.manual = '1';
   } else {
-    $('modal-title').textContent = 'Nuova prenotazione';
+    $('modal-title').textContent = t('booking.new');
     $('prenotazione-form').reset();
     $('f-inizio').value = todayIso();
     const f = new Date(); f.setDate(f.getDate() + 7);
@@ -210,8 +213,8 @@ async function removePrenotazione(id) {
   await loadData();
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  $('btn-nuovo')?.addEventListener('click', () => { if (!clienti.length) alert('Aggiungi prima un cliente.'); else openModal(); });
+function bindBookingEvents() {
+  $('btn-nuovo')?.addEventListener('click', () => { if (!clienti.length) alert(t('booking.addCustomerFirst')); else openModal(); });
   $('btn-reload')?.addEventListener('click', loadData);
   $('btn-export')?.addEventListener('click', () => {
     exportTableCsv(`prenotazioni-${todayIso()}.csv`, EXPORT_COLS, getFiltered());
@@ -231,10 +234,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('f-importo')?.addEventListener('input', () => { $('f-importo').dataset.manual = '1'; });
   $('modal-close')?.addEventListener('click', closeModal);
   $('btn-cancel')?.addEventListener('click', closeModal);
+}
+
+initModule(async () => {
   const { applyReadOnlyMode, onAuthChange } = await import('./winbeach-auth.js');
-  onProfileChange(loadData);
+  if (!window.__bookingBound) {
+    bindBookingEvents();
+    window.__bookingBound = true;
+  }
   onAuthChange(() => applyReadOnlyMode());
   applyReadOnlyMode();
+  const empty = $('empty-state p');
+  if (empty) empty.textContent = t('booking.empty');
   await loadData();
   const params = new URLSearchParams(window.location.search);
   const q = params.get('q');

@@ -42,7 +42,7 @@ function render() {
         ${!isArrivi ? `<button class="btn btn-warning btn-sm" data-checkout="${p.id}" ${p.check_out ? 'disabled' : ''}>${t('common.checkout')}</button>` : ''}
       </td>
     </tr>
-  `).join('') || '<tr><td colspan="7">Nessun record per questa data.</td></tr>';
+  `).join('') || `<tr><td colspan="7">${t('common.noDataDate')}</td></tr>`;
 
   $('data-tbody').querySelectorAll('[data-checkin]').forEach((b) => {
     b.addEventListener('click', () => toggleCheck(Number(b.dataset.checkin), 'check_in'));
