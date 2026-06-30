@@ -52,7 +52,7 @@
         function selezionaTavolo(nomeTavolo) {
             localStorage.setItem('tavoloSelezionato', nomeTavolo);
             // Invia il comando di cambio pagina puntando a pointsale
-            window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+            window.parent.postMessage({ comando: 'cambiaPagina', target: 'point' }, '*');
         }
     </script>
 </body>
