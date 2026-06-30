@@ -17,15 +17,15 @@
       <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn.reload">Ricarica</span></button>
       <button type="button" class="btn btn-secondary" id="btn-export"><i class="fa-solid fa-file-csv"></i> <span data-i18n="btn.exportCsv">Esporta CSV</span></button>
       <button type="button" class="btn btn-secondary" id="btn-pdf"><i class="fa-solid fa-file-pdf"></i> <span data-i18n="btn.exportPdf">Esporta PDF</span></button>
-      <button type="button" class="btn btn-primary" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuova prenotazione</button>
+      <button type="button" class="btn btn-primary" id="btn-nuovo"><i class="fa-solid fa-plus"></i> <span data-i18n="booking.newBtn">Nuova prenotazione</span></button>
     </div>
   </div>
 
-  <p class="subtitle">Prenotazioni collegate a clienti e postazioni.</p>
+  <p class="subtitle" id="page-subtitle">Prenotazioni collegate a clienti e postazioni.</p>
 
   <div class="db-bar">
-    <span><i class="fa-solid fa-database"></i> Base dati</span>
-    <div id="db-status" class="db-status idle">Caricamento…</div>
+    <span><i class="fa-solid fa-database"></i> <span data-i18n="common.db">Base dati</span></span>
+    <div id="db-status" class="db-status idle">…</div>
   </div>
 
   <div class="stats-row">
@@ -35,7 +35,7 @@
   </div>
 
   <div class="filters">
-    <input type="search" id="search-input" placeholder="Cerca cliente o postazione…">
+    <input type="search" id="search-input" data-i18n-placeholder="filter.searchBooking" placeholder="Cerca cliente o postazione…">
     <select id="filter-stato">
       <option value="">Tutti gli stati</option>
       <option value="confermata">Confermata</option>
@@ -65,14 +65,14 @@
 
   <div id="empty-state" class="empty-state" style="display:none">
     <i class="fa-solid fa-calendar-days" style="font-size:2rem;color:#ccc"></i>
-    <p>Nessuna prenotazione. Aggiungi clienti e crea la prima prenotazione.</p>
+    <p data-i18n="booking.empty">Nessuna prenotazione. Aggiungi clienti e crea la prima prenotazione.</p>
   </div>
 
   <div class="modal-overlay" id="prenotazione-modal">
     <div class="modal">
       <div class="modal-header">
         <h3 id="modal-title">Nuova prenotazione</h3>
-        <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">&times;</button>
+        <button type="button" class="modal-close" id="modal-close" data-i18n-aria="common.close" aria-label="Chiudi">&times;</button>
       </div>
       <form id="prenotazione-form">
         <div class="modal-body">
@@ -119,13 +119,13 @@
             </div>
             <div class="form-group" style="grid-column:1/-1">
               <label for="f-note">Note</label>
-              <textarea id="f-note" rows="2" placeholder="Richieste speciali, canale, ecc."></textarea>
+              <textarea id="f-note" rows="2" data-i18n-placeholder="label.notesPlaceholder" placeholder="Richieste speciali, canale, ecc."></textarea>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button>
-          <button type="submit" class="btn btn-primary" id="btn-save">Salva</button>
+          <button type="button" class="btn btn-secondary" id="btn-cancel" data-i18n="common.cancel">Annulla</button>
+          <button type="submit" class="btn btn-primary" id="btn-save" data-i18n="common.save">Salva</button>
         </div>
       </form>
     </div>
