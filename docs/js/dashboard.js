@@ -322,3 +322,16 @@ function animateNumbers() {
         }, 15);
     });
 }
+
+
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.comando === 'cambiaPagina') {
+        const targetPage = event.data.target; // Sarà 'point'
+        
+        // Trova l'elemento della sidebar che ha data-page="point" e cliccalo
+        const voceMenu = document.querySelector(`.leftmenu ul li[data-page="${targetPage}"]`);
+        if (voceMenu) {
+            voceMenu.click();
+        }
+    }
+});
