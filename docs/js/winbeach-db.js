@@ -448,6 +448,21 @@ function prenotazioneSql(p, id) {
     : `INSERT INTO prenotazioni (${cols}) VALUES (${vals})`;
 }
 
+/** @returns {object|null} prenotazione in conflitto, se esiste */
+export function findPrenotazioneOverlap({ id, cella, data_inizio, data_fine, stato }, existingRows) {
+  if (!cella || stato === 'cancellata') return null;
+  const start = String(data_inizio).slice(0, 10);
+  const end = String(data_fine).slice(0, 10);
+  return existingRows.find((p) => {
+    if (p.id === id) return false;
+    if (p.stato === 'cancellata') return false;
+    if (Number(p.cella) !== Number(cella)) return false;
+    const pStart = String(p.data_inizio).slice(0, 10);
+    const pEnd = String(p.data_fine).slice(0, 10);
+    return start <= pEnd && end >= pStart;
+  }) || null;
+}
+
 export async function savePrenotazioneToDb(prenotazione, existingRows = []) {
   const id = prenotazione.id || nextId(existingRows);
   const res = await queryDb(prenotazioneSql(prenotazione, id), 'Guardando prenotazione…');
