@@ -1,7 +1,6 @@
 # WinBeach Web
 
-> **Demo GitHub Pages:** https://falconisilvio.github.io/winbeach/  
-> *(Requiere activar Pages una vez — ver instrucciones abajo)*
+**Demo en vivo:** https://falconisilvio.github.io/winbeach/
 
 Conversión de WinBeach (Windows) a aplicación web.
 
@@ -23,15 +22,6 @@ Los archivos de la demo están en la carpeta [`docs/`](docs/):
 - `docs/index.html`
 - `docs/styles.css`
 - `docs/app.js`
-
-## Activar GitHub Pages (una sola vez, propietario del repo)
-
-1. Ir a **Settings → Pages** en el repositorio.
-2. En **Build and deployment → Source**, elegir **Deploy from a branch**.
-3. Branch: **main**, carpeta: **/docs**.
-4. Guardar. En 1–2 minutos la app estará en:  
-   https://falconisilvio.github.io/winbeach/
-5. En la página principal del repo, clic en el engranaje **About** y pegar esa URL en **Website**.
 
 ## Repositorio
 
