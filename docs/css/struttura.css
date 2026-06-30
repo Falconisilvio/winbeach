@@ -507,6 +507,16 @@ body {
   font-size: 0.85em;
 }
 
+.db-active-profile {
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+  color: #2d3748;
+}
+
+.db-active-profile a {
+  font-size: 0.78rem;
+}
+
 .db-hint,
 .db-fork-hint {
   font-size: 0.8rem;

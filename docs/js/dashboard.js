@@ -132,7 +132,7 @@ function risolviPercorso(nomePagina) {
 }
 
 // Cambia l'area di destra inserendo un iframe dinamico o ripristinando la dashboard nativa
-function caricaProceduraEsterna(nomePagina) {
+window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina) {
     const dashboardView = document.getElementById("dashboard-view");
     const procedureView = document.getElementById("procedure-view");
 
@@ -146,7 +146,7 @@ function caricaProceduraEsterna(nomePagina) {
         procedureView.style.display = "block";
         procedureView.innerHTML = `<iframe src="${percorso}" class="procedure-iframe" title="${nomePagina}"></iframe>`;
     }
-}
+};
 
 //=========================================================
 // CONFIGURAZIONE GRAFICI CHART.JS

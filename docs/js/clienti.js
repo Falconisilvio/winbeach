@@ -1,10 +1,11 @@
 import {
   getDbStatus,
+  getActiveProfile,
   getToken,
-  saveToken,
   loadClientiFromDb,
   saveClienteToDb,
   deleteClienteFromDb,
+  onProfileChange,
 } from './winbeach-db.js';
 
 let clienti = [];
@@ -22,8 +23,10 @@ function updateStatus() {
   const { state, message } = getDbStatus();
   const el = $('db-status');
   if (!el) return;
+  const profile = getActiveProfile();
+  const prefix = profile ? `${profile.name} · ` : '';
   el.className = `db-status ${state}`;
-  el.textContent = message || 'Listo';
+  el.textContent = message ? prefix + message : prefix + 'Listo';
 }
 
 function getFiltered() {
@@ -185,5 +188,6 @@ function bindEvents() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   bindEvents();
+  onProfileChange(loadData);
   await loadData();
 });

@@ -8,8 +8,10 @@ import {
   getToken,
   saveToken,
   getDbStatus,
+  getActiveProfile,
   loadStrutturaFromDb,
   saveStrutturaToDb,
+  onProfileChange,
 } from './winbeach-db.js';
 
 const ELEMENTOS = [
@@ -114,10 +116,15 @@ async function init() {
 
 function initDbPanel() {
   const cfg = getDbConfig();
+  const profile = getActiveProfile();
   document.getElementById('db-owner').value = cfg.owner;
   document.getElementById('db-repo').value = cfg.repo;
   document.getElementById('db-branch').value = cfg.branch;
+  const dbField = document.getElementById('db-database');
+  if (dbField) dbField.value = cfg.database;
   document.getElementById('db-token').value = getToken();
+  const nameEl = document.getElementById('db-profile-name');
+  if (nameEl) nameEl.textContent = profile?.name || '—';
   updateDbStatusUI();
 }
 
@@ -653,11 +660,31 @@ function bindEvents() {
     updateStats();
   });
 
+  onProfileChange(async () => {
+    initDbPanel();
+    await tryLoadFromDatabase();
+    refreshExport();
+    updateStats();
+  });
+
+  const linkGestisci = document.getElementById('link-gestisci-bd');
+  if (linkGestisci) {
+    linkGestisci.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.parent?.caricaProceduraEsterna) {
+        window.parent.caricaProceduraEsterna('cambia');
+      } else {
+        window.location.href = 'pages/cambia.html';
+      }
+    });
+  }
+
   document.getElementById('btn-db-save-config').addEventListener('click', () => {
     saveDbConfig({
       owner: document.getElementById('db-owner').value.trim(),
       repo: document.getElementById('db-repo').value.trim(),
       branch: document.getElementById('db-branch').value.trim(),
+      database: document.getElementById('db-database')?.value.trim(),
     });
     saveToken(document.getElementById('db-token').value.trim());
     updateDbStatusUI();

@@ -274,7 +274,7 @@ const pages = {
 };
 
 // Páginas con lógica propia (githubDB) — no regenerar
-const SKIP = new Set(['booking', 'clienti']);
+const SKIP = new Set(['booking', 'clienti', 'cambia']);
 
 for (const [id, p] of Object.entries(pages)) {
   if (SKIP.has(id)) continue;

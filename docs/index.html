@@ -18,6 +18,14 @@
             <i class="fa-solid fa-umbrella-beach"></i>
             <span class="logo-text">Beach Manager</span>
         </div>
+        <div class="profile-switcher" id="profile-switcher">
+            <button type="button" class="profile-btn" id="btn-profile" aria-haspopup="listbox">
+                <i class="fa-solid fa-umbrella-beach"></i>
+                <span id="active-profile-name">Stabilimento</span>
+                <i class="fa-solid fa-chevron-down profile-chevron"></i>
+            </button>
+            <div class="profile-dropdown" id="profile-dropdown" role="listbox"></div>
+        </div>
         <div class="search">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text" placeholder="Ricerca cliente, postazione, hotel, voucher...">
@@ -245,5 +253,6 @@
     </div>
 
     <script src="js/dashboard.js"></script>
+    <script type="module" src="js/dashboard-profiles.js"></script>
 </body>
 </html>
