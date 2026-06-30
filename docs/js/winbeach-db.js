@@ -175,12 +175,132 @@ export async function saveStrutturaToDb(struttura) {
   }
 }
 
-/**
- * Lectura rápida de clienti (para futuros módulos).
- */
-export async function loadClienti() {
+async function queryDb(sql, statusMsg) {
+  const token = getToken();
+  if (!token) {
+    const msg = 'Se requiere un token de GitHub para guardar.';
+    setStatus('error', msg);
+    return { ok: false, error: msg };
+  }
+
   const cfg = getDbConfig();
-  const db = createClient();
-  const table = await db.table(cfg.database, 'clienti');
-  return table.objects();
+  setStatus('saving', statusMsg || 'Guardando… (10–30 s vía GitHub Actions)');
+
+  try {
+    const db = createClient();
+    const result = await db.query(cfg.database, sql);
+    if (!result.ok) {
+      const msg = result.error || 'Error en la consulta SQL';
+      setStatus('error', msg);
+      return { ok: false, error: msg };
+    }
+    await db.refresh(cfg.database);
+    return { ok: true, result };
+  } catch (err) {
+    const msg = err.message || String(err);
+    setStatus('error', msg);
+    return { ok: false, error: msg };
+  }
+}
+
+function nextId(rows) {
+  if (!rows.length) return 1;
+  return Math.max(...rows.map((r) => Number(r.id) || 0)) + 1;
+}
+
+/**
+ * Carga clienti desde githubDB.
+ */
+export async function loadClientiFromDb() {
+  const cfg = getDbConfig();
+  setStatus('loading', 'Cargando clienti…');
+
+  try {
+    const db = createClient();
+    await db.refresh(cfg.database);
+    const table = await db.table(cfg.database, 'clienti');
+    const rows = table.objects();
+    setStatus('ok', `${rows.length} clienti`);
+    return { ok: true, data: rows };
+  } catch (err) {
+    const msg = err.message || String(err);
+    setStatus('error', msg);
+    return { ok: false, error: msg };
+  }
+}
+
+/**
+ * Inserta o actualiza un cliente.
+ */
+export async function saveClienteToDb(cliente, existingRows = []) {
+  const id = cliente.id || nextId(existingRows);
+  const sql = cliente.id
+    ? `UPDATE clienti SET nome = ${sqlEscape(cliente.nome)}, cognome = ${sqlEscape(cliente.cognome)}, email = ${sqlEscape(cliente.email)}, telefono = ${sqlEscape(cliente.telefono)}, note = ${sqlEscape(cliente.note || '')} WHERE id = ${id}`
+    : `INSERT INTO clienti (id, nome, cognome, email, telefono, note) VALUES (${id}, ${sqlEscape(cliente.nome)}, ${sqlEscape(cliente.cognome)}, ${sqlEscape(cliente.email)}, ${sqlEscape(cliente.telefono)}, ${sqlEscape(cliente.note || '')})`;
+
+  const res = await queryDb(sql, 'Guardando cliente…');
+  if (res.ok) setStatus('ok', 'Cliente guardado');
+  return res.ok ? { ok: true, id } : res;
+}
+
+/**
+ * Elimina un cliente.
+ */
+export async function deleteClienteFromDb(id) {
+  const res = await queryDb(`DELETE FROM clienti WHERE id = ${id}`, 'Eliminando cliente…');
+  if (res.ok) setStatus('ok', 'Cliente eliminado');
+  return res;
+}
+
+/**
+ * Carga prenotazioni y clienti (join en cliente).
+ */
+export async function loadPrenotazioniFromDb() {
+  const cfg = getDbConfig();
+  setStatus('loading', 'Cargando prenotazioni…');
+
+  try {
+    const db = createClient();
+    await db.refresh(cfg.database);
+    const prenotazioni = (await db.table(cfg.database, 'prenotazioni')).objects();
+    const clienti = (await db.table(cfg.database, 'clienti')).objects();
+    const celle = (await db.table(cfg.database, 'celle')).objects();
+
+    const clientiMap = Object.fromEntries(clienti.map((c) => [c.id, c]));
+    const data = prenotazioni.map((p) => ({
+      ...p,
+      cliente: clientiMap[p.cliente_id] || null,
+      cellaInfo: celle.find((c) => c.cella === p.cella) || null,
+    }));
+
+    setStatus('ok', `${data.length} prenotazioni`);
+    return { ok: true, data, clienti, celle };
+  } catch (err) {
+    const msg = err.message || String(err);
+    setStatus('error', msg);
+    return { ok: false, error: msg };
+  }
+}
+
+/**
+ * Inserta o actualiza una prenotazione.
+ */
+export async function savePrenotazioneToDb(prenotazione, existingRows = []) {
+  const id = prenotazione.id || nextId(existingRows);
+  const sql = prenotazione.id
+    ? `UPDATE prenotazioni SET cliente_id = ${prenotazione.cliente_id}, cella = ${prenotazione.cella || 0}, data_inizio = ${sqlEscape(prenotazione.data_inizio)}, data_fine = ${sqlEscape(prenotazione.data_fine)}, stato = ${sqlEscape(prenotazione.stato)}, note = ${sqlEscape(prenotazione.note || '')} WHERE id = ${id}`
+    : `INSERT INTO prenotazioni (id, cliente_id, cella, data_inizio, data_fine, stato, note) VALUES (${id}, ${prenotazione.cliente_id}, ${prenotazione.cella || 0}, ${sqlEscape(prenotazione.data_inizio)}, ${sqlEscape(prenotazione.data_fine)}, ${sqlEscape(prenotazione.stato)}, ${sqlEscape(prenotazione.note || '')})`;
+
+  const res = await queryDb(sql, 'Guardando prenotazione…');
+  if (res.ok) setStatus('ok', 'Prenotazione salvata');
+  return res.ok ? { ok: true, id } : res;
+}
+
+/**
+ * Elimina una prenotazione.
+ */
+export async function deletePrenotazioneFromDb(id) {
+  const res = await queryDb(`DELETE FROM prenotazioni WHERE id = ${id}`, 'Eliminando prenotazione…');
+  if (res.ok) setStatus('ok', 'Prenotazione eliminata');
+  return res;
 }
