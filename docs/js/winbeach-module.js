@@ -78,6 +78,17 @@ export function badge(text, type = 'green') {
   return `<span class="badge badge-${type}">${escapeHtml(text)}</span>`;
 }
 
+/** Navigazione verso un modulo (da iframe verso dashboard parent). */
+export function navigateApp(page, opts = {}) {
+  const msg = { type: 'winbeach-navigate', page, q: opts.q || '', cella: opts.cella || null };
+  if (window.parent !== window) {
+    window.parent.postMessage(msg, '*');
+  } else {
+    const q = opts.q ? `?q=${encodeURIComponent(opts.q)}` : '';
+    window.location.href = `../index.html#${page}${q}`;
+  }
+}
+
 export function bindModal(overlayId, closeIds, onSubmit) {
   const overlay = $(overlayId);
   closeIds.forEach((id) => $(id)?.addEventListener('click', () => overlay?.classList.remove('open')));

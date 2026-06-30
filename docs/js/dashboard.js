@@ -135,7 +135,10 @@ function risolviPercorso(nomePagina) {
 window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina, opts) {
     const dashboardView = document.getElementById("dashboard-view");
     const procedureView = document.getElementById("procedure-view");
-    const query = opts && opts.q ? `?q=${encodeURIComponent(opts.q)}` : "";
+    const params = new URLSearchParams();
+    if (opts && opts.q) params.set("q", opts.q);
+    if (opts && opts.cella) params.set("cella", opts.cella);
+    const query = params.toString() ? `?${params.toString()}` : "";
 
     if (nomePagina === "dashboard") {
         procedureView.style.display = "none";
@@ -199,30 +202,52 @@ function createChannelChart() {
     });
 }
 
+function buildDayLabels(days) {
+    const labels = [];
+    const today = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        labels.push(`${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`);
+    }
+    return labels;
+}
+
 function createPresenceChart() {
+    const labels = buildDayLabels(14);
     new Chart(document.getElementById("chartLine1"), {
         type: "line",
         data: {
-            labels: ["10 Nov", "11 Nov", "12 Nov", "13 Nov", "14 Nov", "15 Nov", "16 Nov", "17 Nov"],
-            datasets: [{ label: "Presenze", data: [100, 140, 130, 155, 150, 175, 160, 200], borderColor: "#0084FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }]
+            labels: labels,
+            datasets: [{ label: "Presenze", data: labels.map(() => 0), borderColor: "#0084FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 240 } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
 }
 
 function createArrivalChart() {
+    const labels = buildDayLabels(14);
     new Chart(document.getElementById("chartLine2"), {
         type: "line",
         data: {
-            labels: ["10 Nov", "11 Nov", "12 Nov", "13 Nov", "14 Nov", "15 Nov", "16 Nov", "17 Nov"],
+            labels: labels,
             datasets: [
-                { label: "Arrivi", data: [40, 90, 60, 85, 70, 110, 140, 90], borderColor: "#74B9FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 },
-                { label: "Partenze", data: [20, 45, 55, 30, 85, 40, 95, 110], borderColor: "#A5A5A5", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }
+                { label: "Arrivi", data: labels.map(() => 0), borderColor: "#74B9FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 },
+                { label: "Partenze", data: labels.map(() => 0), borderColor: "#A5A5A5", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true, max: 240 } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true } } }
     });
 }
+
+window.addEventListener("message", function (e) {
+    if (e.data?.type === "winbeach-navigate" && e.data.page) {
+        const opts = {};
+        if (e.data.q) opts.q = e.data.q;
+        if (e.data.cella) opts.cella = e.data.cella;
+        caricaProceduraEsterna(e.data.page, opts);
+    }
+});
 
 function animateNumbers() {
     document.querySelectorAll(".number").forEach(function (item) {

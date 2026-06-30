@@ -211,6 +211,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   onAuthChange(() => applyReadOnlyMode());
   applyReadOnlyMode();
   await loadData();
-  const q = new URLSearchParams(window.location.search).get('q');
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('q');
+  const cellaParam = params.get('cella');
   if (q && $('search-input')) { $('search-input').value = q; renderTable(); }
+  if (cellaParam && clienti.length) {
+    openModal();
+    fillCellaSelect(Number(cellaParam));
+    $('f-cella').value = cellaParam;
+    calcPrice();
+  }
 });
