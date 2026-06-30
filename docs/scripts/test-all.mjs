@@ -57,7 +57,7 @@ async function testAssets() {
     'js/widget.js', 'js/winbeach-export.js', 'js/winbeach-pwa.js',
     'js/app-i18n.js', 'js/i18n/app.js', 'js/winbeach-toast.js', 'js/winbeach-pdf.js',
     'js/theme-init.js', 'js/lang-init.js', 'js/page-i18n.js', 'js/winbeach-theme.js', 'css/theme.css', 'css/dark-mode.css',
-    'css/widget.css',
+    'css/widget.css', 'css/ristorante.css',
   ];
   for (const f of required) {
     if (!existsSync(join(DOCS, f))) throw new Error(`Missing ${f}`);

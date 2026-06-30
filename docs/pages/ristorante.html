@@ -1,62 +1,46 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beach Restaurant Manager</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { display: flex; height: 100vh; background: #f4f6fa; overflow: hidden; }
-        
-        /* Sidebar del Ristorante */
-        .sidebar-ristorante { width: 220px; background: #2c3e50; color: white; display: flex; flex-direction: column; padding-top: 20px; }
-        .sidebar-ristorante .brand { padding: 0 20px 20px 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #34495e; display: flex; align-items: center; gap: 10px; }
-        
-        .menu-list { list-style: none; margin-top: 20px; }
-        .menu-list li { padding: 15px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; color: #bdc3c7; }
-        .menu-list li:hover, .menu-list li.active { background: #34495e; color: white; font-weight: bold; }
-        
-        /* Area Contenuto Destra (Iframe) */
-        .content-area { flex: 1; height: 100vh; border: none; background: #f4f6fa; }
-    </style>
+  <meta charset="UTF-8">
+  <script src="../js/theme-init.js"></script>
+  <script src="../js/lang-init.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Beach Restaurant Manager</title>
+  <link rel="stylesheet" href="../css/ristorante.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
-<body>
+<body class="ristorante-shell">
 
-    <nav class="sidebar-ristorante">
-        <div class="brand">
-            <i class="fa-solid fa-utensils"></i>
-            <span>Ristorante Beach</span>
-        </div>
-        <ul class="menu-list">
-            <li class="active" onclick="cambiaVista('tavoli', this)">
-                <i class="fa-solid fa-table-cells"></i> Sala & Tavoli
-            </li>
-            <li onclick="cambiaVista('cassa', this)">
-                <i class="fa-solid fa-cash-register"></i> Cassa & Comande
-            </li>
-        </ul>
-    </nav>
+  <nav class="sidebar-ristorante">
+    <div class="brand">
+      <i class="fa-solid fa-utensils"></i>
+      <span>Ristorante Beach</span>
+    </div>
+    <ul class="menu-list">
+      <li class="active" onclick="cambiaVista('tavoli', this)">
+        <i class="fa-solid fa-table-cells"></i> Sala & Tavoli
+      </li>
+      <li onclick="cambiaVista('pointsale', this)">
+        <i class="fa-solid fa-cash-register"></i> Cassa & Comande
+      </li>
+    </ul>
+  </nav>
 
-    <iframe src="tavoli.html" id="ristorante-frame" class="content-area"></iframe>
+  <iframe src="tavoli.html" id="ristorante-frame" class="content-area" title="Ristorante"></iframe>
 
-    <script>
-        function cambiaVista(pagina, elemento) {
-            // Aggiorna lo stato attivo nel menu
-            document.querySelectorAll('.menu-list li').forEach(li => li.classList.remove('active'));
-            elemento.classList.add('active');
-            
-            // Cambia l'url dell'iframe
-            document.getElementById('ristorante-frame').src = pagina + '.html';
-        }
+  <script>
+    function cambiaVista(pagina, elemento) {
+      document.querySelectorAll('.menu-list li').forEach((li) => li.classList.remove('active'));
+      elemento.classList.add('active');
+      document.getElementById('ristorante-frame').src = pagina + '.html';
+    }
 
-        // Ascolta i messaggi provenienti dal frame dei tavoli per forzare il cambio pagina sulla cassa
-        window.addEventListener('message', function(event) {
-            if (event.data === 'apriCassa') {
-                const voceCassa = document.querySelectorAll('.menu-list li')[1];
-                cambiaVista('cassa', voceCassa);
-            }
-        });
-    </script>
+    window.addEventListener('message', function (event) {
+      if (event.data === 'apriCassa') {
+        const voceCassa = document.querySelectorAll('.menu-list li')[1];
+        cambiaVista('pointsale', voceCassa);
+      }
+    });
+  </script>
 </body>
 </html>
