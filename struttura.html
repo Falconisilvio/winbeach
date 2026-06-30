@@ -65,10 +65,31 @@
         <div class="action-buttons">
           <button type="button" id="btn-auto-number" class="btn-primary">Numerar automático</button>
           <button type="button" id="btn-count" class="btn-secondary">Contar elementos</button>
-          <button type="button" id="btn-save" class="btn-primary">Guardar estructura</button>
+          <button type="button" id="btn-save" class="btn-primary">Descargar .txt</button>
           <button type="button" id="btn-load" class="btn-secondary">Cargar archivo</button>
           <input type="file" id="file-input" accept=".txt,.csv" hidden>
         </div>
+      </section>
+
+      <section class="panel db-panel">
+        <h2>Base de datos <small>(githubDB)</small></h2>
+        <p class="db-hint">Lecturas instantáneas vía CDN. Guardar requiere token y tarda ~10–30 s.</p>
+        <div class="db-config">
+          <label>Owner <input type="text" id="db-owner" placeholder="FiveTechSoft"></label>
+          <label>Repo <input type="text" id="db-repo" placeholder="githubdb"></label>
+          <label>Rama <input type="text" id="db-branch" placeholder="main"></label>
+          <label>Token <input type="password" id="db-token" placeholder="ghp_… (solo sesión)" autocomplete="off"></label>
+        </div>
+        <div class="action-buttons">
+          <button type="button" id="btn-db-save-config" class="btn-secondary">Guardar config</button>
+          <button type="button" id="btn-db-load" class="btn-primary">Cargar BD</button>
+          <button type="button" id="btn-db-save" class="btn-primary">Guardar en BD</button>
+        </div>
+        <div id="db-status" class="db-status idle">Sin conexión</div>
+        <p class="db-fork-hint">
+          <a href="https://github.com/FiveTechSoft/githubdb/fork" target="_blank" rel="noopener">Fork githubDB</a>
+          y añade <code>data/winbeach.json</code>
+        </p>
       </section>
 
       <section class="panel stats-panel">
@@ -110,6 +131,6 @@
     </div>
   </section>
 
-  <script src="js/struttura.js"></script>
+  <script type="module" src="js/struttura.js"></script>
 </body>
 </html>
