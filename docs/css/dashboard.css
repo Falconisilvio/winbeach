@@ -26,7 +26,8 @@ TOP BAR (Barra Superiore Gialla)
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
-    z-index: 10;
+    z-index: 110;
+    position: relative;
 }
 
 .topbar .logo {
