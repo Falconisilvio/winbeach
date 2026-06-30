@@ -201,6 +201,9 @@ export function onProfileChange(callback) {
 
 function setStatus(state, message) {
   lastStatus = { state, message };
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('winbeach-db-status', { detail: { state, message } }));
+  }
 }
 
 function createClient() {

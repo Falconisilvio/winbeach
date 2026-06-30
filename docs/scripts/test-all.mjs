@@ -17,6 +17,7 @@ const unitTests = [
   'test-booking-overlap.mjs',
   'test-chart-history.mjs',
   'test-guida-i18n.mjs',
+  'test-i18n.mjs',
 ];
 
 function runNode(script, env = {}) {
@@ -48,10 +49,12 @@ function startServer() {
 }
 
 async function testAssets() {
-  console.log('\n=== Assets paquete 3 ===\n');
+  console.log('\n=== Assets críticos ===\n');
   const required = [
     'widget.html', 'manifest.webmanifest', 'sw.js', 'icons/icon.svg',
-    'js/widget.js', 'js/winbeach-export.js', 'js/winbeach-pwa.js', 'css/widget.css',
+    'js/widget.js', 'js/winbeach-export.js', 'js/winbeach-pwa.js',
+    'js/app-i18n.js', 'js/i18n/app.js', 'js/winbeach-toast.js', 'js/winbeach-pdf.js',
+    'css/widget.css',
   ];
   for (const f of required) {
     if (!existsSync(join(DOCS, f))) throw new Error(`Missing ${f}`);
