@@ -1,5 +1,5 @@
 import { login, getSession } from './winbeach-auth.js';
-import { t, onLangChange, applyAllI18n } from './app-i18n.js';
+import { t, onLangChange, applyI18n, bootLangUi } from './app-i18n.js';
 
 const params = new URLSearchParams(window.location.search);
 const redirect = params.get('redirect') || 'index.html';
@@ -11,17 +11,30 @@ if (getSession()) {
 const form = document.getElementById('login-form');
 const errorEl = document.getElementById('login-error');
 const btn = document.getElementById('btn-submit');
+let lastErrorKey = null;
 
-function resetSubmitLabel() {
-  if (btn) btn.textContent = t('login.submit');
+function applyLoginI18n() {
+  applyI18n(document);
+  const title = t('login.docTitle');
+  if (title !== 'login.docTitle') document.title = title;
+  resetSubmitLabel();
+  if (errorEl?.classList.contains('show') && lastErrorKey) {
+    errorEl.textContent = t(lastErrorKey);
+  }
 }
 
-onLangChange(() => applyAllI18n(document));
-resetSubmitLabel();
+function resetSubmitLabel() {
+  if (btn && !btn.disabled) btn.textContent = t('login.submit');
+}
+
+bootLangUi();
+applyLoginI18n();
+onLangChange(applyLoginI18n);
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   errorEl.classList.remove('show');
+  lastErrorKey = null;
   btn.disabled = true;
   btn.textContent = t('common.loggingIn');
 
@@ -38,6 +51,7 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  errorEl.textContent = res.error || t('common.accessDenied');
+  lastErrorKey = res.errorKey || null;
+  errorEl.textContent = lastErrorKey ? t(lastErrorKey) : (res.error || t('common.accessDenied'));
   errorEl.classList.add('show');
 });

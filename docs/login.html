@@ -32,7 +32,8 @@
     .login-card button[type=submit]:disabled { opacity: 0.6; }
     .demo-hint { margin-top: 20px; font-size: 0.8rem; color: #888; text-align: center; line-height: 1.5; }
     .back-link { display: block; text-align: center; margin-top: 16px; color: #0084ff; text-decoration: none; font-size: 0.9rem; }
-    .login-lang { position: fixed; top: 16px; left: 16px; z-index: 20; }
+    .login-lang { position: fixed; top: 16px; left: 16px; z-index: 200; }
+    .login-lang .lang-dropdown { left: 0; right: auto; }
     .login-theme {
       position: fixed; top: 16px; right: 16px;
       width: 44px; height: 44px; border-radius: 10px;
@@ -74,13 +75,10 @@
     </p>
     <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="login.readonly">Continua in sola lettura</span></a>
   </div>
-  <script type="module" src="js/app-i18n.js"></script>
   <script type="module" src="js/login.js"></script>
   <script type="module">
     import { initThemeUi } from './js/winbeach-theme.js';
-    import { initPageI18n } from './js/page-i18n.js';
     initThemeUi();
-    initPageI18n();
   </script>
 </body>
 </html>
