@@ -28,17 +28,14 @@ function setupAppNavigation() {
             const page = this.getAttribute("data-page");
 
             if (page === "impostazioni") {
-                // Srotola il sottomenu impostazioni sotto Magazzino
                 submenuImpostazioni.classList.add("show");
                 submenuImpostazioni.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            } else if (page === "clienti") {
-                // Chiude il sottomenu e apre direttamente clienti.html
-                submenuImpostazioni.classList.remove("show");
-                caricaProceduraEsterna("clienti");
-            } else {
-                // Per qualsiasi altra icona, reimposta la vista e torna alla Dashboard
+            } else if (page === "dashboard") {
                 submenuImpostazioni.classList.remove("show");
                 caricaProceduraEsterna("dashboard");
+            } else {
+                submenuImpostazioni.classList.remove("show");
+                caricaProceduraEsterna(page);
             }
         });
     });
@@ -59,20 +56,38 @@ function setupAppNavigation() {
     if (btnMenuDashboard) {
         btnMenuDashboard.addEventListener("click", function() {
             caricaProceduraEsterna("dashboard");
-            // Ripristina graficamente l'icona delle statistiche nella sidebar
             sidebarIcons.forEach(i => i.classList.remove("active"));
             document.getElementById("btn-sidebar-statistiche").classList.add("active");
             document.querySelectorAll(".leftmenu ul li").forEach(li => li.classList.remove("active-item"));
         });
     }
-}
 
-const PAGES_IN_CARTELLA = new Set(["clienti", "servizi"]);
+    // 4. Link "Dettaglio" sulle card della dashboard
+    document.querySelectorAll("[data-nav]").forEach(function(link) {
+        link.addEventListener("click", function(e) {
+            e.preventDefault();
+            const pagina = this.getAttribute("data-nav");
+            caricaProceduraEsterna(pagina);
+            document.querySelectorAll(".leftmenu ul li").forEach(li => li.classList.remove("active-item"));
+            const menuItem = document.querySelector(`.leftmenu ul li[data-page="${pagina}"]`);
+            if (menuItem) menuItem.classList.add("active-item");
+        });
+    });
+
+    // 5. Pulsante nuova prenotazione nella topbar
+    const btnNuova = document.querySelector(".topbar .btn-blue");
+    if (btnNuova) {
+        btnNuova.addEventListener("click", function() {
+            caricaProceduraEsterna("booking");
+            sidebarIcons.forEach(i => i.classList.remove("active"));
+            document.querySelector('.sidebar .icon[data-page="booking"]').classList.add("active");
+        });
+    }
+}
 
 function risolviPercorso(nomePagina) {
     if (nomePagina === "struttura") return "struttura.html";
-    if (PAGES_IN_CARTELLA.has(nomePagina)) return `pages/${nomePagina}.html`;
-    return "pages/template.html";
+    return `pages/${nomePagina}.html`;
 }
 
 // Cambia l'area di destra inserendo un iframe dinamico o ripristinando la dashboard nativa

@@ -1,52 +1,30 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Anagrafica Clienti</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #ffffff; color: #333; margin: 0; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f4f6fa; padding-bottom: 15px; margin-bottom: 20px; }
-        h2 { margin: 0; color: #222; font-weight: 500; }
-        .btn { background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #f2f2f2; }
-        th { background-color: #f8f9fa; color: #555; font-weight: 600; }
-        .badge { background: #e8f0fe; color: #0b7ef3; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Anagrafica Clienti</title>
+  <link rel="stylesheet" href="../css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
-    <div class="header">
-        <h2><i class="fa-solid fa-users" style="color: #2ecc71; margin-right: 10px;"></i> Registro Clienti</h2>
-        <button class="btn"><i class="fa-solid fa-user-plus"></i> Nuovo Cliente</button>
+  <div class="header">
+    <h2><i class="fa-solid fa-users" style="color:#2ecc71"></i> Registro Clienti</h2>
+    <div class="toolbar">
+      <button class="btn btn-success"><i class="fa-solid fa-user-plus"></i> Nuovo Cliente</button>
     </div>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Telefono</th>
-                <th>Stato</th>
-                <th>Postazione Abituale</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Mario Rossi</td>
-                <td>mario.rossi@email.com</td>
-                <td>+39 333 1234567</td>
-                <td><span class="badge">Attivo</span></td>
-                <td>Ombrellone A2</td>
-            </tr>
-            <tr>
-                <td>Laura Bianchi</td>
-                <td>laura.b@email.com</td>
-                <td>+39 347 9876543</td>
-                <td><span class="badge">Attivo</span></td>
-                <td>Ombrellone B4</td>
-            </tr>
-        </tbody>
-    </table>
+  </div>
+  <div class="filters">
+    <input type="search" placeholder="Cerca per nome, email, telefono...">
+  </div>
+  <table>
+    <thead>
+      <tr><th>Nome</th><th>Email</th><th>Telefono</th><th>Stato</th><th>Postazione Abituale</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Mario Rossi</td><td>mario.rossi@email.com</td><td>+39 333 1234567</td><td><span class="badge badge-green">Attivo</span></td><td>Ombrellone A2</td></tr>
+      <tr><td>Laura Bianchi</td><td>laura.b@email.com</td><td>+39 347 9876543</td><td><span class="badge badge-green">Attivo</span></td><td>Ombrellone B4</td></tr>
+      <tr><td>Giuseppe Verdi</td><td>g.verdi@email.com</td><td>+39 320 5551234</td><td><span class="badge badge-blue">Occasionale</span></td><td>—</td></tr>
+    </tbody>
+  </table>
 </body>
 </html>
