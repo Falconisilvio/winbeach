@@ -92,20 +92,20 @@ export function onAuthChange(callback) {
 export async function login(username, password) {
   const user = String(username || '').trim();
   const pass = String(password || '');
-  if (!user || !pass) return { ok: false, error: t('auth.loginMissing') };
+  if (!user || !pass) return { ok: false, errorKey: 'auth.loginMissing', error: t('auth.loginMissing') };
 
   const { loadTable } = await import('./winbeach-db.js');
   const res = await loadTable('utenti');
-  if (!res.ok) return { ok: false, error: res.error || t('auth.usersLoadFailed') };
+  if (!res.ok) return { ok: false, errorKey: 'auth.usersLoadFailed', error: res.error || t('auth.usersLoadFailed') };
 
   const hash = await hashPassword(user, pass);
   const found = res.data.find(
     (u) => String(u.username).toLowerCase() === user.toLowerCase() && u.attivo !== false
   );
 
-  if (!found) return { ok: false, error: t('auth.invalidCredentials') };
-  if (!found.password_hash) return { ok: false, error: t('auth.noCredentials') };
-  if (found.password_hash !== hash) return { ok: false, error: t('auth.invalidCredentials') };
+  if (!found) return { ok: false, errorKey: 'auth.invalidCredentials', error: t('auth.invalidCredentials') };
+  if (!found.password_hash) return { ok: false, errorKey: 'auth.noCredentials', error: t('auth.noCredentials') };
+  if (found.password_hash !== hash) return { ok: false, errorKey: 'auth.invalidCredentials', error: t('auth.invalidCredentials') };
 
   const session = saveSession(found);
   return { ok: true, session };

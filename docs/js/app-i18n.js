@@ -26,19 +26,36 @@ function broadcastLang(code) {
   window.dispatchEvent(new CustomEvent('winbeach-lang-change', { detail: { lang: code } }));
 }
 
-export async function applyAllI18n(root = document) {
-  applyI18n(root);
+async function applyPageI18nAsync() {
   try {
     const { applyPageI18n } = await import('./page-i18n.js');
     applyPageI18n();
   } catch { /* ignore */ }
 }
 
+export async function applyAllI18n(root = document) {
+  applyI18n(root);
+  await applyPageI18nAsync();
+}
+
+function syncLangButtonLabels(code = getAppLang()) {
+  const label = APP_LANGS.find((l) => l.code === code)?.label;
+  if (!label) return;
+  document.querySelectorAll('.lang-btn-label').forEach((el) => { el.textContent = label; });
+  document.querySelectorAll('.lang-option').forEach((opt) => {
+    const active = opt.dataset.lang === code;
+    opt.classList.toggle('active', active);
+    opt.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+}
+
 export function setAppLang(code) {
   if (!APP_I18N[code]) return;
   localStorage.setItem(STORAGE_KEY, code);
   document.documentElement.lang = code;
-  applyAllI18n(document);
+  applyI18n(document);
+  syncLangButtonLabels(code);
+  applyPageI18nAsync();
   broadcastLang(code);
   langListeners.forEach((fn) => { try { fn(code); } catch { /* ignore */ } });
 }
@@ -80,8 +97,9 @@ if (typeof window !== 'undefined') {
   window.__wbOnLangChange = onLangChange;
 }
 
-import { initToastBridge } from './winbeach-toast.js';
-initToastBridge();
+if (typeof window !== 'undefined') {
+  import('./winbeach-toast.js').then((m) => m.initToastBridge()).catch(() => {});
+}
 
 function closeLangDropdown(dropdown, btn) {
   if (!dropdown) return;
@@ -90,7 +108,7 @@ function closeLangDropdown(dropdown, btn) {
   if (btn) btn.setAttribute('aria-expanded', 'false');
 }
 
-function initLangSwitcher(btnId, dropdownId) {
+export function initLangSwitcher(btnId, dropdownId) {
   const btn = document.getElementById(btnId);
   const dropdown = document.getElementById(dropdownId);
   if (!btn || !dropdown || btn.dataset.langInit === '1') return;
@@ -152,33 +170,39 @@ document.addEventListener('click', () => {
   });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+export function bootLangUi() {
   initLangSwitcher('app-lang-btn', 'app-lang-dropdown');
   initLangSwitcher('login-lang-btn', 'login-lang-dropdown');
   document.documentElement.lang = getAppLang();
-  applyAllI18n(document);
-});
+  syncLangButtonLabels();
+  applyI18n(document);
+  applyPageI18nAsync();
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootLangUi);
+  } else {
+    bootLangUi();
+  }
+}
 
 window.addEventListener('message', (e) => {
   if (e.data?.type === 'winbeach-lang-change') {
     localStorage.setItem(STORAGE_KEY, e.data.lang);
     document.documentElement.lang = e.data.lang;
-    applyAllI18n(document);
-    const label = APP_LANGS.find((l) => l.code === e.data.lang)?.label;
-    if (label) {
-      document.querySelectorAll('.lang-btn-label').forEach((el) => { el.textContent = label; });
-    }
+    applyI18n(document);
+    syncLangButtonLabels(e.data.lang);
+    applyPageI18nAsync();
   }
 });
 
 window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY && e.newValue) {
     document.documentElement.lang = e.newValue;
-    applyAllI18n(document);
-    const label = APP_LANGS.find((l) => l.code === e.newValue)?.label;
-    if (label) {
-      document.querySelectorAll('.lang-btn-label').forEach((el) => { el.textContent = label; });
-    }
+    applyI18n(document);
+    syncLangButtonLabels(e.newValue);
+    applyPageI18nAsync();
   }
 });
 
