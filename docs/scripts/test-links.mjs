@@ -18,6 +18,7 @@ const NAV_PAGES = [
   'statistiche-durata', 'pagamenti-stripe', 'trasferimenti-stripe', 'log-sconti', 'log-cancellazioni',
   'flussi-cassa', 'contatori-albergo', 'contatori-voucher', 'magazzino', 'elementi', 'servizi',
   'settori', 'struttura', 'tariffe', 'capitaneria', 'esercizi', 'azienda', 'utenti',
+  'tavoli', 'pointsale', 'ristorante',
 ];
 
 function resolvePath(page) {

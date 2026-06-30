@@ -326,44 +326,13 @@ function animateNumbers() {
 }
 
 
-// 1. Gestione del click manuale sulle nuove voci del menu
-document.querySelectorAll('.leftmenu ul li[data-page]').forEach(item => {
-    item.addEventListener('click', function() {
-        const paginaTarget = this.getAttribute('data-page').toLowerCase();
-        
-        // Se la tua dashboard usa un iframe per le procedure (es. #procedure-view o #ristorante-frame)
-        const iframe = document.getElementById('procedure-view') || document.querySelector('main.content iframe');
-        
-        if (iframe) {
-            // Forza il caricamento del file corretto
-            iframe.src = paginaTarget + '.html';
-            
-            // Mostra l'iframe se era nascosto
-            iframe.style.display = 'block';
-            const dbView = document.getElementById('dashboard-view');
-            if (dbView) dbView.style.display = 'none';
-        }
-    });
-});
-
-// 2. Gestione del cambio pagina automatico (quando clicchi dal file tavoli.html)
-window.addEventListener('message', function(event) {
+// Cambio pagina da moduli figli (es. tavoli → cassa ristorante)
+window.addEventListener('message', function (event) {
     if (event.data && event.data.comando === 'cambiaPagina') {
-        const targetPage = event.data.target.toLowerCase(); // 'pointsale'
-        
-        // Trova la voce di menu e simula il click
+        const targetPage = String(event.data.target).toLowerCase();
+        caricaProceduraEsterna(targetPage);
+        document.querySelectorAll('.leftmenu ul li').forEach((li) => li.classList.remove('active-item'));
         const voceMenu = document.querySelector(`.leftmenu ul li[data-page="${targetPage}"]`);
-        if (voceMenu) {
-            voceMenu.click();
-        } else {
-            // Se non trova la voce di menu, forza direttamente il caricamento nell'iframe
-            const iframe = document.getElementById('procedure-view') || document.querySelector('main.content iframe');
-            if (iframe) {
-                iframe.src = targetPage + '.html';
-                iframe.style.display = 'block';
-                const dbView = document.getElementById('dashboard-view');
-                if (dbView) dbView.style.display = 'none';
-            }
-        }
+        if (voceMenu) voceMenu.classList.add('active-item');
     }
 });
