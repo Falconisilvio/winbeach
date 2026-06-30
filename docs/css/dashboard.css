@@ -163,6 +163,10 @@ TOP BAR (Barra Superiore Gialla)
     cursor: pointer;
 }
 
+.topbar .theme-toggle {
+    color: #1a1a1a;
+}
+
 .theme-toggle {
     display: inline-flex;
     align-items: center;
@@ -173,7 +177,7 @@ TOP BAR (Barra Superiore Gialla)
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.7);
-    color: #333;
+    color: #1a1a1a;
     cursor: pointer;
     flex-shrink: 0;
     transition: background 0.15s, transform 0.15s;
@@ -186,6 +190,7 @@ TOP BAR (Barra Superiore Gialla)
 
 .theme-toggle i {
     font-size: 15px;
+    color: currentColor;
 }
 
 .wb-toast-root {

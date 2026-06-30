@@ -49,7 +49,7 @@ function updateToggleUi() {
   document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
     const icon = btn.querySelector('i');
     if (icon) {
-      icon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      icon.className = dark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
     }
     btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
     const label = btn.dataset.themeLabel;
