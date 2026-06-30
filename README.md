@@ -28,7 +28,8 @@ Los archivos de la demo están en la carpeta [`docs/`](docs/):
 - `docs/index.html` — Dashboard (entrada)
 - `docs/css/` — Estilos (dashboard, struttura)
 - `docs/js/` — Lógica (dashboard, configuración playa)
-- `docs/pages/` — Módulos (struttura, clienti, servizi…)
+- `docs/struttura.html` — Configuración playa (procedimiento 1)
+- `docs/pages/` — Otros módulos (clienti, servizi…)
 
 ## Repositorio
 
