@@ -8,6 +8,19 @@ import {
   statoPrenBadge, pagamentoBadge,
 } from './winbeach-module.js';
 import { exportTableCsv } from './winbeach-export.js';
+import { printTableReport } from './winbeach-pdf.js';
+
+const EXPORT_COLS = [
+  { key: 'id', label: 'ID' },
+  { key: 'cliente', label: 'Cliente', format: (p) => clienteLabel(p.cliente) },
+  { key: 'data_inizio', label: 'Inizio' },
+  { key: 'data_fine', label: 'Fine' },
+  { key: 'cella', label: 'Postazione' },
+  { key: 'importo', label: 'Importo' },
+  { key: 'stato_pagamento', label: 'Pagamento' },
+  { key: 'stato', label: 'Stato' },
+  { key: 'canale', label: 'Canale' },
+];
 
 let prenotazioni = [], clienti = [], celle = [], tariffe = [], editingId = null;
 const STATI = [
@@ -201,19 +214,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('btn-nuovo')?.addEventListener('click', () => { if (!clienti.length) alert('Aggiungi prima un cliente.'); else openModal(); });
   $('btn-reload')?.addEventListener('click', loadData);
   $('btn-export')?.addEventListener('click', () => {
-    const rows = getFiltered();
-    const stamp = todayIso();
-    exportTableCsv(`prenotazioni-${stamp}.csv`, [
-      { key: 'id', label: 'ID' },
-      { key: 'cliente', label: 'Cliente', format: (p) => clienteLabel(p.cliente) },
-      { key: 'data_inizio', label: 'Inizio' },
-      { key: 'data_fine', label: 'Fine' },
-      { key: 'cella', label: 'Postazione' },
-      { key: 'importo', label: 'Importo' },
-      { key: 'stato_pagamento', label: 'Pagamento' },
-      { key: 'stato', label: 'Stato' },
-      { key: 'canale', label: 'Canale' },
-    ], rows);
+    exportTableCsv(`prenotazioni-${todayIso()}.csv`, EXPORT_COLS, getFiltered());
+  });
+  $('btn-pdf')?.addEventListener('click', () => {
+    printTableReport({
+      title: 'Prenotazioni',
+      subtitle: todayIso(),
+      columns: EXPORT_COLS,
+      rows: getFiltered(),
+    });
   });
   $('search-input')?.addEventListener('input', renderTable);
   $('filter-stato')?.addEventListener('change', renderTable);

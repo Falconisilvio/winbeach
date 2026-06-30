@@ -1,6 +1,17 @@
 import { loadTable, saveTableRow } from './winbeach-db.js';
 import { $, escapeHtml, formatEuro, todayIso, nowIso, updateDbBar, requireWrite, bindModal, initModule, badge } from './winbeach-module.js';
 import { exportTableCsv } from './winbeach-export.js';
+import { printTableReport } from './winbeach-pdf.js';
+
+const EXPORT_COLS = [
+  { key: 'data', label: 'Data', format: (m) => String(m.data).slice(0, 16) },
+  { key: 'tipo', label: 'Tipo' },
+  { key: 'descrizione', label: 'Descrizione' },
+  { key: 'importo', label: 'Importo' },
+  { key: 'metodo', label: 'Metodo' },
+  { key: 'operatore', label: 'Operatore' },
+  { key: 'note', label: 'Note' },
+];
 
 let movimenti = [];
 
@@ -56,15 +67,15 @@ initModule(async () => {
   $('btn-nuovo')?.addEventListener('click', () => $('data-modal')?.classList.add('open'));
   $('btn-reload')?.addEventListener('click', load);
   $('btn-export')?.addEventListener('click', () => {
-    exportTableCsv(`cassa-${todayIso()}.csv`, [
-      { key: 'data', label: 'Data', format: (m) => String(m.data).slice(0, 16) },
-      { key: 'tipo', label: 'Tipo' },
-      { key: 'descrizione', label: 'Descrizione' },
-      { key: 'importo', label: 'Importo' },
-      { key: 'metodo', label: 'Metodo' },
-      { key: 'operatore', label: 'Operatore' },
-      { key: 'note', label: 'Note' },
-    ], movimenti);
+    exportTableCsv(`cassa-${todayIso()}.csv`, EXPORT_COLS, movimenti);
+  });
+  $('btn-pdf')?.addEventListener('click', () => {
+    printTableReport({
+      title: document.title || 'Cassa',
+      subtitle: todayIso(),
+      columns: EXPORT_COLS,
+      rows: movimenti,
+    });
   });
   bindModal('data-modal', ['modal-close', 'btn-cancel'], save);
   await load();

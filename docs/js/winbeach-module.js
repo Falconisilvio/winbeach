@@ -105,19 +105,39 @@ function refreshModule(loadFn) {
 }
 
 export function initModule(loadFn) {
-  onProfileChange(() => refreshModule(loadFn));
-  onAuthChange(() => refreshModule(loadFn));
+  const boot = async () => {
+    try {
+      const { applyI18n } = await import('./app-i18n.js');
+      applyI18n(document);
+    } catch { /* dashboard only */ }
+    if (!window.__wbToastInit) {
+      try {
+        const { initToastBridge } = await import('./winbeach-toast.js');
+        initToastBridge();
+        window.__wbToastInit = true;
+      } catch { /* ignore */ }
+    }
+    refreshModule(loadFn);
+  };
+  onProfileChange(boot);
+  onAuthChange(boot);
   window.addEventListener('message', (e) => {
     if (e.data?.type === 'winbeach-profile-change' || e.data?.type === 'winbeach-auth-change') {
-      refreshModule(loadFn);
+      boot();
     }
+    if (e.data?.type === 'winbeach-lang-change') {
+      import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
+    }
+  });
+  window.addEventListener('winbeach-lang-change', () => {
+    import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
   });
   window.addEventListener('storage', (e) => {
-    if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles' || e.key === 'winbeach_session') {
-      refreshModule(loadFn);
+    if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles' || e.key === 'winbeach_session' || e.key === 'winbeach-app-lang') {
+      boot();
     }
   });
-  document.addEventListener('DOMContentLoaded', () => refreshModule(loadFn));
+  document.addEventListener('DOMContentLoaded', boot);
 }
 
 export { canWrite, applyReadOnlyMode, userLabel, isAuthenticated };

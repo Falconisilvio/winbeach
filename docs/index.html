@@ -16,13 +16,16 @@
 <body>
 
     <header class="topbar">
-        <button type="button" class="menu-toggle" id="btn-menu-toggle" aria-label="Apri menu">
+        <button type="button" class="menu-toggle" id="btn-menu-toggle" data-i18n-aria="nav.menu" aria-label="Apri menu">
             <i class="fa-solid fa-bars"></i>
         </button>
         <div class="logo">
             <i class="fa-solid fa-umbrella-beach"></i>
-            <span class="logo-text">Beach Manager</span>
+            <span class="logo-text" data-i18n="app.title">Beach Manager</span>
         </div>
+        <label class="lang-switcher">
+            <select id="app-lang" aria-label="Language"></select>
+        </label>
         <div class="profile-switcher" id="profile-switcher">
             <button type="button" class="profile-btn" id="btn-profile" aria-haspopup="listbox">
                 <i class="fa-solid fa-umbrella-beach"></i>
@@ -33,17 +36,17 @@
         </div>
         <div class="search" id="global-search">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="search" id="global-search-input" autocomplete="off" placeholder="Ricerca cliente, postazione, hotel, voucher…" aria-label="Ricerca globale" aria-expanded="false" aria-controls="global-search-results">
+            <input type="search" id="global-search-input" autocomplete="off" data-i18n-placeholder="search.placeholder" placeholder="Ricerca cliente, postazione, hotel, voucher…" data-i18n-aria="nav.search" aria-label="Ricerca globale" aria-expanded="false" aria-controls="global-search-results">
             <div id="global-search-results" class="search-dropdown" hidden role="listbox"></div>
         </div>
         <div class="user-auth" id="user-auth">
             <span id="user-label" class="user-label guest"><i class="fa-solid fa-eye"></i> Sola lettura</span>
-            <button type="button" class="btn-auth" id="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Accedi</button>
-            <button type="button" class="btn-auth btn-auth-out" id="btn-logout" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> Esci</button>
+            <button type="button" class="btn-auth" id="btn-login"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="auth.login">Accedi</span></button>
+            <button type="button" class="btn-auth btn-auth-out" id="btn-logout" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="auth.logout">Esci</span></button>
         </div>
         <div class="toolbar">
             <button class="btn-blue" data-requires-write>
-                <i class="fa-solid fa-plus"></i> <span class="btn-label">Nuova prenotazione</span>
+                <i class="fa-solid fa-plus"></i> <span class="btn-label" data-i18n="auth.newBooking">Nuova prenotazione</span>
             </button>
         </div>
     </header>
@@ -59,101 +62,101 @@
         <aside class="sidebar">
             <div class="icon active" data-page="spiaggia" id="btn-sidebar-dashboard">
                 <i class="fa-solid fa-umbrella-beach"></i>
-                <span>Spiaggia</span>
+                <span data-i18n="nav.spiaggia">Spiaggia</span>
             </div>
             <div class="icon" data-page="booking">
                 <i class="fa-regular fa-calendar-days"></i>
-                <span>Booking</span>
+                <span data-i18n="nav.booking">Booking</span>
             </div>
             <div class="icon" data-page="planner">
                 <i class="fa-solid fa-list"></i>
-                <span>Planner</span>
+                <span data-i18n="nav.planner">Planner</span>
             </div>
             <div class="icon" data-page="listini">
                 <i class="fa-regular fa-rectangle-list"></i>
-                <span>Listini</span>
+                <span data-i18n="nav.listini">Listini</span>
             </div>
             <div class="icon" data-page="cassa">
                 <i class="fa-solid fa-cash-register"></i>
-                <span>Cassa</span>
+                <span data-i18n="nav.cassa">Cassa</span>
             </div>
             <div class="icon" data-page="dashboard" id="btn-sidebar-statistiche">
                 <i class="fa-solid fa-chart-column"></i>
-                <span>Statistiche</span>
+                <span data-i18n="nav.stats">Statistiche</span>
             </div>
             <div class="icon" data-page="clienti">
                 <i class="fa-regular fa-user"></i>
-                <span>Clienti</span>
+                <span data-i18n="nav.clienti">Clienti</span>
             </div>
             <div class="icon" data-page="qr-scan">
                 <i class="fa-solid fa-qrcode"></i>
-                <span>QR scan</span>
+                <span data-i18n="nav.qr">QR scan</span>
             </div>
             <div class="icon" data-page="impostazioni" id="btn-sidebar-impostazioni">
                 <i class="fa-solid fa-gear"></i>
-                <span>Impostazioni</span>
+                <span data-i18n="nav.settings">Impostazioni</span>
             </div>
             <div class="icon" data-page="cambia">
                 <i class="fa-solid fa-right-left"></i>
-                <span>Cambia</span>
+                <span data-i18n="nav.cambia">Cambia</span>
             </div>
             <div class="icon" data-page="guida">
                 <i class="fa-regular fa-circle-question"></i>
-                <span>Guida</span>
+                <span data-i18n="nav.guida">Guida</span>
             </div>
         </aside>
 
         <nav class="leftmenu">
             <h2 id="btn-menu-dashboard" style="cursor: pointer;">
                 <i class="fa-solid fa-house"></i>
-                Dashboard
+                <span data-i18n="menu.dashboard">Dashboard</span>
             </h2>
             <ul>
                 <li class="group">
                     <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                    Arrivi e partenze
+                    <span data-i18n="menu.arrivi">Arrivi e partenze</span>
                 </li>
-                <li data-page="arrivi-oggi">Arrivi oggi</li>
-                <li data-page="partenze-oggi">Partenze oggi</li>
-                <li data-page="arrivi-domani">Arrivi domani</li>
-                <li data-page="partenze-domani">Partenze domani</li>
-                <li data-page="modifiche-ombrelloni">Modifiche ombrelloni</li>
-                <li data-page="tutte-prenotazioni">Tutte le prenotazioni</li>
+                <li data-page="arrivi-oggi" data-i18n="menu.arriviOggi">Arrivi oggi</li>
+                <li data-page="partenze-oggi" data-i18n="menu.partenzeOggi">Partenze oggi</li>
+                <li data-page="arrivi-domani" data-i18n="menu.arriviDomani">Arrivi domani</li>
+                <li data-page="partenze-domani" data-i18n="menu.partenzeDomani">Partenze domani</li>
+                <li data-page="modifiche-ombrelloni" data-i18n="menu.modifiche">Modifiche ombrelloni</li>
+                <li data-page="tutte-prenotazioni" data-i18n="menu.tuttePren">Tutte le prenotazioni</li>
 
                 <li class="group">
                     <i class="fa-solid fa-chart-pie"></i>
-                    Statistiche stabilimento
+                    <span data-i18n="menu.statsStab">Statistiche stabilimento</span>
                 </li>
-                <li data-page="statistiche-ombrellone">Statistiche per ombrellone</li>
-                <li data-page="statistiche-settore">Statistiche per settore</li>
-                <li data-page="statistiche-durata">Statistiche per durata</li>
-                <li data-page="pagamenti-stripe">Pagamenti Stripe</li>
-                <li data-page="trasferimenti-stripe">Trasferimenti Stripe</li>
+                <li data-page="statistiche-ombrellone" data-i18n="menu.statsOmb">Statistiche per ombrellone</li>
+                <li data-page="statistiche-settore" data-i18n="menu.statsSett">Statistiche per settore</li>
+                <li data-page="statistiche-durata" data-i18n="menu.statsDur">Statistiche per durata</li>
+                <li data-page="pagamenti-stripe" data-i18n="menu.stripePay">Pagamenti Stripe</li>
+                <li data-page="trasferimenti-stripe" data-i18n="menu.stripeTr">Trasferimenti Stripe</li>
 
                 <li class="group">
                     <i class="fa-solid fa-file-lines"></i>
-                    Log e flussi
+                    <span data-i18n="menu.log">Log e flussi</span>
                 </li>
-                <li data-page="log-sconti">Log sconti</li>
-                <li data-page="log-cancellazioni">Log cancellazioni</li>
-                <li data-page="flussi-cassa">Flussi di cassa</li>
+                <li data-page="log-sconti" data-i18n="menu.logSconti">Log sconti</li>
+                <li data-page="log-cancellazioni" data-i18n="menu.logCanc">Log cancellazioni</li>
+                <li data-page="flussi-cassa" data-i18n="menu.flussi">Flussi di cassa</li>
 
                 <li class="group">
                     <i class="fa-solid fa-calculator"></i>
-                    Contatori
+                    <span data-i18n="menu.contatori">Contatori</span>
                 </li>
-                <li data-page="contatori-albergo">Contatori Albergo</li>
-                <li data-page="contatori-voucher">Contatori Voucher</li>
+                <li data-page="contatori-albergo" data-i18n="menu.contAlb">Contatori Albergo</li>
+                <li data-page="contatori-voucher" data-i18n="menu.contVouch">Contatori Voucher</li>
 
                 <li class="group" data-page="magazzino" style="cursor:pointer;">
                     <i class="fa-solid fa-warehouse"></i>
-                    Magazzino
+                    <span data-i18n="menu.magazzino">Magazzino</span>
                 </li>
 
                 <div id="submenu-impostazioni" class="hidden-menu">
                     <li class="group">
                         <i class="fa-solid fa-gear"></i>
-                        Impostazioni
+                        <span data-i18n="menu.impostazioni">Impostazioni</span>
                     </li>
                     <li data-page="elementi">Elementi</li>
                     <li data-page="servizi">Servizi</li>
@@ -173,77 +176,77 @@
 
             <div id="dashboard-view">
                 <div class="content-header">
-                    <h1>Dashboard</h1>
+                    <h1 data-i18n="menu.dashboard">Dashboard</h1>
                     <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
                 </div>
 
                 <div class="dashboard">
                     <div class="card arrivi">
-                        <h3>Arrivi</h3>
+                        <h3 data-i18n="dash.arrivi">Arrivi</h3>
                         <div class="number">150</div>
-                        <a href="#" data-nav="arrivi-oggi">Dettaglio →</a>
+                        <a href="#" data-nav="arrivi-oggi" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
                     <div class="card partenze">
-                        <h3>Partenze</h3>
+                        <h3 data-i18n="dash.partenze">Partenze</h3>
                         <div class="number">100</div>
-                        <a href="#" data-nav="partenze-oggi">Dettaglio →</a>
+                        <a href="#" data-nav="partenze-oggi" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
                     <div class="card cancellazioni">
-                        <h3>Cancellazioni</h3>
+                        <h3 data-i18n="dash.cancellazioni">Cancellazioni</h3>
                         <div class="number-inline">
                             <span class="number">20</span><span class="subtext">/1000€</span>
                         </div>
-                        <a href="#" data-nav="log-cancellazioni">Dettaglio →</a>
+                        <a href="#" data-nav="log-cancellazioni" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
                     <div class="card occupazione">
-                        <h3>Tasso di occupazione</h3>
+                        <h3 data-i18n="dash.occupazione">Tasso di occupazione</h3>
                         <div class="number">50%</div>
-                        <a href="#" data-nav="statistiche-settore">Dettaglio →</a>
+                        <a href="#" data-nav="statistiche-settore" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
 
                     <div class="card pagamenti">
-                        <h3>Prenotazioni per stato pagamenti</h3>
+                        <h3 data-i18n="dash.pagamenti">Prenotazioni per stato pagamenti</h3>
                         <div class="chart-container">
                             <canvas id="chartPayment"></canvas>
                         </div>
-                        <a href="#" class="view-detail" data-nav="pagamenti-stripe">Dettaglio →</a>
+                        <a href="#" class="view-detail" data-nav="pagamenti-stripe" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
                     <div class="card canale">
-                        <h3>Prenotazioni per canale</h3>
+                        <h3 data-i18n="dash.canale">Prenotazioni per canale</h3>
                         <div class="chart-container">
                             <canvas id="chartChannel"></canvas>
                         </div>
-                        <a href="#" class="view-detail" data-nav="tutte-prenotazioni">Dettaglio →</a>
+                        <a href="#" class="view-detail" data-nav="tutte-prenotazioni" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
 
                     <div class="card fatturato">
-                        <h3>Fatturato</h3>
+                        <h3 data-i18n="dash.fatturato">Fatturato</h3>
                         <div class="number-inline">
                             <span class="number">50.000</span><span class="currency">€</span>
                             <i class="fa-regular fa-eye eye-icon"></i>
                         </div>
                     </div>
                     <div class="card presenze">
-                        <h3>Presenze</h3>
+                        <h3 data-i18n="dash.presenze">Presenze</h3>
                         <div class="number">200</div>
-                        <a href="#" data-nav="statistiche-ombrellone">Dettaglio →</a>
+                        <a href="#" data-nav="statistiche-ombrellone" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
                     <div class="card sconti">
-                        <h3>Sconti</h3>
+                        <h3 data-i18n="dash.sconti">Sconti</h3>
                         <div class="number-inline">
                             <span class="number">10</span><span class="subtext">/500€</span>
                         </div>
-                        <a href="#" data-nav="log-sconti">Dettaglio →</a>
+                        <a href="#" data-nav="log-sconti" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
                     <div class="card carrello">
-                        <h3>Carrello Medio</h3>
+                        <h3 data-i18n="dash.carrello">Carrello Medio</h3>
                         <div class="number">40€</div>
-                        <a href="#" data-nav="statistiche-durata">Dettaglio →</a>
+                        <a href="#" data-nav="statistiche-durata" data-i18n="dash.detail">Dettaglio →</a>
                     </div>
 
                     <div class="card grafico1">
                         <div class="card-header">
-                            <h3>Grafico Presenze</h3>
+                            <h3 data-i18n="dash.chartPres">Grafico Presenze</h3>
                             <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
                         </div>
                         <div class="line-chart-container">
@@ -252,7 +255,7 @@
                     </div>
                     <div class="card grafico2">
                         <div class="card-header">
-                            <h3>Grafico Arrivi/Partenze</h3>
+                            <h3 data-i18n="dash.chartArr">Grafico Arrivi/Partenze</h3>
                             <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
                         </div>
                         <div class="line-chart-container">
@@ -272,6 +275,7 @@
     <script type="module" src="js/dashboard-stats.js"></script>
     <script type="module" src="js/dashboard-auth.js"></script>
     <script type="module" src="js/dashboard-search.js"></script>
+    <script type="module" src="js/app-i18n.js"></script>
     <script type="module" src="js/winbeach-pwa.js"></script>
 </body>
 </html>
