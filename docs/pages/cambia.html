@@ -25,12 +25,12 @@
   </p>
 
   <div class="info-box">
-    <strong><i class="fa-solid fa-circle-info"></i> Multi-tenant</strong>
+    <strong><i class="fa-solid fa-circle-info"></i> <span data-i18n="cambia.multiTenant">Multi-tenant</span></strong>
     <ul>
-      <li><strong>Stesso repo:</strong> <code>winbeach-lido1.json</code>, <code>winbeach-lido2.json</code> nello stesso fork</li>
-      <li><strong>Repo separati:</strong> ogni cliente con il proprio repository dati</li>
-      <li><strong>Token:</strong> uno per stabilimento (salvato nel browser)</li>
-      <li><strong>Widget prenotazioni:</strong> link pubblico per clienti — pulsante <i class="fa-solid fa-link"></i> su ogni scheda</li>
+      <li><strong data-i18n="cambia.infoSameRepo">Stesso repo:</strong> <code>winbeach-lido1.json</code>, <code>winbeach-lido2.json</code> nello stesso fork</li>
+      <li><strong data-i18n="cambia.infoSeparateRepo">Repo separati:</strong> ogni cliente con il proprio repository dati</li>
+      <li><strong data-i18n="cambia.infoToken">Token:</strong> uno per stabilimento (salvato nel browser)</li>
+      <li><strong data-i18n="cambia.infoWidget">Widget prenotazioni:</strong> <span data-i18n="cambia.infoWidgetHint">link pubblico per clienti — pulsante</span> <i class="fa-solid fa-link"></i> su ogni scheda</li>
     </ul>
   </div>
 
@@ -40,40 +40,40 @@
     <div class="modal">
       <div class="modal-header">
         <h3 id="modal-title">Nuovo stabilimento</h3>
-        <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">&times;</button>
+        <button type="button" class="modal-close" id="modal-close" data-i18n-aria="common.close" aria-label="Chiudi">&times;</button>
       </div>
       <form id="profile-form">
         <div class="modal-body">
           <div class="form-grid">
             <div class="form-group" style="grid-column:1/-1">
-              <label for="f-name">Nome stabilimento *</label>
+              <label for="f-name" data-i18n="cambia.labelName">Nome stabilimento *</label>
               <input type="text" id="f-name" required placeholder="es. Lido Europa">
             </div>
             <div class="form-group">
-              <label for="f-owner">Owner GitHub *</label>
+              <label for="f-owner" data-i18n="cambia.labelOwner">Owner GitHub *</label>
               <input type="text" id="f-owner" required placeholder="FiveTechSoft">
             </div>
             <div class="form-group">
-              <label for="f-repo">Repo *</label>
+              <label for="f-repo" data-i18n="cambia.labelRepo">Repo *</label>
               <input type="text" id="f-repo" required placeholder="nome-repo">
             </div>
             <div class="form-group">
-              <label for="f-branch">Rama</label>
+              <label for="f-branch" data-i18n="cambia.labelBranch">Rama</label>
               <input type="text" id="f-branch" value="main">
             </div>
             <div class="form-group">
-              <label for="f-database">File BD (senza .json) *</label>
+              <label for="f-database" data-i18n="cambia.labelDatabase">File BD (senza .json) *</label>
               <input type="text" id="f-database" required placeholder="winbeach-lido-europa">
             </div>
             <div class="form-group" style="grid-column:1/-1">
-              <label for="f-token">Token GitHub (scritture)</label>
+              <label for="f-token" data-i18n="cambia.labelToken">Token GitHub (scritture)</label>
               <input type="password" id="f-token" placeholder="ghp_…" autocomplete="off">
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button>
-          <button type="submit" class="btn btn-success">Salva</button>
+          <button type="button" class="btn btn-secondary" id="btn-cancel" data-i18n="common.cancel">Annulla</button>
+          <button type="submit" class="btn btn-success" id="btn-save" data-i18n="common.save">Salva</button>
         </div>
       </form>
     </div>

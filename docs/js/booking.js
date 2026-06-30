@@ -167,9 +167,9 @@ async function savePrenotazione(e) {
   const { assertCanWrite } = await import('./winbeach-auth.js');
   const authErr = assertCanWrite();
   if (authErr) { alert(authErr); return; }
-  if (!getToken()) { alert('Configura il token GitHub prima di salvare.'); return; }
+  if (!getToken()) { alert(t('err.tokenCambia')); return; }
   const clienteId = Number($('f-cliente').value);
-  if (!clienteId) { alert('Seleziona un cliente.'); return; }
+  if (!clienteId) { alert(t('booking.selectCustomer')); return; }
   const existing = editingId ? prenotazioni.find((x) => x.id === editingId) : null;
   const prenotazione = {
     id: editingId || undefined,
@@ -187,12 +187,14 @@ async function savePrenotazione(e) {
     check_in: existing?.check_in ?? false,
     check_out: existing?.check_out ?? false,
   };
-  if (prenotazione.data_fine < prenotazione.data_inizio) { alert('Data fine non valida.'); return; }
+  if (prenotazione.data_fine < prenotazione.data_inizio) { alert(t('err.invalidEndDate')); return; }
   const overlap = findPrenotazioneOverlap(prenotazione, prenotazioni);
   if (overlap) {
-    alert(
-      `Postazione ${prenotazione.cella} già occupata dal ${formatDate(overlap.data_inizio)} al ${formatDate(overlap.data_fine)} (prenotazione #${overlap.id}).`
-    );
+    alert(t('booking.overlap')
+      .replace('{cell}', prenotazione.cella)
+      .replace('{from}', formatDate(overlap.data_inizio))
+      .replace('{to}', formatDate(overlap.data_fine))
+      .replace('{id}', overlap.id));
     return;
   }
   $('btn-save').disabled = true;
@@ -207,7 +209,7 @@ async function removePrenotazione(id) {
   const { assertCanWrite } = await import('./winbeach-auth.js');
   const authErr = assertCanWrite();
   if (authErr) { alert(authErr); return; }
-  if (!getToken() || !confirm('Eliminare?')) return;
+  if (!getToken() || !confirm(t('booking.confirmDelete'))) return;
   await deletePrenotazioneFromDb(id);
   updateStatus();
   await loadData();
