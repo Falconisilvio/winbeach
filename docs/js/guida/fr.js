@@ -3,7 +3,7 @@ export const fr = {
     lang: 'fr',
     title: 'Guide — WinBeach Web',
     header: '<i class="fa-solid fa-circle-question" style="color:#0984e3"></i> Guide WinBeach Web',
-    subtitle: 'Manuel opérationnel complet — Beach Manager sur GitHub Pages avec base de données githubDB.',
+    subtitle: 'Manuel opérationnel complet — Beach Manager sur GitHub Pages sur GitHub Pages.',
   },
   html: `
     <nav class="guide-toc" aria-label="Table des matières">
@@ -12,7 +12,7 @@ export const fr = {
         <li><a href="#intro">Introduction</a></li>
         <li><a href="#accesso">Accès et sécurité</a></li>
         <li><a href="#navigazione">Navigation</a></li>
-        <li><a href="#multi-bd">Multi-établissement et githubDB</a></li>
+        <li><a href="#multi-bd">Multi-établissement et base de données</a></li>
         <li><a href="#dashboard">Tableau de bord</a></li>
         <li><a href="#spiaggia">Plage</a></li>
         <li><a href="#booking">Booking et réservations</a></li>
@@ -42,7 +42,7 @@ export const fr = {
       <h4>Fonctionnalités principales</h4>
       <ul>
         <li>Tableau de bord opérationnel avec KPI en temps réel (arrivées, départs, occupation, chiffre d'affaires)</li>
-        <li>CRUD complet sur 24+ tables via <strong>githubDB</strong></li>
+        <li>CRUD complet sur 24+ tables via <strong>base de données cloud</strong></li>
         <li>Planimétrie interactive de la plage (éditeur Structure)</li>
         <li>Multi-établissement : plusieurs plages avec bases de données séparées</li>
         <li>Authentification des utilisateurs avec rôles (lecture seule / écriture / admin)</li>
@@ -71,8 +71,8 @@ export const fr = {
           </tbody>
         </table>
       </div>
-      <h4>Token GitHub (écritures sur githubDB)</h4>
-      <p>Les modifications sont envoyées au dépôt githubDB via GitHub Actions. Un <strong>Personal Access Token</strong> avec la permission <code>repo</code> sur le fork de la base de données est requis.</p>
+      <h4>Token GitHub (écritures sur la base de données)</h4>
+      <p>Les modifications sont envoyées au dépôt de données via GitHub Actions. Un <strong>Personal Access Token</strong> avec la permission <code>repo</code> sur le fork de la base de données est requis.</p>
       <ol>
         <li>Connectez-vous en tant qu'<strong>admin</strong></li>
         <li>Accédez à <strong>Changer d'établissement</strong> → modifier le profil → champ Token</li>
@@ -84,7 +84,7 @@ export const fr = {
       <h4>Double protection des écritures</h4>
       <ul>
         <li><strong>Niveau 1 — Utilisateur :</strong> session valide + rôle Opérateur ou Administrateur</li>
-        <li><strong>Niveau 2 — githubDB :</strong> token GitHub avec accès en écriture au dépôt de données</li>
+        <li><strong>Niveau 2 — Base de données :</strong> token GitHub avec accès en écriture au dépôt de données</li>
       </ul>
     </section>
 
@@ -112,18 +112,18 @@ export const fr = {
       <h4>Menu textuel (gauche)</h4>
       <p>Regroupe les modules opérationnels : <em>Arrivées et départs</em>, <em>Statistiques de l'établissement</em>, <em>Journal et flux</em>, <em>Compteurs</em>, <em>Stock</em> et le sous-menu <em>Paramètres</em>.</p>
       <h4>Sélecteur d'établissement (barre supérieure)</h4>
-      <p>Liste déroulante avec tous les profils configurés. Changer d'établissement recharge les données depuis la base githubDB correspondante.</p>
-      <h4>Barre d'état githubDB</h4>
-      <p>Dans chaque module s'affiche <code>nom établissement · état</code> : <em>idle</em>, <em>loading</em>, <em>ok</em>, <em>error</em>. Indique si la lecture/écriture vers githubDB a réussi.</p>
+      <p>Liste déroulante avec tous les profils configurés. Changer d'établissement recharge les données depuis la base de données correspondante.</p>
+      <h4>Barre d'état connexion</h4>
+      <p>Dans chaque module s'affiche <code>nom établissement · état</code> : <em>idle</em>, <em>loading</em>, <em>ok</em>, <em>error</em>. Indique si la lecture/écriture vers la base de données a réussi.</p>
     </section>
 
     <section class="guide-section" id="multi-bd">
-      <h3><i class="fa-solid fa-database"></i> 4. Multi-établissement et githubDB</h3>
-      <p>Chaque établissement correspond à un fichier JSON dans le dépôt githubDB, par ex. <code>data/winbeach.json</code>, <code>data/winbeach-lido-sud.json</code>.</p>
+      <h3><i class="fa-solid fa-database"></i> 4. Multi-établissement et base de données</h3>
+      <p>Chaque établissement correspond à un fichier JSON dans le dépôt de données, par ex. <code>data/winbeach.json</code>, <code>data/winbeach-lido-sud.json</code>.</p>
       <h4>Configuration du profil</h4>
       <ul>
         <li><strong>Nom de l'établissement</strong> — libellé visible dans l'application</li>
-        <li><strong>Owner / Repo</strong> — ex. <code>FiveTechSoft/githubdb</code></li>
+        <li><strong>Owner / Repo</strong> — ex. <code>owner/nom-repo</code></li>
         <li><strong>Branche (branch)</strong> — généralement <code>main</code></li>
         <li><strong>Fichier BD</strong> — nom sans <code>.json</code></li>
         <li><strong>Token</strong> — un par profil, enregistré dans le navigateur</li>
@@ -139,7 +139,7 @@ export const fr = {
 
     <section class="guide-section" id="dashboard">
       <h3><i class="fa-solid fa-house"></i> 5. Tableau de bord</h3>
-      <p>Vue d'ensemble quotidienne de l'établissement actif. Les chiffres se mettent à jour automatiquement depuis githubDB (<code>dashboard-stats.js</code>).</p>
+      <p>Vue d'ensemble quotidienne de l'établissement actif. Les chiffres se mettent à jour automatiquement depuis la base de données (<code>dashboard-stats.js</code>).</p>
       <h4>Cartes KPI</h4>
       <ul>
         <li><strong>Arrivées / Départs</strong> — réservations dont le début/fin correspond à aujourd'hui</li>
@@ -260,7 +260,7 @@ export const fr = {
         <li><strong>Journal des annulations</strong> — réservations annulées avec éventuelle pénalité</li>
         <li><strong>Flux de caisse</strong> — mouvements financiers (voir section Caisse)</li>
       </ul>
-      <p>Tous les journaux sont persistés dans githubDB et consultables en lecture seule par tout utilisateur.</p>
+      <p>Tous les journaux sont persistés dans la base de données et consultables en lecture seule par tout utilisateur.</p>
     </section>
 
     <section class="guide-section" id="contatori">
@@ -301,7 +301,7 @@ export const fr = {
         <li>Définissez les lignes/colonnes et la colonne passerelle</li>
         <li>Sélectionnez l'outil : élément, tassa (secteur), numérotation</li>
         <li>Cliquez sur les cellules pour attribuer le type et le secteur</li>
-        <li><strong>Charger depuis BD</strong> — lit <code>celle</code> depuis githubDB</li>
+        <li><strong>Charger depuis BD</strong> — lit <code>celle</code> depuis la base de données</li>
         <li><strong>Enregistrer en BD</strong> — sauvegarde la planimétrie (nécessite connexion + token)</li>
       </ol>
       <p>Éléments spéciaux : <em>Mer</em> (premières rangées), <em>Passerelle</em> (colonne centrale), non numérotés.</p>
@@ -313,7 +313,7 @@ export const fr = {
       <ul>
         <li><strong>Nouveau</strong> — ajoute un établissement avec sa propre BD</li>
         <li><strong>Activer</strong> — change le contexte de données dans toute l'application</li>
-        <li><strong>Test de connexion</strong> — vérifie la lecture githubDB</li>
+        <li><strong>Test de connexion</strong> — vérifie la lecture de la base de données</li>
         <li><strong>Profils démo</strong> — crée 3 établissements préchargés</li>
       </ul>
       <p>Modification des profils et des tokens : <span class="guide-badge admin">Administrateur</span> uniquement.</p>
@@ -343,7 +343,7 @@ export const fr = {
         <li><strong>Virements Stripe</strong> — versements vers le compte bancaire (<code>trasferimenti_stripe</code>)</li>
       </ul>
       <div class="guide-tip">
-        Les paiements Stripe réels nécessitent un backend serveur. Dans cette version web, les modules enregistrent et affichent des données démo/historiques dans githubDB.
+        Les paiements Stripe réels nécessitent un backend serveur. Dans cette version web, les modules enregistrent et affichent des données démo/historiques dans la base de données.
       </div>
     </section>
 
@@ -361,7 +361,7 @@ export const fr = {
 
     <section class="guide-section" id="faq">
       <h3><i class="fa-solid fa-life-ring"></i> 22. FAQ et dépannage</h3>
-      <h4>« Illegal invocation » ou erreur fetch githubDB</h4>
+      <h4>« Illegal invocation » ou erreur connexion données</h4>
       <p>Erreur corrigée côté client : rechargez avec Ctrl+Shift+R. Si le problème persiste, videz le cache du navigateur.</p>
       <h4>Impossible d'enregistrer / boutons masqués</h4>
       <ol>
@@ -370,7 +370,7 @@ export const fr = {
         <li>Le <strong>token GitHub</strong> est-il configuré dans le profil actif ?</li>
       </ol>
       <h4>Enregistrement lent</h4>
-      <p>Normal : githubDB utilise GitHub Actions (~10–30 s). Attendez le message de confirmation dans la barre d'état.</p>
+      <p>Normal : La synchronisation utilise GitHub Actions (~10–30 s). Attendez le message de confirmation dans la barre d'état.</p>
       <h4>Données non mises à jour après modification</h4>
       <p>Le CDN GitHub peut prendre 1–2 minutes. Utilisez <strong>Recharger</strong> dans le module ou changez de profil puis revenez.</p>
       <h4>Tableau de bord avec des chiffres à zéro</h4>
@@ -385,15 +385,15 @@ export const fr = {
       <ul>
         <li>Frontend statique : HTML, CSS, JavaScript ES modules</li>
         <li>Hébergement : GitHub Pages (branche <code>gh-pages</code>, dossier <code>docs</code>)</li>
-        <li>Base de données : <a href="https://github.com/FiveTechSoft/githubdb">githubDB</a> — JSON + SQL via Actions</li>
+        <li>Base de données : <a href="https://github.com/owner/nom-repo">Dépôt de données</a> — JSON + SQL via Actions</li>
         <li>Dépôt application : <code>Falconisilvio/winbeach</code></li>
-        <li>Dépôt données : <code>FiveTechSoft/githubdb</code></li>
+        <li>Dépôt données : <code>owner/nom-repo</code></li>
       </ul>
-      <h4>Tables githubDB (winbeach)</h4>
+      <h4>Tables de données (winbeach)</h4>
       <p><code>config</code>, <code>celle</code>, <code>clienti</code>, <code>prenotazioni</code>, <code>elementi</code>, <code>settori</code>, <code>listini</code>, <code>tariffe</code>, <code>servizi</code>, <code>movimenti_cassa</code>, <code>log_sconti</code>, <code>log_cancellazioni</code>, <code>log_modifiche</code>, <code>contatori_albergo</code>, <code>voucher</code>, <code>articoli</code>, <code>movimenti_magazzino</code>, <code>utenti</code>, <code>azienda</code>, <code>capitaneria</code>, <code>esercizi</code>, <code>pagamenti_stripe</code>, <code>trasferimenti_stripe</code>, <code>attivita</code></p>
       <h4>Fichiers clés</h4>
       <ul>
-        <li><code>js/winbeach-db.js</code> — connexion githubDB, multi-profils</li>
+        <li><code>js/winbeach-db.js</code> — connexion base de données, multi-profils</li>
         <li><code>js/winbeach-auth.js</code> — connexion et permissions</li>
         <li><code>js/winbeach-module.js</code> — utilitaires des modules et lecture seule</li>
         <li><code>js/table-crud.js</code> — factory CRUD générique</li>
