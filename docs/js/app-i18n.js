@@ -173,6 +173,7 @@ document.addEventListener('click', () => {
 export function bootLangUi() {
   initLangSwitcher('app-lang-btn', 'app-lang-dropdown');
   initLangSwitcher('login-lang-btn', 'login-lang-dropdown');
+  initLangSwitcher('struttura-lang-btn', 'struttura-lang-dropdown');
   document.documentElement.lang = getAppLang();
   syncLangButtonLabels();
   applyI18n(document);

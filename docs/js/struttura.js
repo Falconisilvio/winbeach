@@ -10,26 +10,32 @@ import {
   getDbStatus,
   getActiveProfile,
   profileDisplayName,
+  resolveDbStatusMessage,
   loadStrutturaFromDb,
   saveStrutturaToDb,
   onProfileChange,
 } from './winbeach-db.js';
 import { applyReadOnlyMode, onAuthChange } from './winbeach-auth.js';
+import { t, applyI18n, onLangChange } from './app-i18n.js';
 
 const ELEMENTOS = [
-  { id: 'Ombrellone', label: 'Sombrilla', attivo: true, icon: '☂' },
-  { id: 'Hawaiana', label: 'Hawaiana', attivo: true, icon: '🏖' },
-  { id: 'Cabina', label: 'Cabaña', attivo: true, icon: '🏠' },
-  { id: 'Tenda', label: 'Tienda de campaña', attivo: true, icon: '⛺' },
-  { id: 'Palma', label: 'Palma', attivo: false, icon: '🌴' },
-  { id: 'Pasarela', label: 'Pasarela', attivo: false, icon: '═' },
-  { id: 'Bidone', label: 'Papelera', attivo: false, icon: '🗑' },
-  { id: 'Papelera', label: 'Contenedor', attivo: false, icon: '♻' },
-  { id: 'Adorno', label: 'Adorno', attivo: false, icon: '✦' },
-  { id: 'Arbusto', label: 'Arbusto', attivo: false, icon: '🌿' },
-  { id: 'Planta', label: 'Planta', attivo: false, icon: '🌱' },
-  { id: 'Mare', label: 'Mar', attivo: false, icon: '🌊' },
+  { id: 'Ombrellone', attivo: true, icon: '☂' },
+  { id: 'Hawaiana', attivo: true, icon: '🏖' },
+  { id: 'Cabina', attivo: true, icon: '🏠' },
+  { id: 'Tenda', attivo: true, icon: '⛺' },
+  { id: 'Palma', attivo: false, icon: '🌴' },
+  { id: 'Pasarela', attivo: false, icon: '═' },
+  { id: 'Bidone', attivo: false, icon: '🗑' },
+  { id: 'Papelera', attivo: false, icon: '♻' },
+  { id: 'Adorno', attivo: false, icon: '✦' },
+  { id: 'Arbusto', attivo: false, icon: '🌿' },
+  { id: 'Planta', attivo: false, icon: '🌱' },
+  { id: 'Mare', attivo: false, icon: '🌊' },
 ];
+
+function elementLabel(id) {
+  return t(`struttura.el.${id}`);
+}
 
 const TASAS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
@@ -133,9 +139,9 @@ function initDbPanel() {
 function updateDbStatusUI() {
   const el = document.getElementById('db-status');
   if (!el) return;
-  const { state, message } = getDbStatus();
-  el.className = `db-status ${state}`;
-  el.textContent = message || (typeof window.__wbT === 'function' ? window.__wbT('db.noConnection') : 'Sin conexión');
+  const status = getDbStatus();
+  el.className = `db-status ${status.state}`;
+  el.textContent = resolveDbStatusMessage(status) || t('db.noConnection');
 }
 
 function applyStrutturaData(data) {
@@ -213,10 +219,10 @@ function buildLegends() {
     else swatch.style.background = SWATCH_COLOR[el.id] || '#ccc';
 
     const label = document.createElement('span');
-    label.textContent = `${el.icon} ${el.label}`;
+    label.textContent = `${el.icon} ${elementLabel(el.id)}`;
     if (el.attivo) {
       const badge = document.createElement('small');
-      badge.textContent = ' (alquilable)';
+      badge.textContent = t('struttura.rentable');
       badge.style.color = '#2f855a';
       label.appendChild(badge);
     }
@@ -252,7 +258,7 @@ function buildLegends() {
     swatch.style.justifyContent = 'center';
 
     const label = document.createElement('span');
-    label.textContent = `Tasa ${rate}`;
+    label.textContent = t('struttura.rateLabel', { rate });
 
     li.appendChild(swatch);
     li.appendChild(label);
@@ -391,12 +397,13 @@ function setMode(mode) {
   });
 
   const hints = {
-    elemento: 'Modo: Sección elementos — clic en una celda para asignar el elemento seleccionado.',
-    tarifa: 'Modo: Sección tarifas — clic en celdas activas para asignar la tasa (A, B, C...).',
-    numeracion: 'Modo: Numeración — clic en celdas activas para asignar el número secuencial.',
-    borrar: 'Modo: Borrar — clic en una celda para vaciarla.',
+    elemento: 'struttura.mode.elemento',
+    tarifa: 'struttura.mode.tarifa',
+    numeracion: 'struttura.mode.numeracion',
+    borrar: 'struttura.mode.borrar',
   };
-  document.getElementById('mode-hint').textContent = hints[mode] || '';
+  const key = hints[mode];
+  document.getElementById('mode-hint').textContent = key ? t(key) : '';
 }
 
 function autoNumber() {
@@ -482,9 +489,8 @@ function downloadFile() {
 function copyToClipboard() {
   navigator.clipboard.writeText(exportToText()).then(() => {
     const btn = document.getElementById('btn-copy');
-    const orig = btn.textContent;
-    btn.textContent = '¡Copiado!';
-    setTimeout(() => { btn.textContent = orig; }, 1500);
+    btn.textContent = t('struttura.copied');
+    setTimeout(() => { btn.textContent = t('struttura.copy'); }, 1500);
   });
 }
 
@@ -510,14 +516,14 @@ function updateStats() {
     }
   }
 
-  let html = `<strong>Activos (alquilables):</strong> ${activos}<br>`;
-  html += `<strong>Numerados:</strong> ${numerados}<br>`;
-  html += '<strong>Por elemento:</strong><br>';
+  let html = `<strong>${t('struttura.stat.active')}</strong> ${activos}<br>`;
+  html += `<strong>${t('struttura.stat.numbered')}</strong> ${numerados}<br>`;
+  html += `<strong>${t('struttura.stat.byElement')}</strong><br>`;
   Object.entries(porElemento).forEach(([k, v]) => {
-    html += `&nbsp;${k}: ${v}<br>`;
+    html += `&nbsp;${elementLabel(k)}: ${v}<br>`;
   });
   if (Object.keys(porTasa).length) {
-    html += '<strong>Por tasa:</strong><br>';
+    html += `<strong>${t('struttura.stat.byRate')}</strong><br>`;
     Object.entries(porTasa).forEach(([k, v]) => {
       html += `&nbsp;${k}: ${v}<br>`;
     });
@@ -692,7 +698,7 @@ function bindEvents() {
     updateDbStatusUI();
     const el = document.getElementById('db-status');
     el.className = 'db-status ok';
-    el.textContent = 'Configuración guardada en el navegador.';
+    el.textContent = t('struttura.db.configSaved');
   });
 
   document.getElementById('btn-db-load').addEventListener('click', async () => {
@@ -714,19 +720,36 @@ function bindEvents() {
     saveToken(document.getElementById('db-token').value.trim());
     const btn = document.getElementById('btn-db-save');
     btn.disabled = true;
-    btn.textContent = 'Guardando…';
+    btn.textContent = t('db.savingWait');
     const result = await saveStrutturaToDb(getStrutturaSnapshot());
     updateDbStatusUI();
     btn.disabled = false;
-    btn.textContent = 'Guardar en BD';
+    btn.textContent = t('struttura.db.saveDb');
     if (!result.ok && result.error) {
       alert(result.error);
     }
   });
 }
 
+function applyStrutturaI18n() {
+  applyI18n(document);
+  const docTitle = t('page.struttura.docTitle');
+  if (docTitle !== 'page.struttura.docTitle') document.title = docTitle;
+  buildLegends();
+  setMode(state.mode);
+  updateStats();
+  updateDbStatusUI();
+  const saveBtn = document.getElementById('btn-db-save');
+  if (saveBtn && !saveBtn.disabled) saveBtn.textContent = t('struttura.db.saveDb');
+}
+
+onLangChange(applyStrutturaI18n);
+window.addEventListener('winbeach-lang-change', applyStrutturaI18n);
+window.addEventListener('winbeach-db-status', updateDbStatusUI);
+
 document.addEventListener('DOMContentLoaded', () => {
   init();
+  applyStrutturaI18n();
   onAuthChange(applyReadOnlyMode);
   applyReadOnlyMode();
 });
