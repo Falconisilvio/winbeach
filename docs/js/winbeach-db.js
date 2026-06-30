@@ -573,6 +573,7 @@ export async function loadDashboardStats() {
   };
   const canali = {};
   attive.forEach((p) => { canali[p.canale || 'offline'] = (canali[p.canale || 'offline'] || 0) + 1; });
+  const history = computeChartHistory(attive, 14);
   return {
     ok: true,
     stats: {
@@ -589,8 +590,29 @@ export async function loadDashboardStats() {
       prenotazioni: prenotazioniEnriched,
       postazioni,
       occupateOggi: occupateOggi.length,
+      history,
     },
   };
+}
+
+/** Serie giornaliere per grafici dashboard (ultimi N giorni). */
+export function computeChartHistory(prenotazioni, days = 14) {
+  const attive = prenotazioni.filter((p) => p.stato !== 'cancellata');
+  const labels = [];
+  const presenze = [];
+  const arrivi = [];
+  const partenze = [];
+  const today = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const iso = d.toISOString().slice(0, 10);
+    labels.push(`${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`);
+    presenze.push(attive.filter((p) => p.data_inizio <= iso && p.data_fine >= iso).length);
+    arrivi.push(attive.filter((p) => p.data_inizio === iso).length);
+    partenze.push(attive.filter((p) => p.data_fine === iso).length);
+  }
+  return { labels, presenze, arrivi, partenze, rangeLabel: `${labels[0]} – ${labels[labels.length - 1]}` };
 }
 
 export function calcImportoFromTariffe(tariffe, tassa, dataInizio, dataFine) {
