@@ -13,6 +13,7 @@ import {
   saveStrutturaToDb,
   onProfileChange,
 } from './winbeach-db.js';
+import { applyReadOnlyMode, onAuthChange } from './winbeach-auth.js';
 
 const ELEMENTOS = [
   { id: 'Ombrellone', label: 'Sombrilla', attivo: true, icon: '☂' },
@@ -723,4 +724,8 @@ function bindEvents() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  onAuthChange(applyReadOnlyMode);
+  applyReadOnlyMode();
+});

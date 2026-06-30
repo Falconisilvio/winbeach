@@ -2,6 +2,7 @@ import { createTableCrud } from './table-crud.js';
 
 createTableCrud({
   table: 'utenti',
+  requireAdmin: true,
   fields: ['username', 'email', 'ruolo', 'ultimo_accesso', 'attivo'],
   newTitle: 'Nuovo',
   editTitle: 'Modifica',

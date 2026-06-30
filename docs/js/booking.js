@@ -147,6 +147,9 @@ async function loadData() {
 
 async function savePrenotazione(e) {
   e.preventDefault();
+  const { assertCanWrite } = await import('./winbeach-auth.js');
+  const authErr = assertCanWrite();
+  if (authErr) { alert(authErr); return; }
   if (!getToken()) { alert('Configura il token GitHub prima di salvare.'); return; }
   const clienteId = Number($('f-cliente').value);
   if (!clienteId) { alert('Seleziona un cliente.'); return; }
@@ -176,6 +179,9 @@ async function savePrenotazione(e) {
 }
 
 async function removePrenotazione(id) {
+  const { assertCanWrite } = await import('./winbeach-auth.js');
+  const authErr = assertCanWrite();
+  if (authErr) { alert(authErr); return; }
   if (!getToken() || !confirm('Eliminare?')) return;
   await deletePrenotazioneFromDb(id);
   updateStatus();
@@ -192,6 +198,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('f-importo')?.addEventListener('input', () => { $('f-importo').dataset.manual = '1'; });
   $('modal-close')?.addEventListener('click', closeModal);
   $('btn-cancel')?.addEventListener('click', closeModal);
+  const { applyReadOnlyMode, onAuthChange } = await import('./winbeach-auth.js');
   onProfileChange(loadData);
+  onAuthChange(() => applyReadOnlyMode());
+  applyReadOnlyMode();
   await loadData();
 });

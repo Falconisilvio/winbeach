@@ -3,7 +3,7 @@
  */
 import { loadTable, saveTableRow, deleteTableRow } from './winbeach-db.js';
 import {
-  $, escapeHtml, updateDbBar, requireToken, bindModal, initModule, badge,
+  $, escapeHtml, updateDbBar, requireWrite, bindModal, initModule, badge,
 } from './winbeach-module.js';
 
 export function createTableCrud(config) {
@@ -89,7 +89,12 @@ export function createTableCrud(config) {
 
   async function save(e) {
     e.preventDefault();
-    if (!requireToken()) return;
+    if (config.requireAdmin) {
+      const { assertAdmin } = await import('./winbeach-auth.js');
+      const err = assertAdmin();
+      if (err) { alert(err); return; }
+    }
+    if (!requireWrite()) return;
     const row = { id: editingId || undefined };
     config.formFields.forEach((f) => {
       const el = $(f.id);
@@ -108,7 +113,12 @@ export function createTableCrud(config) {
   }
 
   async function remove(id) {
-    if (!requireToken()) return;
+    if (config.requireAdmin) {
+      const { assertAdmin } = await import('./winbeach-auth.js');
+      const err = assertAdmin();
+      if (err) { alert(err); return; }
+    }
+    if (!requireWrite()) return;
     if (!confirm('Eliminare questo record?')) return;
     await deleteTableRow(config.table, id);
     updateDbBar();

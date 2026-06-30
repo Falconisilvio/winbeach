@@ -1,5 +1,5 @@
 import { loadTable, saveTableRow } from './winbeach-db.js';
-import { $, updateDbBar, requireToken, initModule } from './winbeach-module.js';
+import { $, updateDbBar, requireWrite, initModule } from './winbeach-module.js';
 
 const FIELDS = ['ragione_sociale', 'piva', 'indirizzo', 'email', 'telefono', 'stagione'];
 
@@ -14,7 +14,7 @@ async function load() {
 
 async function save(e) {
   e.preventDefault();
-  if (!requireToken()) return;
+  if (!requireWrite()) return;
   const row = { id: window._aziendaId || undefined };
   FIELDS.forEach((f) => { row[f] = $(`f-${f.replace(/_/g, '-')}`)?.value.trim() || ''; });
   await saveTableRow('azienda', row, FIELDS, window._aziendaRows || []);

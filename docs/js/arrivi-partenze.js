@@ -1,7 +1,7 @@
 import { loadPrenotazioniFromDb, savePrenotazioneToDb } from './winbeach-db.js';
 import {
   $, escapeHtml, formatDate, formatEuro, todayIso, tomorrowIso, updateDbBar,
-  clienteLabel, statoPrenBadge, pagamentoBadge, initModule, requireToken,
+  clienteLabel, statoPrenBadge, pagamentoBadge, initModule, requireWrite,
 } from './winbeach-module.js';
 
 const MODE = document.body.dataset.mode || 'arrivi-oggi';
@@ -51,7 +51,7 @@ function render() {
 }
 
 async function toggleCheck(id, field) {
-  if (!requireToken()) return;
+  if (!requireWrite()) return;
   const p = prenotazioni.find((x) => x.id === id);
   if (!p) return;
   const updated = { ...p, [field]: true, cliente: undefined, cellaInfo: undefined };
