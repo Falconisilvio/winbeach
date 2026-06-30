@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0084ff">
+  <meta name="description" content="Prenota la tua postazione in spiaggia online">
+  <title>Prenota — WinBeach</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="css/widget.css">
+</head>
+<body>
+  <div class="widget-wrap">
+    <header class="widget-header">
+      <i class="fa-solid fa-umbrella-beach"></i>
+      <h1 id="widget-facility">Stabilimento</h1>
+      <p>Prenotazione online — canale widget</p>
+    </header>
+
+    <div class="widget-steps" aria-hidden="true">
+      <div class="widget-step-dot active" id="dot-1"></div>
+      <div class="widget-step-dot" id="dot-2"></div>
+      <div class="widget-step-dot" id="dot-3"></div>
+      <div class="widget-step-dot" id="dot-4"></div>
+    </div>
+
+    <section class="widget-card" id="step-1">
+      <h2><i class="fa-regular fa-calendar"></i> 1. Scegli le date</h2>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label for="w-inizio">Arrivo</label>
+          <input type="date" id="w-inizio" required>
+        </div>
+        <div class="form-row">
+          <label for="w-fine">Partenza</label>
+          <input type="date" id="w-fine" required>
+        </div>
+      </div>
+      <div class="widget-actions">
+        <button type="button" class="btn btn-primary" id="btn-step1">Continua</button>
+      </div>
+    </section>
+
+    <section class="widget-card hidden" id="step-2">
+      <h2><i class="fa-solid fa-umbrella-beach"></i> 2. Scegli postazione</h2>
+      <p class="widget-note">Postazioni libere per il periodo selezionato:</p>
+      <div class="widget-slots" id="widget-slots"></div>
+      <p class="widget-price" id="widget-price"></p>
+      <div class="widget-actions">
+        <button type="button" class="btn btn-secondary" id="btn-back2">Indietro</button>
+        <button type="button" class="btn btn-primary" id="btn-step2">Continua</button>
+      </div>
+    </section>
+
+    <section class="widget-card hidden" id="step-3">
+      <h2><i class="fa-regular fa-user"></i> 3. I tuoi dati</h2>
+      <form id="widget-form">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label for="w-nome">Nome *</label>
+            <input type="text" id="w-nome" required autocomplete="given-name">
+          </div>
+          <div class="form-row">
+            <label for="w-cognome">Cognome</label>
+            <input type="text" id="w-cognome" autocomplete="family-name">
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="w-email">Email</label>
+          <input type="email" id="w-email" autocomplete="email">
+        </div>
+        <div class="form-row">
+          <label for="w-telefono">Telefono</label>
+          <input type="tel" id="w-telefono" autocomplete="tel">
+        </div>
+        <p class="widget-note">La prenotazione resta <strong>in attesa</strong> fino a conferma dello stabilimento.</p>
+        <div class="widget-actions">
+          <button type="button" class="btn btn-secondary" id="btn-back3">Indietro</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit">Invia richiesta</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="widget-card hidden" id="step-4">
+      <div class="widget-success">
+        <i class="fa-solid fa-circle-check"></i>
+        <h2>Grazie!</h2>
+        <p id="success-msg"></p>
+        <p class="widget-price" id="success-ref"></p>
+        <button type="button" class="btn btn-secondary" id="success-copy"><i class="fa-solid fa-copy"></i> Copia riepilogo</button>
+        <div class="widget-actions">
+          <button type="button" class="btn btn-primary" id="btn-new">Nuova prenotazione</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="widget-status" id="widget-status"></p>
+    <p class="widget-note" style="text-align:center">
+      <a href="index.html">Area staff</a> ·
+      <a href="login.html">Accedi</a> per salvare direttamente in base dati
+    </p>
+  </div>
+
+  <script type="module" src="js/widget.js"></script>
+  <script type="module" src="js/winbeach-pwa.js"></script>
+</body>
+</html>

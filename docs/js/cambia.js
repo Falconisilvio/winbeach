@@ -22,6 +22,16 @@ function connectionLabel(p) {
   return `${p.owner}/${p.repo} · ${p.database}.json`;
 }
 
+function widgetUrl(p) {
+  const url = new URL('../widget.html', window.location.href);
+  url.searchParams.set('owner', p.owner);
+  url.searchParams.set('repo', p.repo);
+  url.searchParams.set('branch', p.branch || 'main');
+  url.searchParams.set('database', p.database);
+  url.searchParams.set('name', p.name);
+  return url.href;
+}
+
 function renderCards() {
   const grid = $('profiles-grid');
   const activeId = getActiveProfileId();
@@ -44,6 +54,7 @@ function renderCards() {
         <p class="profile-conn">${escapeHtml(connectionLabel(p))}</p>
         <div class="profile-card-actions">
           ${active ? '' : `<button type="button" class="btn btn-primary btn-sm" data-activate="${p.id}">Attiva</button>`}
+          <button type="button" class="btn btn-secondary btn-sm" data-widget="${p.id}" title="Copia link widget"><i class="fa-solid fa-link"></i></button>
           <button type="button" class="btn btn-secondary btn-sm" data-edit="${p.id}"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="btn btn-danger btn-sm" data-delete="${p.id}" ${profiles.length < 2 ? 'disabled title="Minimo 1 stabilimento"' : ''}><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -53,6 +64,15 @@ function renderCards() {
 
   grid.querySelectorAll('[data-activate]').forEach((btn) => {
     btn.addEventListener('click', () => activate(btn.dataset.activate));
+  });
+  grid.querySelectorAll('[data-widget]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const p = getProfiles().find((x) => x.id === btn.dataset.widget);
+      if (!p) return;
+      const link = widgetUrl(p);
+      navigator.clipboard?.writeText(link).then(() => alert(`Link widget copiato:\n${link}`))
+        .catch(() => prompt('Link widget prenotazioni:', link));
+    });
   });
   grid.querySelectorAll('[data-edit]').forEach((btn) => {
     btn.addEventListener('click', () => openModal(btn.dataset.edit));

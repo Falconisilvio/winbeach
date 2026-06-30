@@ -38,7 +38,7 @@ function extractScripts(html) {
 async function testLocal() {
   console.log(`\n=== Test local: ${BASE} ===\n`);
 
-  const pages = ['index.html', 'struttura.html', ...readdirSync(join(DOCS, 'pages')).map((f) => `pages/${f}`)];
+  const pages = ['index.html', 'struttura.html', 'widget.html', 'manifest.webmanifest', 'sw.js', ...readdirSync(join(DOCS, 'pages')).map((f) => `pages/${f}`)];
 
   for (const page of pages) {
     const url = `${BASE}/${page}`;
@@ -51,13 +51,13 @@ async function testLocal() {
 
     const html = readFileSync(join(DOCS, page), 'utf8');
     for (const src of extractScripts(html)) {
-      const resolved = src.startsWith('http') ? src : join(DOCS, page.startsWith('pages/') ? '..' : '.', src).replace(/\\/g, '/');
-      const localPath = src.startsWith('http') ? null : join(DOCS, page.startsWith('pages/') ? '..' : '.', src);
-      if (localPath && !existsSync(localPath)) {
+      if (src.startsWith('http')) continue;
+      const rel = src.replace(/^\.\//, '').replace(/^\.\.\//, '');
+      const localPath = join(DOCS, rel);
+      const norm = `${BASE}/${rel.replace(/\\/g, '/')}`;
+      if (!existsSync(localPath)) {
         fail(`${page}: script no existe → ${src}`);
-      } else if (!src.startsWith('http')) {
-        const scriptUrl = `${BASE}/${page.startsWith('pages/') ? '../' : ''}${src}`.replace(/\/\.\.\//g, '/').replace(/([^:])\/+/g, '$1/');
-        const norm = src.startsWith('../') ? `${BASE}/${src.replace(/^\.\.\//, '')}` : `${BASE}/${src}`;
+      } else {
         const sres = await fetchStatus(norm);
         if (!sres.ok) fail(`${page}: script 404 → ${norm}`);
       }

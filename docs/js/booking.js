@@ -7,6 +7,7 @@ import {
   $, formatDate, formatEuro, todayIso, clienteLabel,
   statoPrenBadge, pagamentoBadge,
 } from './winbeach-module.js';
+import { exportTableCsv } from './winbeach-export.js';
 
 let prenotazioni = [], clienti = [], celle = [], tariffe = [], editingId = null;
 const STATI = [
@@ -199,6 +200,21 @@ async function removePrenotazione(id) {
 document.addEventListener('DOMContentLoaded', async () => {
   $('btn-nuovo')?.addEventListener('click', () => { if (!clienti.length) alert('Aggiungi prima un cliente.'); else openModal(); });
   $('btn-reload')?.addEventListener('click', loadData);
+  $('btn-export')?.addEventListener('click', () => {
+    const rows = getFiltered();
+    const stamp = todayIso();
+    exportTableCsv(`prenotazioni-${stamp}.csv`, [
+      { key: 'id', label: 'ID' },
+      { key: 'cliente', label: 'Cliente', format: (p) => clienteLabel(p.cliente) },
+      { key: 'data_inizio', label: 'Inizio' },
+      { key: 'data_fine', label: 'Fine' },
+      { key: 'cella', label: 'Postazione' },
+      { key: 'importo', label: 'Importo' },
+      { key: 'stato_pagamento', label: 'Pagamento' },
+      { key: 'stato', label: 'Stato' },
+      { key: 'canale', label: 'Canale' },
+    ], rows);
+  });
   $('search-input')?.addEventListener('input', renderTable);
   $('filter-stato')?.addEventListener('change', renderTable);
   $('prenotazione-form')?.addEventListener('submit', savePrenotazione);

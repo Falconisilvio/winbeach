@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="WinBeach">
+  <rect width="512" height="512" rx="96" fill="#0084ff"/>
+  <path fill="#fff" d="M128 320c0-88 64-160 128-160s128 72 128 160H128zm128-200c-22 0-40 28-40 60h80c0-32-18-60-40-60z"/>
+  <ellipse cx="256" cy="368" rx="180" ry="24" fill="#74b9ff" opacity=".5"/>
+</svg>
