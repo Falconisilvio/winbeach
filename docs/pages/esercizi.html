@@ -10,13 +10,25 @@
 <body>
   <div class="header">
     <h2><i class="fa-solid fa-store" style="color:#fd79a8"></i> Esercizi</h2>
-    <div class="toolbar"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nuovo esercizio</button></div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+      <button type="button" class="btn btn-primary" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuovo</button>
+    </div>
   </div>
-  <div class="table-scroll">
-    <table>
-      <thead><tr><th>Esercizio</th><th>Tipo</th><th>Responsabile</th><th>Stato</th></tr></thead>
-      <tbody><tr><td>Bar Centrale</td><td>Bar</td><td>Marco R.</td><td><span class="badge badge-green">Attivo</span></td></tr><tr><td>Chiosco Nord</td><td>Ristoro</td><td>Anna L.</td><td><span class="badge badge-green">Attivo</span></td></tr><tr><td>Noleggio</td><td>Servizi</td><td>Paolo B.</td><td><span class="badge badge-green">Attivo</span></td></tr></tbody>
-    </table>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> githubDB</span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="filters"><input type="search" id="search-input" placeholder="Cerca…"></div>
+  <div class="table-scroll"><table><thead><tr><th>Esercizio</th><th>Tipo</th><th>Responsabile</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
+  <div id="empty-state" class="empty-state" style="display:none"><p>Nessun record.</p></div>
+  <div class="modal-overlay" id="data-modal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modal-title">Nuovo</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
+      <form id="data-form"><div class="modal-body"><div class="form-grid"><div class="form-group"><label for="f-nome">Nome *</label><input type="text" id="f-nome"></div>
+            <div class="form-group"><label for="f-tipo">Tipo</label><input type="text" id="f-tipo"></div>
+            <div class="form-group"><label for="f-responsabile">Responsabile</label><input type="text" id="f-responsabile"></div>
+            <div class="form-group"><label><input type="checkbox" id="f-attivo"> Attivo</label></div></div></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button><button type="submit" class="btn btn-primary" id="btn-save">Salva</button></div>
+      </form>
+    </div>
   </div>
-</body>
-</html>
+  <script type="module" src="../js/esercizi.js"></script>
+</body></html>

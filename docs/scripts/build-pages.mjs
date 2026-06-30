@@ -274,7 +274,15 @@ const pages = {
 };
 
 // Páginas con lógica propia (githubDB) — no regenerar
-const SKIP = new Set(['booking', 'clienti', 'cambia']);
+const SKIP = new Set([
+  'booking', 'clienti', 'cambia', 'settori', 'elementi', 'listini', 'tariffe',
+  'servizi', 'utenti', 'capitaneria', 'esercizi', 'contatori-albergo', 'contatori-voucher',
+  'magazzino', 'log-sconti', 'log-cancellazioni', 'modifiche-ombrelloni',
+  'pagamenti-stripe', 'trasferimenti-stripe', 'planner', 'azienda', 'cassa', 'flussi-cassa',
+  'spiaggia', 'arrivi-oggi', 'partenze-oggi', 'arrivi-domani', 'partenze-domani',
+  'tutte-prenotazioni', 'statistiche-ombrellone', 'statistiche-settore', 'statistiche-durata',
+  'qr-scan',
+]);
 
 for (const [id, p] of Object.entries(pages)) {
   if (SKIP.has(id)) continue;

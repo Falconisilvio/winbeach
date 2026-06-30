@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>QR Scan</title>
-  <link rel="stylesheet" href="../css/page.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>QR Scan</title>
+<link rel="stylesheet" href="../css/page.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></head>
 <body>
-  <div class="header">
-    <h2><i class="fa-solid fa-qrcode" style="color:#2d3436"></i> QR Scan</h2>
-    
-  </div><div class="qr-zone"><i class="fa-solid fa-qrcode"></i><h3>Scansiona il QR del cliente</h3><p>Inquadra il codice per verificare prenotazione e accesso.</p><button class="btn btn-primary"><i class="fa-solid fa-camera"></i> Attiva fotocamera</button></div>
-</body>
-</html>
+<div class="header"><h2><i class="fa-solid fa-qrcode" style="color:#0084ff"></i> QR Scan / Ricerca rapida</h2></div>
+<div class="db-bar"><span><i class="fa-solid fa-database"></i> githubDB</span><div id="db-status" class="db-status idle">…</div></div>
+<div class="qr-zone">
+  <i class="fa-solid fa-qrcode"></i>
+  <p>Cerca per ID prenotazione, numero postazione o nome cliente</p>
+  <input type="text" id="qr-input" placeholder="es. 12 o Mario Rossi" style="padding:12px;width:100%;max-width:320px;margin:12px 0">
+  <div><button type="button" class="btn btn-primary" id="btn-search">Cerca</button>
+  <button type="button" class="btn btn-secondary" id="btn-camera"><i class="fa-solid fa-camera"></i> Camera</button></div>
+</div>
+<div id="qr-result" style="margin-top:20px"></div>
+<script type="module" src="../js/qr-scan.js"></script></body></html>
