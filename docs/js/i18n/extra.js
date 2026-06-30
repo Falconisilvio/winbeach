@@ -156,6 +156,12 @@ export const EXTRA_I18N = {
   'export.col.start': { it: 'Inizio', en: 'Start', es: 'Inicio', fr: 'Début', de: 'Beginn' },
   'export.col.end': { it: 'Fine', en: 'End', es: 'Fin', fr: 'Fin', de: 'Ende' },
   'export.title.bookings': { it: 'Prenotazioni', en: 'Bookings', es: 'Reservas', fr: 'Réservations', de: 'Buchungen' },
+  'nav.language': { it: 'Lingua', en: 'Language', es: 'Idioma', fr: 'Langue', de: 'Sprache' },
+  'qr.noScanner': { it: 'Scanner QR non disponibile. Usa la ricerca manuale.', en: 'QR scanner unavailable. Use manual search.', es: 'Escáner QR no disponible. Usa la búsqueda manual.', fr: 'Scanner QR indisponible. Utilisez la recherche manuelle.', de: 'QR-Scanner nicht verfügbar. Manuelle Suche verwenden.' },
+  'qr.cameraError': { it: 'Impossibile accedere alla fotocamera:', en: 'Cannot access camera:', es: 'No se puede acceder a la cámara:', fr: 'Impossible d\'accéder à la caméra :', de: 'Kamera nicht zugänglich:' },
+  'qr.notFound': { it: 'Nessuna prenotazione trovata.', en: 'No booking found.', es: 'Ninguna reserva encontrada.', fr: 'Aucune réservation trouvée.', de: 'Keine Buchung gefunden.' },
+  'qr.openBooking': { it: 'Apri in Booking', en: 'Open in Booking', es: 'Abrir en Reservas', fr: 'Ouvrir dans Réservations', de: 'In Buchungen öffnen' },
+  'pdf.allowPopup': { it: 'Consenti i popup per esportare il PDF.', en: 'Allow pop-ups to export the PDF.', es: 'Permite las ventanas emergentes para exportar el PDF.', fr: 'Autorisez les pop-ups pour exporter le PDF.', de: 'Pop-ups erlauben, um das PDF zu exportieren.' },
 };
 
 export function mergeExtraI18n(pack, lang) {

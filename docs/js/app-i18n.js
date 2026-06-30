@@ -77,29 +77,78 @@ if (typeof window !== 'undefined') {
 import { initToastBridge } from './winbeach-toast.js';
 initToastBridge();
 
+function closeLangDropdown(dropdown, btn) {
+  if (!dropdown) return;
+  dropdown.classList.remove('open');
+  dropdown.hidden = true;
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function initLangSwitcher(btnId, dropdownId) {
+  const btn = document.getElementById(btnId);
+  const dropdown = document.getElementById(dropdownId);
+  if (!btn || !dropdown || btn.dataset.langInit === '1') return;
+  btn.dataset.langInit = '1';
+
+  const labelEl = btn.querySelector('.lang-btn-label');
+
+  const syncUi = (code) => {
+    const found = APP_LANGS.find((l) => l.code === code) || APP_LANGS[0];
+    if (labelEl && found) labelEl.textContent = found.label;
+    dropdown.querySelectorAll('.lang-option').forEach((opt) => {
+      const active = opt.dataset.lang === code;
+      opt.classList.toggle('active', active);
+      opt.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  };
+
+  dropdown.innerHTML = APP_LANGS.map(({ code, label }) => `
+    <button type="button" class="lang-option" data-lang="${code}" role="option" aria-selected="false">${label}</button>
+  `).join('');
+
+  syncUi(getAppLang());
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const willOpen = !dropdown.classList.contains('open');
+    document.querySelectorAll('.lang-dropdown.open').forEach((d) => {
+      if (d !== dropdown) {
+        const b = d.closest('.lang-switcher')?.querySelector('.lang-btn');
+        closeLangDropdown(d, b);
+      }
+    });
+    if (willOpen) {
+      dropdown.classList.add('open');
+      dropdown.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+    } else {
+      closeLangDropdown(dropdown, btn);
+    }
+  });
+
+  dropdown.querySelectorAll('.lang-option').forEach((opt) => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setAppLang(opt.dataset.lang);
+      syncUi(opt.dataset.lang);
+      closeLangDropdown(dropdown, btn);
+    });
+  });
+
+  onLangChange(syncUi);
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.lang-dropdown.open').forEach((dropdown) => {
+    const switcher = dropdown.closest('.lang-switcher');
+    const btn = switcher?.querySelector('.lang-btn');
+    closeLangDropdown(dropdown, btn);
+  });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-  const sel = document.getElementById('app-lang');
-  if (sel) {
-    APP_LANGS.forEach(({ code, label }) => {
-      const o = document.createElement('option');
-      o.value = code;
-      o.textContent = label;
-      sel.appendChild(o);
-    });
-    sel.value = getAppLang();
-    sel.addEventListener('change', () => setAppLang(sel.value));
-  }
-  const loginSel = document.getElementById('login-lang');
-  if (loginSel && !loginSel.options.length) {
-    APP_LANGS.forEach(({ code, label }) => {
-      const o = document.createElement('option');
-      o.value = code;
-      o.textContent = label;
-      loginSel.appendChild(o);
-    });
-    loginSel.value = getAppLang();
-    loginSel.addEventListener('change', () => setAppLang(loginSel.value));
-  }
+  initLangSwitcher('app-lang-btn', 'app-lang-dropdown');
+  initLangSwitcher('login-lang-btn', 'login-lang-dropdown');
   document.documentElement.lang = getAppLang();
   applyAllI18n(document);
 });
@@ -109,6 +158,10 @@ window.addEventListener('message', (e) => {
     localStorage.setItem(STORAGE_KEY, e.data.lang);
     document.documentElement.lang = e.data.lang;
     applyAllI18n(document);
+    const label = APP_LANGS.find((l) => l.code === e.data.lang)?.label;
+    if (label) {
+      document.querySelectorAll('.lang-btn-label').forEach((el) => { el.textContent = label; });
+    }
   }
 });
 
@@ -116,6 +169,10 @@ window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY && e.newValue) {
     document.documentElement.lang = e.newValue;
     applyAllI18n(document);
+    const label = APP_LANGS.find((l) => l.code === e.newValue)?.label;
+    if (label) {
+      document.querySelectorAll('.lang-btn-label').forEach((el) => { el.textContent = label; });
+    }
   }
 });
 
