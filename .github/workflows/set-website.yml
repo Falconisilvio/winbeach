@@ -1,0 +1,24 @@
+name: Configurar URL en About
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  administration: write
+
+jobs:
+  set-website:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Establecer Website en About del repositorio
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              homepage: 'https://falconisilvio.github.io/winbeach/',
+              description: 'Conversión WinBeach Windows → Web. Demo: https://falconisilvio.github.io/winbeach/'
+            });
+            core.info('Website configurado: https://falconisilvio.github.io/winbeach/');
