@@ -149,6 +149,17 @@ window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina, opts
         dashboardView.style.display = "none";
         procedureView.style.display = "block";
         procedureView.innerHTML = `<iframe src="${percorso}" class="procedure-iframe" title="${nomePagina}"></iframe>`;
+        const iframe = procedureView.querySelector("iframe");
+        if (iframe) {
+            iframe.addEventListener("load", function () {
+                const theme = localStorage.getItem("winbeach_theme")
+                    || document.documentElement.getAttribute("data-theme")
+                    || "light";
+                try {
+                    iframe.contentWindow.postMessage({ type: "winbeach-theme-change", theme: theme }, "*");
+                } catch { /* ignore */ }
+            });
+        }
 
         const sidebarIcons = document.querySelectorAll(".sidebar .icon");
         const submenuImpostazioni = document.getElementById("submenu-impostazioni");
