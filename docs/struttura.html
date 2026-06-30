@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Configuración Playa — Procedimiento 1</title>
+  <link rel="stylesheet" href="css/struttura.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Configuración de la Playa</h1>
+    <p class="subtitle">Procedimiento 1 — Tipos de elemento, tasas y numeración</p>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>Numeración</h2>
+        <div class="numeracion-controls">
+          <label for="prossimo">Próximo</label>
+          <div class="prossimo-row">
+            <button type="button" id="btn-minus" class="btn-icon" title="Disminuir">−</button>
+            <input type="number" id="prossimo" value="1" min="1">
+            <button type="button" id="btn-plus" class="btn-icon" title="Aumentar">+</button>
+          </div>
+          <button type="button" id="btn-reset-num" class="btn-secondary">Reiniciar</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Leyenda — Elementos</h2>
+        <ul id="element-legend" class="legend-list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Tasas (Settore)</h2>
+        <ul id="rate-legend" class="legend-list rates"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Selección</h2>
+        <div class="tool-buttons">
+          <button type="button" class="tool-btn active" data-mode="elemento" title="Asignar tipo de elemento">
+            <span class="tool-icon">▦</span> Sección elementos
+          </button>
+          <button type="button" class="tool-btn" data-mode="tarifa" title="Asignar tasa A, B, C...">
+            <span class="tool-icon">$</span> Sección tarifas
+          </button>
+          <button type="button" class="tool-btn" data-mode="numeracion" title="Numerar celdas activas">
+            <span class="tool-icon">#</span> Numeración celdas
+          </button>
+          <button type="button" class="tool-btn" data-mode="borrar" title="Borrar celda">
+            <span class="tool-icon">✕</span> Borrar una celda
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Estructura</h2>
+        <div class="structure-controls">
+          <label>Filas <input type="number" id="grid-rows" value="14" min="4" max="50"></label>
+          <label>Columnas <input type="number" id="grid-cols" value="22" min="8" max="60"></label>
+          <button type="button" id="btn-apply-size" class="btn-secondary">Aplicar tamaño</button>
+        </div>
+        <div class="action-buttons">
+          <button type="button" id="btn-auto-number" class="btn-primary">Numerar automático</button>
+          <button type="button" id="btn-count" class="btn-secondary">Contar elementos</button>
+          <button type="button" id="btn-save" class="btn-primary">Descargar .txt</button>
+          <button type="button" id="btn-load" class="btn-secondary">Cargar archivo</button>
+          <input type="file" id="file-input" accept=".txt,.csv" hidden>
+        </div>
+      </section>
+
+      <section class="panel db-panel">
+        <h2>Base de datos <small>(githubDB)</small></h2>
+        <p class="db-active-profile">Stabilimento: <strong id="db-profile-name">—</strong></p>
+        <p class="db-hint">Lecturas vía CDN. Guardar requiere token (~10–30 s). <a href="#" id="link-gestisci-bd">Gestisci stabilimenti</a></p>
+        <div class="db-config">
+          <label>Owner <input type="text" id="db-owner" placeholder="FiveTechSoft"></label>
+          <label>Repo <input type="text" id="db-repo" placeholder="githubdb"></label>
+          <label>Rama <input type="text" id="db-branch" placeholder="main"></label>
+          <label>Archivo BD <input type="text" id="db-database" placeholder="winbeach"></label>
+          <label>Token <input type="password" id="db-token" placeholder="ghp_…" autocomplete="off"></label>
+        </div>
+        <div class="action-buttons">
+          <button type="button" id="btn-db-save-config" class="btn-secondary">Guardar config</button>
+          <button type="button" id="btn-db-load" class="btn-primary">Cargar BD</button>
+          <button type="button" id="btn-db-save" class="btn-primary">Guardar en BD</button>
+        </div>
+        <div id="db-status" class="db-status idle">Sin conexión</div>
+        <p class="db-fork-hint">
+          <a href="https://github.com/FiveTechSoft/githubdb/fork" target="_blank" rel="noopener">Fork githubDB</a>
+          y añade <code>data/winbeach.json</code>
+        </p>
+      </section>
+
+      <section class="panel stats-panel">
+        <h2>Resumen</h2>
+        <div id="stats" class="stats"></div>
+      </section>
+    </aside>
+
+    <main class="main-area">
+      <div class="beach-container">
+        <div class="sea-border" aria-hidden="true"></div>
+        <div id="beach-grid" class="beach-grid" role="grid" aria-label="Cuadrícula de la playa"></div>
+      </div>
+      <p class="hint" id="mode-hint">Modo: Sección elementos — clic en una celda para asignar el elemento seleccionado.</p>
+    </main>
+  </div>
+
+  <section class="export-panel">
+    <div class="export-header">
+      <h2>Archivo de configuración</h2>
+      <button type="button" id="btn-download" class="btn-primary">Descargar .txt</button>
+      <button type="button" id="btn-copy" class="btn-secondary">Copiar</button>
+    </div>
+    <div class="table-wrapper">
+      <table id="export-table" class="export-table">
+        <thead>
+          <tr>
+            <th>CELDA</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>ELEMENTO</th>
+            <th>DESC</th>
+            <th>SETTORE</th>
+            <th>ATTIVO</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <script type="module" src="js/struttura.js"></script>
+</body>
+</html>

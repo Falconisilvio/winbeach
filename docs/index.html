@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Beach Manager Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header class="topbar">
+        <button type="button" class="menu-toggle" id="btn-menu-toggle" aria-label="Apri menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="logo">
+            <i class="fa-solid fa-umbrella-beach"></i>
+            <span class="logo-text">Beach Manager</span>
+        </div>
+        <div class="profile-switcher" id="profile-switcher">
+            <button type="button" class="profile-btn" id="btn-profile" aria-haspopup="listbox">
+                <i class="fa-solid fa-umbrella-beach"></i>
+                <span id="active-profile-name">Stabilimento</span>
+                <i class="fa-solid fa-chevron-down profile-chevron"></i>
+            </button>
+            <div class="profile-dropdown" id="profile-dropdown" role="listbox"></div>
+        </div>
+        <div class="search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" placeholder="Ricerca cliente, postazione, hotel, voucher...">
+        </div>
+        <div class="toolbar">
+            <button class="btn-blue">
+                <i class="fa-solid fa-plus"></i> <span class="btn-label">Nuova prenotazione</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="layout" id="app-layout">
+
+        <aside class="sidebar">
+            <div class="icon active" data-page="spiaggia" id="btn-sidebar-dashboard">
+                <i class="fa-solid fa-umbrella-beach"></i>
+                <span>Spiaggia</span>
+            </div>
+            <div class="icon" data-page="booking">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Booking</span>
+            </div>
+            <div class="icon" data-page="planner">
+                <i class="fa-solid fa-list"></i>
+                <span>Planner</span>
+            </div>
+            <div class="icon" data-page="listini">
+                <i class="fa-regular fa-rectangle-list"></i>
+                <span>Listini</span>
+            </div>
+            <div class="icon" data-page="cassa">
+                <i class="fa-solid fa-cash-register"></i>
+                <span>Cassa</span>
+            </div>
+            <div class="icon" data-page="dashboard" id="btn-sidebar-statistiche">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Statistiche</span>
+            </div>
+            <div class="icon" data-page="clienti">
+                <i class="fa-regular fa-user"></i>
+                <span>Clienti</span>
+            </div>
+            <div class="icon" data-page="qr-scan">
+                <i class="fa-solid fa-qrcode"></i>
+                <span>QR scan</span>
+            </div>
+            <div class="icon" data-page="impostazioni" id="btn-sidebar-impostazioni">
+                <i class="fa-solid fa-gear"></i>
+                <span>Impostazioni</span>
+            </div>
+            <div class="icon" data-page="cambia">
+                <i class="fa-solid fa-right-left"></i>
+                <span>Cambia</span>
+            </div>
+            <div class="icon" data-page="guida">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Guida</span>
+            </div>
+        </aside>
+
+        <nav class="leftmenu">
+            <h2 id="btn-menu-dashboard" style="cursor: pointer;">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </h2>
+            <ul>
+                <li class="group">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    Arrivi e partenze
+                </li>
+                <li data-page="arrivi-oggi">Arrivi oggi</li>
+                <li data-page="partenze-oggi">Partenze oggi</li>
+                <li data-page="arrivi-domani">Arrivi domani</li>
+                <li data-page="partenze-domani">Partenze domani</li>
+                <li data-page="modifiche-ombrelloni">Modifiche ombrelloni</li>
+                <li data-page="tutte-prenotazioni">Tutte le prenotazioni</li>
+
+                <li class="group">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    Statistiche stabilimento
+                </li>
+                <li data-page="statistiche-ombrellone">Statistiche per ombrellone</li>
+                <li data-page="statistiche-settore">Statistiche per settore</li>
+                <li data-page="statistiche-durata">Statistiche per durata</li>
+                <li data-page="pagamenti-stripe">Pagamenti Stripe</li>
+                <li data-page="trasferimenti-stripe">Trasferimenti Stripe</li>
+
+                <li class="group">
+                    <i class="fa-solid fa-file-lines"></i>
+                    Log e flussi
+                </li>
+                <li data-page="log-sconti">Log sconti</li>
+                <li data-page="log-cancellazioni">Log cancellazioni</li>
+                <li data-page="flussi-cassa">Flussi di cassa</li>
+
+                <li class="group">
+                    <i class="fa-solid fa-calculator"></i>
+                    Contatori
+                </li>
+                <li data-page="contatori-albergo">Contatori Albergo</li>
+                <li data-page="contatori-voucher">Contatori Voucher</li>
+
+                <li class="group" data-page="magazzino" style="cursor:pointer;">
+                    <i class="fa-solid fa-warehouse"></i>
+                    Magazzino
+                </li>
+
+                <div id="submenu-impostazioni" class="hidden-menu">
+                    <li class="group">
+                        <i class="fa-solid fa-gear"></i>
+                        Impostazioni
+                    </li>
+                    <li data-page="elementi">Elementi</li>
+                    <li data-page="servizi">Servizi</li>
+                    <li data-page="settori">Settori</li>
+                    <li data-page="struttura">Struttura</li>
+                    <li data-page="listini">Listini</li>
+                    <li data-page="tariffe">Tariffe</li>
+                    <li data-page="capitaneria">Capitaneria</li>
+                    <li data-page="esercizi">Esercizi</li>
+                    <li data-page="azienda">Azienda</li>
+                    <li data-page="utenti">Utenti</li>
+                </div>
+            </ul>
+        </nav>
+
+        <main class="content">
+
+            <div id="dashboard-view">
+                <div class="content-header">
+                    <h1>Dashboard</h1>
+                    <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
+                </div>
+
+                <div class="dashboard">
+                    <div class="card arrivi">
+                        <h3>Arrivi</h3>
+                        <div class="number">150</div>
+                        <a href="#" data-nav="arrivi-oggi">Dettaglio →</a>
+                    </div>
+                    <div class="card partenze">
+                        <h3>Partenze</h3>
+                        <div class="number">100</div>
+                        <a href="#" data-nav="partenze-oggi">Dettaglio →</a>
+                    </div>
+                    <div class="card cancellazioni">
+                        <h3>Cancellazioni</h3>
+                        <div class="number-inline">
+                            <span class="number">20</span><span class="subtext">/1000€</span>
+                        </div>
+                        <a href="#" data-nav="log-cancellazioni">Dettaglio →</a>
+                    </div>
+                    <div class="card occupazione">
+                        <h3>Tasso di occupazione</h3>
+                        <div class="number">50%</div>
+                        <a href="#" data-nav="statistiche-settore">Dettaglio →</a>
+                    </div>
+
+                    <div class="card pagamenti">
+                        <h3>Prenotazioni per stato pagamenti</h3>
+                        <div class="chart-container">
+                            <canvas id="chartPayment"></canvas>
+                        </div>
+                        <a href="#" class="view-detail" data-nav="pagamenti-stripe">Dettaglio →</a>
+                    </div>
+                    <div class="card canale">
+                        <h3>Prenotazioni per canale</h3>
+                        <div class="chart-container">
+                            <canvas id="chartChannel"></canvas>
+                        </div>
+                        <a href="#" class="view-detail" data-nav="tutte-prenotazioni">Dettaglio →</a>
+                    </div>
+
+                    <div class="card fatturato">
+                        <h3>Fatturato</h3>
+                        <div class="number-inline">
+                            <span class="number">50.000</span><span class="currency">€</span>
+                            <i class="fa-regular fa-eye eye-icon"></i>
+                        </div>
+                    </div>
+                    <div class="card presenze">
+                        <h3>Presenze</h3>
+                        <div class="number">200</div>
+                        <a href="#" data-nav="statistiche-ombrellone">Dettaglio →</a>
+                    </div>
+                    <div class="card sconti">
+                        <h3>Sconti</h3>
+                        <div class="number-inline">
+                            <span class="number">10</span><span class="subtext">/500€</span>
+                        </div>
+                        <a href="#" data-nav="log-sconti">Dettaglio →</a>
+                    </div>
+                    <div class="card carrello">
+                        <h3>Carrello Medio</h3>
+                        <div class="number">40€</div>
+                        <a href="#" data-nav="statistiche-durata">Dettaglio →</a>
+                    </div>
+
+                    <div class="card grafico1">
+                        <div class="card-header">
+                            <h3>Grafico Presenze</h3>
+                            <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
+                        </div>
+                        <div class="line-chart-container">
+                            <canvas id="chartLine1"></canvas>
+                        </div>
+                    </div>
+                    <div class="card grafico2">
+                        <div class="card-header">
+                            <h3>Grafico Arrivi/Partenze</h3>
+                            <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
+                        </div>
+                        <div class="line-chart-container">
+                            <canvas id="chartLine2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="procedure-view" style="display: none;"></div>
+
+        </main>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script type="module" src="js/dashboard-profiles.js"></script>
+    <script type="module" src="js/dashboard-stats.js"></script>
+</body>
+</html>

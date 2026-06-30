@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Anagrafica Clienti</title>
+  <link rel="stylesheet" href="../css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+  <div class="header">
+    <h2><i class="fa-solid fa-users" style="color:#2ecc71"></i> Registro Clienti</h2>
+    <div class="toolbar">
+      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+      <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-user-plus"></i> Nuovo Cliente</button>
+    </div>
+  </div>
+
+  <div class="db-bar">
+    <span><i class="fa-solid fa-database"></i> githubDB</span>
+    <div id="db-status" class="db-status idle">Caricamento…</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">Clienti totali</div></div>
+  </div>
+
+  <div class="filters">
+    <input type="search" id="search-input" placeholder="Cerca per nome, email, telefono…">
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefono</th>
+          <th>Stato / Note</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody id="clienti-tbody"></tbody>
+    </table>
+  </div>
+
+  <div id="empty-state" class="empty-state" style="display:none">
+    <i class="fa-solid fa-users" style="font-size:2rem;color:#ccc"></i>
+    <p>Nessun cliente. Clicca <strong>Nuovo Cliente</strong> per iniziare.</p>
+  </div>
+
+  <div class="modal-overlay" id="cliente-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Nuovo cliente</h3>
+        <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">&times;</button>
+      </div>
+      <form id="cliente-form">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="f-nome">Nome *</label>
+              <input type="text" id="f-nome" required>
+            </div>
+            <div class="form-group">
+              <label for="f-cognome">Cognome</label>
+              <input type="text" id="f-cognome">
+            </div>
+            <div class="form-group">
+              <label for="f-email">Email</label>
+              <input type="email" id="f-email">
+            </div>
+            <div class="form-group">
+              <label for="f-telefono">Telefono</label>
+              <input type="tel" id="f-telefono">
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label for="f-note">Note / Etichetta</label>
+              <input type="text" id="f-note" placeholder="es. VIP, Occasionale, Hotel partner…">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button>
+          <button type="submit" class="btn btn-success" id="btn-save">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/clienti.js"></script>
+</body>
+</html>

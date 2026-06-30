@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Flussi di Cassa</title>
+  <link rel="stylesheet" href="../css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+  <div class="header">
+    <h2><i class="fa-solid fa-money-bill-wave" style="color:#27ae60"></i> Flussi di Cassa</h2>
+    <div class="toolbar">
+      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+      <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuovo movimento</button>
+    </div>
+  </div>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> githubDB</span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="num" id="stat-entrate">0 €</div><div class="lbl">Entrate oggi</div></div>
+    <div class="stat-box"><div class="num" id="stat-uscite">0 €</div><div class="lbl">Uscite oggi</div></div>
+    <div class="stat-box"><div class="num" id="stat-saldo">0 €</div><div class="lbl">Saldo Flussi di Cassa</div></div>
+  </div>
+  <div class="table-scroll"><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrizione</th><th>Importo</th><th>Operatore</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
+  <div class="modal-overlay" id="data-modal">
+    <div class="modal">
+      <div class="modal-header"><h3>Nuovo movimento</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
+      <form id="data-form"><div class="modal-body"><div class="form-grid">
+        <div class="form-group"><label for="f-tipo">Tipo</label><select id="f-tipo"><option value="entrata">Entrata</option><option value="uscita">Uscita</option></select></div>
+        <div class="form-group"><label for="f-importo">Importo €</label><input type="number" id="f-importo" step="0.01" required></div>
+        <div class="form-group" style="grid-column:1/-1"><label for="f-desc">Descrizione</label><input id="f-desc" required></div>
+        <div class="form-group"><label for="f-metodo">Metodo</label><select id="f-metodo"><option>contanti</option><option>carta</option><option>bonifico</option></select></div>
+        <div class="form-group"><label for="f-pren">Prenotazione ID</label><input type="number" id="f-pren"></div>
+        <div class="form-group"><label for="f-op">Operatore</label><input id="f-op" value="operatore1"></div>
+        <div class="form-group" style="grid-column:1/-1"><label for="f-note">Note</label><input id="f-note"></div>
+      </div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button><button type="submit" class="btn btn-success">Salva</button></div></form>
+    </div>
+  </div>
+  <script type="module" src="../js/cassa.js"></script>
+</body>
+</html>

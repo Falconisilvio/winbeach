@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Spiaggia</title>
+  <link rel="stylesheet" href="../css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+  <div class="header">
+    <h2><i class="fa-solid fa-umbrella-beach" style="color:#00a8ff"></i> Spiaggia — Occupazione</h2>
+    <div class="toolbar"><button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button></div>
+  </div>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> githubDB</span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="filters"><label>Data <input type="date" id="data-spiaggia"></label></div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="num" id="stat-postazioni">0</div><div class="lbl">Postazioni</div></div>
+    <div class="stat-box"><div class="num" id="stat-occupate">0</div><div class="lbl">Occupate</div></div>
+    <div class="stat-box"><div class="num" id="stat-libe">0</div><div class="lbl">Libere</div></div>
+    <div class="stat-box"><div class="num" id="stat-pct">0%</div><div class="lbl">Occupazione</div></div>
+  </div>
+  <div id="spiaggia-grid" class="spiaggia-grid"></div>
+  <script type="module" src="../js/spiaggia.js"></script>
+</body>
+</html>
