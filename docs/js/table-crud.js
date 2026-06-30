@@ -6,6 +6,11 @@ import {
   $, escapeHtml, updateDbBar, requireWrite, bindModal, initModule, badge,
 } from './winbeach-module.js';
 
+async function t(key) {
+  const { t: tr } = await import('./app-i18n.js');
+  return tr(key);
+}
+
 export function createTableCrud(config) {
   let rows = [];
   let editingId = null;
@@ -29,7 +34,11 @@ export function createTableCrud(config) {
     tbody.innerHTML = filtered.map((r) => {
       const cells = config.columns.map((c) => {
         if (c.render) return `<td>${c.render(r)}</td>`;
-        if (c.type === 'bool') return `<td>${r[c.key] ? badge('Sì', 'green') : badge('No', 'gray')}</td>`;
+        if (c.type === 'bool') {
+          const yes = config.yesLabel || 'Sì';
+          const no = config.noLabel || 'No';
+          return `<td>${r[c.key] ? badge(yes, 'green') : badge(no, 'gray')}</td>`;
+        }
         if (c.type === 'euro') return `<td>${Number(r[c.key] || 0).toLocaleString('it-IT')} €</td>`;
         return `<td>${escapeHtml(r[c.key] ?? '—')}</td>`;
       }).join('');
@@ -50,7 +59,7 @@ export function createTableCrud(config) {
     const modal = $(config.modalId || 'data-modal');
     if (id) {
       const r = rows.find((x) => x.id === id);
-      $(config.modalTitleId || 'modal-title').textContent = config.editTitle || 'Modifica';
+      $(config.modalTitleId || 'modal-title').textContent = config.editTitle || '';
       config.formFields.forEach((f) => {
         const el = $(f.id);
         if (!el) return;
@@ -59,7 +68,7 @@ export function createTableCrud(config) {
         else el.value = v ?? '';
       });
     } else {
-      $(config.modalTitleId || 'modal-title').textContent = config.newTitle || 'Nuovo';
+      $(config.modalTitleId || 'modal-title').textContent = config.newTitle || '';
       config.formFields.forEach((f) => {
         const el = $(f.id);
         if (!el) return;
@@ -104,10 +113,12 @@ export function createTableCrud(config) {
       else row[f.field] = el.value.trim();
     });
     const btn = $('btn-save');
-    if (btn) { btn.disabled = true; btn.textContent = 'Salvataggio…'; }
-    await saveTableRow(config.table, row, config.fields, rows, `Salvando ${config.table}…`);
+    const saving = await t('common.saving');
+    const saveLbl = await t('common.save');
+    if (btn) { btn.disabled = true; btn.textContent = saving; }
+    await saveTableRow(config.table, row, config.fields, rows, `${saving} ${config.table}…`);
     updateDbBar();
-    if (btn) { btn.disabled = false; btn.textContent = 'Salva'; }
+    if (btn) { btn.disabled = false; btn.textContent = saveLbl; }
     closeModal();
     await load();
   }
@@ -119,7 +130,7 @@ export function createTableCrud(config) {
       if (err) { alert(err); return; }
     }
     if (!requireWrite()) return;
-    if (!confirm('Eliminare questo record?')) return;
+    if (!confirm(await t('common.confirmDelete'))) return;
     await deleteTableRow(config.table, id);
     updateDbBar();
     await load();
@@ -133,6 +144,18 @@ export function createTableCrud(config) {
   }
 
   initModule(async () => {
+    const yesLabel = await t('common.yes');
+    const noLabel = await t('common.no');
+    config.yesLabel = yesLabel;
+    config.noLabel = noLabel;
+    if (!config.newTitle) config.newTitle = await t('btn.new');
+    if (!config.editTitle) config.editTitle = await t('common.edit');
+    const saveBtn = $('btn-save');
+    if (saveBtn) saveBtn.textContent = await t('common.save');
+    const cancelBtn = $('btn-cancel');
+    if (cancelBtn) cancelBtn.textContent = await t('common.cancel');
+    const emptyP = document.querySelector('#empty-state p');
+    if (emptyP && !emptyP.dataset.i18n) emptyP.textContent = await t('common.noRecords');
     bind();
     await load();
     const q = new URLSearchParams(window.location.search).get('q');

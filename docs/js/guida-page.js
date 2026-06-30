@@ -1,6 +1,7 @@
 import { GUIDE_I18N, GUIDE_LANGS } from './guida/index.js';
 
 const STORAGE_KEY = 'winbeach-guide-lang';
+const APP_LANG_KEY = 'winbeach-app-lang';
 
 function getLangFromUrl() {
   const p = new URLSearchParams(window.location.search).get('lang');
@@ -8,12 +9,16 @@ function getLangFromUrl() {
 }
 
 function getLang() {
-  return getLangFromUrl() || localStorage.getItem(STORAGE_KEY) || 'it';
+  return getLangFromUrl()
+    || localStorage.getItem(APP_LANG_KEY)
+    || localStorage.getItem(STORAGE_KEY)
+    || 'it';
 }
 
 function setLang(lang) {
   if (!GUIDE_I18N[lang]) return;
   localStorage.setItem(STORAGE_KEY, lang);
+  localStorage.setItem(APP_LANG_KEY, lang);
   render(lang);
   document.querySelectorAll('.guide-lang-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
@@ -50,4 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   const initial = getLang();
   setLang(initial);
+
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'winbeach-lang-change' && GUIDE_I18N[e.data.lang]) {
+      setLang(e.data.lang);
+    }
+  });
+  window.addEventListener('storage', (e) => {
+    if (e.key === APP_LANG_KEY && GUIDE_I18N[e.newValue]) setLang(e.newValue);
+  });
 });

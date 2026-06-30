@@ -19,6 +19,13 @@ export function t(key) {
   return APP_I18N[lang]?.[key] ?? APP_I18N.it[key] ?? key;
 }
 
+export async function applyPageLabels(root = document) {
+  try {
+    const { applyPageI18n } = await import('./page-i18n.js');
+    applyPageI18n();
+  } catch { /* ignore */ }
+}
+
 export function applyI18n(root = document) {
   root.querySelectorAll('[data-i18n]').forEach((el) => {
     const key = el.dataset.i18n;
@@ -57,7 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.documentElement.lang = getAppLang();
   applyI18n(document);
+  applyPageLabels();
 });
+
+export 
 
 window.addEventListener('message', (e) => {
   if (e.data?.type === 'winbeach-lang-change') {
