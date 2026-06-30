@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <script src="js/theme-init.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Beach Manager Dashboard</title>
     <meta name="theme-color" content="#0084ff">
@@ -26,6 +27,9 @@
         <label class="lang-switcher">
             <select id="app-lang" aria-label="Language"></select>
         </label>
+        <button type="button" class="theme-toggle" id="btn-theme-toggle" data-theme-toggle data-i18n-aria="theme.toggle" aria-pressed="false" title="Dark mode">
+            <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        </button>
         <div class="profile-switcher" id="profile-switcher">
             <button type="button" class="profile-btn" id="btn-profile" aria-haspopup="listbox">
                 <i class="fa-solid fa-umbrella-beach"></i>
@@ -276,6 +280,10 @@
     <script type="module" src="js/dashboard-auth.js"></script>
     <script type="module" src="js/dashboard-search.js"></script>
     <script type="module" src="js/app-i18n.js"></script>
+    <script type="module">
+      import { initThemeUi } from './js/winbeach-theme.js';
+      initThemeUi();
+    </script>
     <script type="module" src="js/winbeach-pwa.js"></script>
 </body>
 </html>
