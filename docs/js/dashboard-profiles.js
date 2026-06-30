@@ -4,6 +4,7 @@ import {
   setActiveProfile,
   onProfileChange,
 } from './winbeach-db.js';
+import { t, onLangChange } from './app-i18n.js';
 
 function renderSwitcher() {
   const nameEl = document.getElementById('active-profile-name');
@@ -11,12 +12,13 @@ function renderSwitcher() {
   const active = getActiveProfile();
 
   if (nameEl) {
-    nameEl.textContent = active?.name || 'Stabilimento';
+    nameEl.textContent = active?.name || t('profile.defaultName');
   }
 
   if (!dropdown) return;
 
   const profiles = getProfiles();
+  const manageLabel = t('profile.manage');
   dropdown.innerHTML = profiles.map((p) => `
     <button type="button" class="profile-option ${p.id === active?.id ? 'active' : ''}" data-id="${p.id}">
       <i class="fa-solid fa-umbrella-beach"></i>
@@ -25,7 +27,7 @@ function renderSwitcher() {
     </button>
   `).join('') + `
     <a href="#" class="profile-manage" data-page="cambia">
-      <i class="fa-solid fa-gear"></i> Gestisci stabilimenti
+      <i class="fa-solid fa-gear"></i> ${manageLabel}
     </a>
   `;
 
@@ -73,11 +75,14 @@ function setupSwitcher() {
     reloadIframeIfNeeded();
   });
 
+  onLangChange(() => renderSwitcher());
+
   window.addEventListener('message', (e) => {
     if (e.data?.type === 'winbeach-profile-change') {
       renderSwitcher();
       reloadIframeIfNeeded();
     }
+    if (e.data?.type === 'winbeach-lang-change') renderSwitcher();
   });
 
   window.addEventListener('storage', (e) => {

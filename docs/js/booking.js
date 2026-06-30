@@ -11,17 +11,19 @@ import {
 import { exportTableCsv } from './winbeach-export.js';
 import { printTableReport } from './winbeach-pdf.js';
 
-const EXPORT_COLS = [
-  { key: 'id', label: 'ID' },
-  { key: 'cliente', label: 'Cliente', format: (p) => clienteLabel(p.cliente) },
-  { key: 'data_inizio', label: 'Inizio' },
-  { key: 'data_fine', label: 'Fine' },
-  { key: 'cella', label: 'Postazione' },
-  { key: 'importo', label: 'Importo' },
-  { key: 'stato_pagamento', label: 'Pagamento' },
-  { key: 'stato', label: 'Stato' },
-  { key: 'canale', label: 'Canale' },
-];
+function exportCols() {
+  return [
+    { key: 'id', label: 'ID' },
+    { key: 'cliente', label: t('col.customer'), format: (p) => clienteLabel(p.cliente) },
+    { key: 'data_inizio', label: t('export.col.start') },
+    { key: 'data_fine', label: t('export.col.end') },
+    { key: 'cella', label: t('col.spot') },
+    { key: 'importo', label: t('col.amount') },
+    { key: 'stato_pagamento', label: t('col.payment') },
+    { key: 'stato', label: t('col.status') },
+    { key: 'canale', label: t('col.channel') },
+  ];
+}
 
 let prenotazioni = [], clienti = [], celle = [], tariffe = [], editingId = null;
 function statiOptions() {
@@ -219,13 +221,13 @@ function bindBookingEvents() {
   $('btn-nuovo')?.addEventListener('click', () => { if (!clienti.length) alert(t('booking.addCustomerFirst')); else openModal(); });
   $('btn-reload')?.addEventListener('click', loadData);
   $('btn-export')?.addEventListener('click', () => {
-    exportTableCsv(`prenotazioni-${todayIso()}.csv`, EXPORT_COLS, getFiltered());
+    exportTableCsv(`prenotazioni-${todayIso()}.csv`, exportCols(), getFiltered());
   });
   $('btn-pdf')?.addEventListener('click', () => {
     printTableReport({
-      title: 'Prenotazioni',
+      title: t('export.title.bookings'),
       subtitle: todayIso(),
-      columns: EXPORT_COLS,
+      columns: exportCols(),
       rows: getFiltered(),
     });
   });

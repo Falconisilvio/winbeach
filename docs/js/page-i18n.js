@@ -49,6 +49,29 @@ const AUTO_LABEL = {
   Telefono: 'col.phone',
   Note: 'col.notes',
   Indirizzo: 'col.address',
+  'Cliente *': 'label.clienteReq',
+  Postazione: 'col.spot',
+  'Data inizio *': 'label.startDateReq',
+  'Data fine *': 'label.endDateReq',
+  Stato: 'col.status',
+  'Importo €': 'label.amount',
+  'Pagato €': 'label.paid',
+  Canale: 'col.channel',
+  'Stato pagamento': 'label.paymentStatus',
+  'Ora arrivo': 'col.arrivalTime',
+};
+
+const SELECT_OPT_BY_ID = {
+  'f-pagamento': {
+    da_saldare: 'badge.da_saldare',
+    parziale: 'badge.parziale',
+    saldato: 'badge.saldato',
+  },
+  'f-canale': {
+    offline: 'channel.offline',
+    widget: 'channel.widget',
+    portale: 'channel.portal',
+  },
 };
 
 const AUTO_BTN = {
@@ -101,6 +124,10 @@ function buildReverseMap(...maps) {
   for (const map of maps) {
     for (const key of Object.values(map)) keys.add(key);
   }
+  for (const map of Object.values(SELECT_OPT_BY_ID)) {
+    for (const key of Object.values(map)) keys.add(key);
+  }
+  keys.add('label.notesPlaceholder');
   for (const key of ZONE_KEYS.concat(CAT_BTN_KEYS).concat(FILTER_OPT_KEYS).concat(Object.values(EMPTY_STATE_KEYS))) {
     keys.add(key);
   }
@@ -257,6 +284,25 @@ function applyAutoLabels() {
     if (!key) return;
     applyKeyToEl(btn, key);
   });
+
+  Object.entries(SELECT_OPT_BY_ID).forEach(([selectId, valueMap]) => {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    sel.querySelectorAll('option').forEach((opt) => {
+      const key = opt.dataset.i18n || valueMap[opt.value];
+      if (!key) return;
+      opt.dataset.i18n = key;
+      const val = t(key);
+      if (val !== key) opt.textContent = val;
+    });
+  });
+
+  const noteField = document.getElementById('f-note');
+  if (noteField) {
+    const phKey = noteField.dataset.i18nPlaceholder || 'label.notesPlaceholder';
+    noteField.dataset.i18nPlaceholder = phKey;
+    noteField.placeholder = t(phKey);
+  }
 }
 
 export function applyPageI18n() {
