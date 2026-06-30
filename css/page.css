@@ -238,3 +238,103 @@ tr:hover td {
   color: #0084ff;
   width: 20px;
 }
+
+.btn-danger { background: #e74c3c; color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+
+.db-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.db-bar .db-status {
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 120px;
+}
+
+.db-bar .db-status.idle { background: #edf2f7; color: #4a5568; }
+.db-bar .db-status.loading,
+.db-bar .db-status.saving { background: #ebf8ff; color: #2b6cb0; }
+.db-bar .db-status.ok { background: #f0fff4; color: #276749; }
+.db-bar .db-status.error { background: #fff5f5; color: #c53030; }
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: #888;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #888;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 20px;
+}

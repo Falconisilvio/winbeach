@@ -10,21 +10,81 @@
   <div class="header">
     <h2><i class="fa-solid fa-users" style="color:#2ecc71"></i> Registro Clienti</h2>
     <div class="toolbar">
-      <button class="btn btn-success"><i class="fa-solid fa-user-plus"></i> Nuovo Cliente</button>
+      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+      <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-user-plus"></i> Nuovo Cliente</button>
     </div>
   </div>
-  <div class="filters">
-    <input type="search" placeholder="Cerca per nome, email, telefono...">
+
+  <div class="db-bar">
+    <span><i class="fa-solid fa-database"></i> githubDB</span>
+    <div id="db-status" class="db-status idle">Caricamento…</div>
   </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">Clienti totali</div></div>
+  </div>
+
+  <div class="filters">
+    <input type="search" id="search-input" placeholder="Cerca per nome, email, telefono…">
+  </div>
+
   <table>
     <thead>
-      <tr><th>Nome</th><th>Email</th><th>Telefono</th><th>Stato</th><th>Postazione Abituale</th></tr>
+      <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>Stato / Note</th>
+        <th>Azioni</th>
+      </tr>
     </thead>
-    <tbody>
-      <tr><td>Mario Rossi</td><td>mario.rossi@email.com</td><td>+39 333 1234567</td><td><span class="badge badge-green">Attivo</span></td><td>Ombrellone A2</td></tr>
-      <tr><td>Laura Bianchi</td><td>laura.b@email.com</td><td>+39 347 9876543</td><td><span class="badge badge-green">Attivo</span></td><td>Ombrellone B4</td></tr>
-      <tr><td>Giuseppe Verdi</td><td>g.verdi@email.com</td><td>+39 320 5551234</td><td><span class="badge badge-blue">Occasionale</span></td><td>—</td></tr>
-    </tbody>
+    <tbody id="clienti-tbody"></tbody>
   </table>
+
+  <div id="empty-state" class="empty-state" style="display:none">
+    <i class="fa-solid fa-users" style="font-size:2rem;color:#ccc"></i>
+    <p>Nessun cliente. Clicca <strong>Nuovo Cliente</strong> per iniziare.</p>
+  </div>
+
+  <div class="modal-overlay" id="cliente-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Nuovo cliente</h3>
+        <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">&times;</button>
+      </div>
+      <form id="cliente-form">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="f-nome">Nome *</label>
+              <input type="text" id="f-nome" required>
+            </div>
+            <div class="form-group">
+              <label for="f-cognome">Cognome</label>
+              <input type="text" id="f-cognome">
+            </div>
+            <div class="form-group">
+              <label for="f-email">Email</label>
+              <input type="email" id="f-email">
+            </div>
+            <div class="form-group">
+              <label for="f-telefono">Telefono</label>
+              <input type="tel" id="f-telefono">
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label for="f-note">Note / Etichetta</label>
+              <input type="text" id="f-note" placeholder="es. VIP, Occasionale, Hotel partner…">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button>
+          <button type="submit" class="btn btn-success" id="btn-save">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/clienti.js"></script>
 </body>
 </html>

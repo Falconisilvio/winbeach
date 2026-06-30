@@ -270,7 +270,11 @@ const pages = {
   }
 };
 
+// Páginas con lógica propia (githubDB) — no regenerar
+const SKIP = new Set(['booking', 'clienti']);
+
 for (const [id, p] of Object.entries(pages)) {
+  if (SKIP.has(id)) continue;
   const html = head(p.title) + header(p.icon, p.color, p.title, p.btn || '') + (p.body || '') + '\n</body>\n</html>\n';
   fs.writeFileSync(path.join(pagesDir, `${id}.html`), html);
 }
