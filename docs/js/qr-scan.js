@@ -1,11 +1,14 @@
 import { loadPrenotazioniFromDb } from './winbeach-db.js';
+import { t } from './app-i18n.js';
 import { $, clienteLabel, formatDate, formatEuro, updateDbBar, initModule, navigateApp } from './winbeach-module.js';
 
 let prenotazioni = [];
 let scanner = null;
+let lastQuery = '';
 
 async function search(code) {
   const q = code.trim().toLowerCase();
+  lastQuery = q;
   if (!q) return;
   const found = prenotazioni.find((p) =>
     String(p.id) === q ||
@@ -14,16 +17,16 @@ async function search(code) {
   );
   const result = $('qr-result');
   if (!found) {
-    result.innerHTML = '<p class="empty-state">Nessuna prenotazione trovata.</p>';
+    result.innerHTML = `<p class="empty-state">${t('qr.notFound')}</p>`;
     return;
   }
   result.innerHTML = `
     <div class="info-box">
       <strong>#${found.id} — ${clienteLabel(found.cliente)}</strong><br>
-      Post. ${found.cella || '—'} · ${formatDate(found.data_inizio)} → ${formatDate(found.data_fine)}<br>
-      Importo: ${formatEuro(found.importo)} · ${found.stato_pagamento || '—'}
+      ${t('common.spot')} ${found.cella || '—'} · ${formatDate(found.data_inizio)} → ${formatDate(found.data_fine)}<br>
+      ${t('col.amount')}: ${formatEuro(found.importo)} · ${found.stato_pagamento || '—'}
       <div style="margin-top:12px">
-        <button type="button" class="btn btn-primary btn-sm" id="btn-open-booking">Apri in Booking</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-open-booking">${t('qr.openBooking')}</button>
       </div>
     </div>`;
   $('btn-open-booking')?.addEventListener('click', () => {
@@ -47,7 +50,7 @@ async function stopCamera() {
 
 async function startCamera() {
   if (!window.Html5Qrcode) {
-    alert('Scanner QR non disponibile. Usa la ricerca manuale.');
+    alert(t('qr.noScanner'));
     return;
   }
   const wrap = $('qr-reader-wrap');
@@ -69,7 +72,7 @@ async function startCamera() {
     );
   } catch (err) {
     await stopCamera();
-    alert('Impossibile accedere alla fotocamera: ' + (err.message || err));
+    alert(`${t('qr.cameraError')} ${err.message || err}`);
   }
 }
 
@@ -79,16 +82,24 @@ async function load() {
   if (res.ok) prenotazioni = res.data;
 }
 
-initModule(async () => {
+function bindQrEvents() {
+  if (window.__qrBound) return;
+  window.__qrBound = true;
   $('qr-input')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(e.target.value); });
   $('btn-search')?.addEventListener('click', () => search($('qr-input').value));
   $('btn-camera')?.addEventListener('click', startCamera);
   $('btn-stop-camera')?.addEventListener('click', stopCamera);
   window.addEventListener('beforeunload', stopCamera);
+}
+
+initModule(async () => {
+  bindQrEvents();
   await load();
   const q = new URLSearchParams(window.location.search).get('q');
   if (q && $('qr-input')) {
     $('qr-input').value = q;
-    search(q);
+    await search(q);
+  } else if (lastQuery) {
+    await search(lastQuery);
   }
 });

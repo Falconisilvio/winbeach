@@ -84,7 +84,7 @@
 }
 
 [data-theme="dark"] .topbar .search input,
-[data-theme="dark"] .lang-switcher select,
+[data-theme="dark"] .topbar .lang-btn,
 [data-theme="dark"] .profile-btn,
 [data-theme="dark"] .btn-auth {
   background: var(--wb-topbar-control);
@@ -95,7 +95,9 @@
 [data-theme="dark"] .search-dropdown,
 [data-theme="dark"] .search-result,
 [data-theme="dark"] .profile-dropdown,
-[data-theme="dark"] .profile-option {
+[data-theme="dark"] .profile-option,
+[data-theme="dark"] .lang-dropdown,
+[data-theme="dark"] .lang-option {
   background: var(--wb-surface);
   border-color: var(--wb-border);
   color: var(--wb-text);

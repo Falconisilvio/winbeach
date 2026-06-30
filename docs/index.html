@@ -25,12 +25,19 @@
             <i class="fa-solid fa-umbrella-beach"></i>
             <span class="logo-text" data-i18n="app.title">Winbeach </span>
         </div>
-        <label class="lang-switcher">
-            <select id="app-lang" aria-label="Language"></select>
-        </label>
-        <button type="button" class="theme-toggle" id="btn-theme-toggle" data-theme-toggle data-i18n-aria="theme.toggle" aria-pressed="false" title="Dark mode">
-            <i class="fa-solid fa-sun" aria-hidden="true"></i>
-        </button>
+        <div class="topbar-utils">
+            <div class="lang-switcher" id="app-lang-switcher">
+                <button type="button" class="lang-btn" id="app-lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="nav.language">
+                    <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                    <span class="lang-btn-label">IT</span>
+                    <i class="fa-solid fa-chevron-down lang-chevron" aria-hidden="true"></i>
+                </button>
+                <div class="lang-dropdown" id="app-lang-dropdown" role="listbox" hidden></div>
+            </div>
+            <button type="button" class="theme-toggle" id="btn-theme-toggle" data-theme-toggle data-i18n-aria="theme.toggle" aria-pressed="false" title="Dark mode">
+                <i class="fa-solid fa-sun" aria-hidden="true"></i>
+            </button>
+        </div>
         <div class="profile-switcher" id="profile-switcher">
             <button type="button" class="profile-btn" id="btn-profile" aria-haspopup="listbox">
                 <i class="fa-solid fa-umbrella-beach"></i>

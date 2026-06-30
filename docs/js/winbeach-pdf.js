@@ -1,4 +1,5 @@
 import { getActiveProfile } from './winbeach-db.js';
+import { t } from './app-i18n.js';
 
 function esc(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -36,7 +37,7 @@ export function printTableReport({ title, columns, rows, subtitle = '' }) {
 
   const win = window.open('', '_blank', 'width=900,height=700');
   if (!win) {
-    alert('Consenti i popup per esportare il PDF.');
+    alert(t('pdf.allowPopup'));
     return;
   }
   win.document.write(html);
