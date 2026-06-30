@@ -8,6 +8,7 @@ import {
   getToken,
   saveToken,
   testActiveProfile,
+  ensureDemoProfiles,
   onProfileChange,
 } from './winbeach-db.js';
 
@@ -138,6 +139,11 @@ function bindEvents() {
     $('btn-test').disabled = true;
     await testActiveProfile();
     $('btn-test').disabled = false;
+  });
+  $('btn-demo')?.addEventListener('click', () => {
+    const n = ensureDemoProfiles();
+    renderCards();
+    alert(n ? `Aggiunti ${n} stabilimenti demo (BD separate).` : 'I profili demo sono già configurati.');
   });
   $('profile-modal').addEventListener('click', (e) => {
     if (e.target === $('profile-modal')) closeModal();

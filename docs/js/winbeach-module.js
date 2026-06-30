@@ -75,6 +75,12 @@ export function bindModal(overlayId, closeIds, onSubmit) {
 
 export function initModule(loadFn) {
   onProfileChange(loadFn);
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'winbeach-profile-change') loadFn();
+  });
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles') loadFn();
+  });
   document.addEventListener('DOMContentLoaded', loadFn);
 }
 

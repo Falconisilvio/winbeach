@@ -87,14 +87,24 @@ export function getActiveProfile() {
   return getProfiles().find((p) => p.id === id) || getProfiles()[0] || null;
 }
 
+function broadcastProfileChange(id) {
+  window.dispatchEvent(new CustomEvent('winbeach-profile-change', { detail: { id } }));
+  const msg = { type: 'winbeach-profile-change', id };
+  try {
+    window.parent?.postMessage(msg, '*');
+  } catch { /* cross-origin */ }
+  try {
+    document.querySelectorAll('iframe').forEach((frame) => {
+      frame.contentWindow?.postMessage(msg, '*');
+    });
+  } catch { /* cross-origin */ }
+}
+
 export function setActiveProfile(id) {
   const exists = getProfiles().some((p) => p.id === id);
   if (!exists) return false;
   localStorage.setItem(ACTIVE_ID_KEY, id);
-  window.dispatchEvent(new CustomEvent('winbeach-profile-change', { detail: { id } }));
-  try {
-    window.parent?.postMessage({ type: 'winbeach-profile-change', id }, '*');
-  } catch { /* cross-origin */ }
+  broadcastProfileChange(id);
   return true;
 }
 
@@ -565,6 +575,30 @@ export function calcImportoFromTariffe(tariffe, tassa, dataInizio, dataFine) {
   if (days >= 15) return t.quindicinale || t.giornaliero * days;
   if (days >= 7) return t.settimanale || t.giornaliero * days;
   return (t.giornaliero || 0) * days;
+}
+
+/** Crea 3 stabilimenti demo (BD distinte) si no existen ya */
+export function ensureDemoProfiles() {
+  const demos = [
+    { name: 'Stabilimento principale', database: 'winbeach' },
+    { name: 'Lido Sud', database: 'winbeach-lido-sud' },
+    { name: 'Lido Europa', database: 'winbeach-lido-europa' },
+  ];
+  const existing = getProfiles();
+  const byDb = Object.fromEntries(existing.map((p) => [p.database, p]));
+  let added = 0;
+
+  for (const demo of demos) {
+    if (byDb[demo.database]) continue;
+    saveProfile({ ...DEFAULT_CONNECTION, ...demo });
+    added++;
+  }
+
+  if (!getActiveProfileId() && getProfiles().length) {
+    setActiveProfile(getProfiles()[0].id);
+  }
+
+  return added;
 }
 
 /** Comprueba conectividad de lectura del perfil activo */
