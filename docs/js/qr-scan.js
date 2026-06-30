@@ -35,4 +35,9 @@ initModule(async () => {
   $('btn-search')?.addEventListener('click', () => search($('qr-input').value));
   $('btn-camera')?.addEventListener('click', () => alert('Fotocamera: inserisci manualmente ID postazione o prenotazione.'));
   await load();
+  const q = new URLSearchParams(window.location.search).get('q');
+  if (q && $('qr-input')) {
+    $('qr-input').value = q;
+    search(q);
+  }
 });

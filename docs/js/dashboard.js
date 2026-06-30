@@ -132,19 +132,35 @@ function risolviPercorso(nomePagina) {
 }
 
 // Cambia l'area di destra inserendo un iframe dinamico o ripristinando la dashboard nativa
-window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina) {
+window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina, opts) {
     const dashboardView = document.getElementById("dashboard-view");
     const procedureView = document.getElementById("procedure-view");
+    const query = opts && opts.q ? `?q=${encodeURIComponent(opts.q)}` : "";
 
     if (nomePagina === "dashboard") {
         procedureView.style.display = "none";
         procedureView.innerHTML = "";
         dashboardView.style.display = "block";
     } else {
-        const percorso = risolviPercorso(nomePagina);
+        const percorso = risolviPercorso(nomePagina) + query;
         dashboardView.style.display = "none";
         procedureView.style.display = "block";
         procedureView.innerHTML = `<iframe src="${percorso}" class="procedure-iframe" title="${nomePagina}"></iframe>`;
+
+        const sidebarIcons = document.querySelectorAll(".sidebar .icon");
+        const submenuImpostazioni = document.getElementById("submenu-impostazioni");
+        const pageToIcon = {
+            booking: "booking", clienti: "clienti", spiaggia: "spiaggia",
+            "qr-scan": "qr-scan", cassa: "cassa", planner: "planner", listini: "listini",
+            cambia: "cambia", guida: "guida",
+        };
+        const iconPage = pageToIcon[nomePagina];
+        if (iconPage) {
+            sidebarIcons.forEach((i) => i.classList.remove("active"));
+            const icon = document.querySelector(`.sidebar .icon[data-page="${iconPage}"]`);
+            if (icon) icon.classList.add("active");
+            if (submenuImpostazioni) submenuImpostazioni.classList.remove("show");
+        }
     }
 };
 

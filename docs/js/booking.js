@@ -1,7 +1,7 @@
 import {
   getDbStatus, getActiveProfile, getToken, loadPrenotazioniFromDb,
   savePrenotazioneToDb, deletePrenotazioneFromDb, onProfileChange,
-  loadTable, calcImportoFromTariffe,
+  loadTable, calcImportoFromTariffe, findPrenotazioneOverlap,
 } from './winbeach-db.js';
 import {
   $, formatDate, formatEuro, todayIso, clienteLabel,
@@ -153,6 +153,7 @@ async function savePrenotazione(e) {
   if (!getToken()) { alert('Configura il token GitHub prima di salvare.'); return; }
   const clienteId = Number($('f-cliente').value);
   if (!clienteId) { alert('Seleziona un cliente.'); return; }
+  const existing = editingId ? prenotazioni.find((x) => x.id === editingId) : null;
   const prenotazione = {
     id: editingId || undefined,
     cliente_id: clienteId,
@@ -166,10 +167,17 @@ async function savePrenotazione(e) {
     canale: $('f-canale').value,
     stato_pagamento: $('f-pagamento').value,
     ora_arrivo: $('f-ora').value,
-    check_in: false,
-    check_out: false,
+    check_in: existing?.check_in ?? false,
+    check_out: existing?.check_out ?? false,
   };
   if (prenotazione.data_fine < prenotazione.data_inizio) { alert('Data fine non valida.'); return; }
+  const overlap = findPrenotazioneOverlap(prenotazione, prenotazioni);
+  if (overlap) {
+    alert(
+      `Postazione ${prenotazione.cella} già occupata dal ${formatDate(overlap.data_inizio)} al ${formatDate(overlap.data_fine)} (prenotazione #${overlap.id}).`
+    );
+    return;
+  }
   $('btn-save').disabled = true;
   const result = await savePrenotazioneToDb(prenotazione, prenotazioni);
   updateStatus();
@@ -203,4 +211,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   onAuthChange(() => applyReadOnlyMode());
   applyReadOnlyMode();
   await loadData();
+  const q = new URLSearchParams(window.location.search).get('q');
+  if (q && $('search-input')) { $('search-input').value = q; renderTable(); }
 });

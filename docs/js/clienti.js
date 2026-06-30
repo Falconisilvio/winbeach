@@ -199,4 +199,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   onAuthChange(() => { applyReadOnlyMode(); });
   applyReadOnlyMode();
   await loadData();
+  const q = new URLSearchParams(window.location.search).get('q');
+  if (q && $('search-input')) { $('search-input').value = q; renderTable(); }
 });

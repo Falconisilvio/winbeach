@@ -132,5 +132,11 @@ export function createTableCrud(config) {
     bindModal(config.modalId || 'data-modal', ['modal-close', 'btn-cancel'], save);
   }
 
-  initModule(async () => { bind(); await load(); });
+  initModule(async () => {
+    bind();
+    await load();
+    const q = new URLSearchParams(window.location.search).get('q');
+    const searchEl = $(config.searchId || 'search-input');
+    if (q && searchEl) { searchEl.value = q; render(); }
+  });
 }

@@ -26,9 +26,10 @@
             </button>
             <div class="profile-dropdown" id="profile-dropdown" role="listbox"></div>
         </div>
-        <div class="search">
+        <div class="search" id="global-search">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" placeholder="Ricerca cliente, postazione, hotel, voucher...">
+            <input type="search" id="global-search-input" autocomplete="off" placeholder="Ricerca cliente, postazione, hotel, voucher…" aria-label="Ricerca globale" aria-expanded="false" aria-controls="global-search-results">
+            <div id="global-search-results" class="search-dropdown" hidden role="listbox"></div>
         </div>
         <div class="user-auth" id="user-auth">
             <span id="user-label" class="user-label guest"><i class="fa-solid fa-eye"></i> Sola lettura</span>
@@ -265,5 +266,6 @@
     <script type="module" src="js/dashboard-profiles.js"></script>
     <script type="module" src="js/dashboard-stats.js"></script>
     <script type="module" src="js/dashboard-auth.js"></script>
+    <script type="module" src="js/dashboard-search.js"></script>
 </body>
 </html>
