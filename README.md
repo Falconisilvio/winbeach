@@ -1,11 +1,17 @@
-# WinBeach Web
+<p align="center">
+  <a href="https://falconisilvio.github.io/winbeach/">
+    <img src="https://img.shields.io/badge/🌐_Demo_en_vivo-falconisilvio.github.io%2Fwinbeach-2b6cb0?style=for-the-badge" alt="Demo en vivo">
+  </a>
+</p>
+
+<h1 align="center">WinBeach Web</h1>
+
+<p align="center">
+  <strong>Configuración de la playa (Procedimiento 1)</strong><br>
+  <a href="https://falconisilvio.github.io/winbeach/">https://falconisilvio.github.io/winbeach/</a>
+</p>
 
 Conversión de WinBeach (Windows) a aplicación web.
-
-## Demo en vivo
-
-**Configuración de la playa (Procedimiento 1):**  
-https://falconisilvio.github.io/winbeach/
 
 ## Procedimiento 1 — Configuración de la playa
 
