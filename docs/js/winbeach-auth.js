@@ -2,6 +2,8 @@
  * Autenticación WinBeach — solo usuarios identificados pueden escribir.
  * Valida contra tabla utenti en githubDB (password_hash SHA-256).
  */
+import { t } from './app-i18n.js';
+
 const SESSION_KEY = 'winbeach_session';
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const WRITE_ROLES = new Set(['Amministratore', 'Operatore', 'Administratore', 'Operador']);
@@ -90,20 +92,20 @@ export function onAuthChange(callback) {
 export async function login(username, password) {
   const user = String(username || '').trim();
   const pass = String(password || '');
-  if (!user || !pass) return { ok: false, error: 'Inserisci utente e password.' };
+  if (!user || !pass) return { ok: false, error: t('auth.loginMissing') };
 
   const { loadTable } = await import('./winbeach-db.js');
   const res = await loadTable('utenti');
-  if (!res.ok) return { ok: false, error: res.error || 'Impossibile caricare utenti.' };
+  if (!res.ok) return { ok: false, error: res.error || t('auth.usersLoadFailed') };
 
   const hash = await hashPassword(user, pass);
   const found = res.data.find(
     (u) => String(u.username).toLowerCase() === user.toLowerCase() && u.attivo !== false
   );
 
-  if (!found) return { ok: false, error: 'Utente o password non validi.' };
-  if (!found.password_hash) return { ok: false, error: 'Utente senza credenziali configurate.' };
-  if (found.password_hash !== hash) return { ok: false, error: 'Utente o password non validi.' };
+  if (!found) return { ok: false, error: t('auth.invalidCredentials') };
+  if (!found.password_hash) return { ok: false, error: t('auth.noCredentials') };
+  if (found.password_hash !== hash) return { ok: false, error: t('auth.invalidCredentials') };
 
   const session = saveSession(found);
   return { ok: true, session };
@@ -112,28 +114,41 @@ export async function login(username, password) {
 /** Mensaje si no puede escribir; null si OK */
 export function assertCanWrite() {
   if (!isAuthenticated()) {
-    return 'Accedi per modificare i dati (menu utente in alto).';
+    return t('auth.signInToEdit');
   }
   const s = getSession();
   if (!WRITE_ROLES.has(s.ruolo)) {
-    return `Il ruolo "${s.ruolo}" ha accesso in sola lettura.`;
+    return t('auth.roleReadonly').replace('{role}', s.ruolo);
   }
   return null;
 }
 
 export function assertAdmin() {
-  if (!isAdmin()) return 'Solo gli amministratori possono eseguire questa operazione.';
+  if (!isAdmin()) return t('auth.adminOnly');
   return null;
 }
 
+function loginHrefForBanner() {
+  return /\/pages\//.test(window.location.pathname) ? '../login.html' : 'login.html';
+}
+
+function updateReadOnlyBanner() {
+  const banner = document.getElementById('read-only-banner');
+  if (!banner) return;
+  const href = loginHrefForBanner();
+  banner.innerHTML = `<i class="fa-solid fa-lock"></i> ${t('auth.readonlyShort')} — <a href="${href}">${t('banner.readonlyLink')}</a> ${t('banner.readonlySuffix')}`;
+}
+
 function ensureReadOnlyBanner() {
-  if (document.getElementById('read-only-banner')) return;
+  if (document.getElementById('read-only-banner')) {
+    updateReadOnlyBanner();
+    return;
+  }
   const b = document.createElement('div');
   b.id = 'read-only-banner';
   b.className = 'read-only-banner';
-  const loginHref = /\/pages\//.test(window.location.pathname) ? '../login.html' : 'login.html';
-  b.innerHTML = `<i class="fa-solid fa-lock"></i> Sola lettura — <a href="${loginHref}">Accedi</a> per modificare`;
   document.body.prepend(b);
+  updateReadOnlyBanner();
 }
 
 /** Oculta controles de escritura si el usuario no está autorizado */
@@ -147,7 +162,10 @@ export function applyReadOnlyMode() {
     ensureReadOnlyBanner();
   }
   const banner = document.getElementById('read-only-banner');
-  if (banner) banner.hidden = write;
+  if (banner) {
+    banner.hidden = write;
+    if (!write) updateReadOnlyBanner();
+  }
 
   document.querySelectorAll('[data-requires-write]').forEach((el) => {
     el.hidden = !write;
@@ -165,3 +183,13 @@ export function userLabel() {
   if (!s) return null;
   return `${s.username} (${s.ruolo})`;
 }
+
+function onLangRefreshAuth() {
+  updateReadOnlyBanner();
+  applyReadOnlyMode();
+}
+
+window.addEventListener('winbeach-lang-change', onLangRefreshAuth);
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'winbeach-lang-change') onLangRefreshAuth();
+});
