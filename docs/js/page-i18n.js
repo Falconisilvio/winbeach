@@ -1,6 +1,7 @@
 /**
  * Traducciones de módulos (páginas iframe) según slug URL.
  */
+import { APP_I18N } from './i18n/app.js';
 import { getAppLang, t } from './app-i18n.js';
 
 const SLUG_ALIASES = {
@@ -56,6 +57,8 @@ const AUTO_BTN = {
   'btn-cancel': 'common.cancel',
   'btn-export': 'btn.exportCsv',
   'btn-pdf': 'btn.exportPdf',
+  'btn-test': 'cambia.testConn',
+  'btn-demo': 'cambia.demoProfiles',
 };
 
 const AUTO_STAT = {
@@ -66,6 +69,8 @@ const AUTO_STAT = {
   'Check-in effettuati': 'stat.checkedIn',
   'Check-out effettuati': 'stat.checkedOut',
 };
+
+const FILTER_OPT_KEYS = ['filter.allStatus', 'filter.confirmed', 'filter.pending', 'filter.cancelled'];
 
 const AUTO_FILTER_OPT = {
   'Tutti gli stati': 'filter.allStatus',
@@ -83,9 +88,67 @@ const AUTO_PAGE = {
   '.pointsale-page .btn-invia': 'pos.print',
 };
 
-const AUTO_ZONE = [
-  ['.tavoli-page .zona-titolo', ['Sala Interna', 'tavoli.zoneInterna'], ['Terrazza Vista Mare', 'tavoli.zoneTerrazza'], ['Giardino', 'tavoli.zoneGiardino'], ['Gazebo Beach', 'tavoli.zoneGazebo']],
-];
+const ZONE_KEYS = ['tavoli.zoneInterna', 'tavoli.zoneTerrazza', 'tavoli.zoneGiardino', 'tavoli.zoneGazebo'];
+const CAT_BTN_KEYS = ['pos.catRistorante', 'pos.catBevande', 'pos.catBar'];
+
+const EMPTY_STATE_KEYS = {
+  booking: 'booking.empty',
+  clienti: 'common.noRecords',
+};
+
+function buildReverseMap(...maps) {
+  const keys = new Set();
+  for (const map of maps) {
+    for (const key of Object.values(map)) keys.add(key);
+  }
+  for (const key of ZONE_KEYS.concat(CAT_BTN_KEYS).concat(FILTER_OPT_KEYS).concat(Object.values(EMPTY_STATE_KEYS))) {
+    keys.add(key);
+  }
+  const rev = {};
+  for (const key of keys) {
+    for (const lang of Object.keys(APP_I18N)) {
+      const v = APP_I18N[lang][key];
+      if (v) rev[v.trim()] = key;
+    }
+  }
+  return rev;
+}
+
+const REVERSE = buildReverseMap(AUTO_TH, AUTO_LABEL, AUTO_BTN, AUTO_STAT, AUTO_FILTER_OPT, AUTO_PAGE);
+
+function resolveKey(el, text, staticMap) {
+  if (el?.dataset?.i18n) return el.dataset.i18n;
+  const trimmed = (text ?? '').trim();
+  const key = staticMap[trimmed] || REVERSE[trimmed];
+  if (key && el) el.dataset.i18n = key;
+  return key;
+}
+
+function setTextWithIcon(el, val) {
+  const icon = el.querySelector('i');
+  if (icon) {
+    el.textContent = '';
+    el.appendChild(icon.cloneNode(true));
+    el.appendChild(document.createTextNode(` ${val}`));
+  } else {
+    el.textContent = val;
+  }
+}
+
+function applyKeyToEl(el, key) {
+  if (!el || !key) return;
+  el.dataset.i18n = key;
+  const val = t(key);
+  if (val === key) return;
+  if (el.tagName === 'OPTION') {
+    el.textContent = val;
+    return;
+  }
+  const icon = el.querySelector('i');
+  if (icon && el.childNodes.length > 1) setTextWithIcon(el, val);
+  else if (icon) setTextWithIcon(el, val);
+  else el.textContent = val;
+}
 
 export function getPageSlug() {
   const file = window.location.pathname.split('/').pop() || '';
@@ -104,113 +167,95 @@ function setH2Title(title) {
 
 function applyAutoLabels() {
   document.querySelectorAll('th').forEach((th) => {
-    const key = th.dataset.i18n || AUTO_TH[th.textContent.trim()];
+    const key = resolveKey(th, th.textContent, AUTO_TH);
     if (!key) return;
     const val = t(key);
     if (val !== key) th.textContent = val;
   });
 
   document.querySelectorAll('label').forEach((lb) => {
-    if (lb.dataset.i18n) return;
     const text = lb.childNodes[0]?.textContent?.trim();
-    const key = AUTO_LABEL[text];
+    const key = resolveKey(lb, text, AUTO_LABEL);
     if (!key) return;
     const val = t(key);
     if (val !== key && lb.childNodes[0]) lb.childNodes[0].textContent = val;
   });
 
-  Object.entries(AUTO_BTN).forEach(([id, key]) => {
+  Object.entries(AUTO_BTN).forEach(([id, defaultKey]) => {
     const btn = document.getElementById(id);
-    if (!btn || btn.dataset.i18n) return;
-    const icon = btn.querySelector('i');
+    if (!btn) return;
+    const key = btn.dataset.i18n || defaultKey;
+    btn.dataset.i18n = key;
     const val = t(key);
     if (val === key) return;
-    if (icon) {
-      btn.textContent = '';
-      btn.appendChild(icon.cloneNode(true));
-      btn.appendChild(document.createTextNode(` ${val}`));
-    } else {
-      btn.textContent = val;
-    }
+    setTextWithIcon(btn, val);
   });
 
   const nuovo = document.getElementById('btn-nuovo');
-  if (nuovo && !nuovo.dataset.i18n) {
+  if (nuovo) {
     const slug = getPageSlug();
-    const key = slug === 'booking' ? 'booking.newBtn' : slug === 'clienti' ? 'clienti.newBtn' : 'btn.new';
+    const defaultKey = slug === 'booking' ? 'booking.newBtn' : slug === 'clienti' ? 'clienti.newBtn' : 'btn.new';
+    const key = nuovo.dataset.i18n || defaultKey;
+    nuovo.dataset.i18n = key;
     const val = t(key);
-    const icon = nuovo.querySelector('i');
-    if (val !== key) {
-      if (icon) {
-        nuovo.textContent = '';
-        nuovo.appendChild(icon.cloneNode(true));
-        nuovo.appendChild(document.createTextNode(` ${val}`));
-      } else {
-        nuovo.textContent = val;
-      }
-    }
+    if (val !== key) setTextWithIcon(nuovo, val);
   }
 
   document.querySelectorAll('.stat-box .lbl').forEach((el) => {
-    const key = el.dataset.i18n || AUTO_STAT[el.textContent.trim()];
+    const key = resolveKey(el, el.textContent, AUTO_STAT);
     if (!key) return;
     const val = t(key);
     if (val !== key) el.textContent = val;
   });
 
-  document.querySelectorAll('#filter-stato option').forEach((opt) => {
-    const key = AUTO_FILTER_OPT[opt.textContent.trim()];
+  document.querySelectorAll('#filter-stato option').forEach((opt, i) => {
+    const key = opt.dataset.i18n || FILTER_OPT_KEYS[i] || resolveKey(opt, opt.textContent, AUTO_FILTER_OPT);
     if (!key) return;
+    opt.dataset.i18n = key;
     const val = t(key);
     if (val !== key) opt.textContent = val;
   });
 
   const search = document.getElementById('search-input');
-  if (search && !search.dataset.i18nPlaceholder) {
+  if (search) {
     const slug = getPageSlug();
-    if (slug === 'booking') search.placeholder = t('filter.searchBooking');
+    const phKey = search.dataset.i18nPlaceholder || (slug === 'booking' ? 'filter.searchBooking' : slug === 'clienti' ? 'common.search' : null);
+    if (phKey) {
+      search.dataset.i18nPlaceholder = phKey;
+      search.placeholder = t(phKey);
+    }
   }
 
-  Object.entries(AUTO_PAGE).forEach(([sel, key]) => {
-    const el = document.querySelector(sel);
-    if (!el || el.dataset.i18n) return;
-    const val = t(key);
-    if (val === key) return;
-    const icon = el.querySelector('i');
-    if (icon) {
-      el.textContent = '';
-      el.appendChild(icon.cloneNode(true));
-      el.appendChild(document.createTextNode(` ${val}`));
-    } else {
-      el.textContent = val;
-    }
+  document.querySelectorAll('.db-bar > span').forEach((el) => {
+    if (!el.querySelector('i')) return;
+    const key = el.dataset.i18n || 'common.db';
+    applyKeyToEl(el, key);
   });
 
-  AUTO_ZONE.forEach(([sel, ...pairs]) => {
-    document.querySelectorAll(sel).forEach((el) => {
-      if (el.dataset.i18n) return;
-      const text = el.textContent.replace(/\s+/g, ' ').trim();
-      for (const [it, key] of pairs) {
-        if (text.includes(it)) {
-          const val = t(key);
-          if (val !== key) {
-            const icon = el.querySelector('i');
-            el.textContent = '';
-            if (icon) el.appendChild(icon.cloneNode(true));
-            el.appendChild(document.createTextNode(` ${val}`));
-          }
-          break;
-        }
-      }
-    });
+  const slug = getPageSlug();
+  const emptyKey = EMPTY_STATE_KEYS[slug];
+  if (emptyKey) {
+    const emptyP = document.querySelector('#empty-state p');
+    if (emptyP) applyKeyToEl(emptyP, emptyKey);
+  }
+
+  Object.entries(AUTO_PAGE).forEach(([sel, defaultKey]) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const key = el.dataset.i18n || defaultKey;
+    applyKeyToEl(el, key);
+  });
+
+  document.querySelectorAll('.tavoli-page .zona-titolo').forEach((el, i) => {
+    const key = el.dataset.i18n || ZONE_KEYS[i];
+    if (!key) return;
+    applyKeyToEl(el, key);
   });
 
   document.querySelectorAll('.cat-btn').forEach((btn, i) => {
-    const keys = ['pos.catRistorante', 'pos.catBevande', 'pos.catBar'];
-    const key = keys[i];
+    const key = btn.dataset.i18n || CAT_BTN_KEYS[i];
     if (!key) return;
-    const val = t(key);
-    if (val !== key) btn.textContent = val;
+    applyKeyToEl(btn, key);
   });
 }
 
@@ -236,6 +281,7 @@ export function applyPageI18n() {
     const val = t(key);
     if (val === key) return;
     if (el.dataset.i18nHtml === '1') el.innerHTML = val;
+    else if (el.querySelector('i') && el.childNodes.length > 1) setTextWithIcon(el, val);
     else el.textContent = val;
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {

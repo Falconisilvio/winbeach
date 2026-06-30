@@ -55,7 +55,7 @@ export function updateDbBar() {
 
 export function requireToken() {
   if (!getToken()) {
-    alert('Configura il token GitHub in Cambia stabilimento o Struttura prima di salvare.');
+    alert(t('err.tokenSave'));
     return false;
   }
   return true;
@@ -65,11 +65,11 @@ export function requireToken() {
 export function requireWrite() {
   const authErr = assertCanWrite();
   if (authErr) {
-    alert(authErr + '\n\nVai su Login per autenticarti.');
+    alert(`${authErr}\n\n${t('err.goLogin')}`);
     return false;
   }
   if (!getToken()) {
-    alert('Configura il token GitHub in Cambia stabilimento prima di salvare.');
+    alert(t('err.tokenCambia'));
     return false;
   }
   return true;

@@ -1,7 +1,6 @@
 import {
   getProfiles,
   getActiveProfileId,
-  getActiveProfile,
   setActiveProfile,
   saveProfile,
   deleteProfile,
@@ -9,14 +8,11 @@ import {
   saveToken,
   testActiveProfile,
   ensureDemoProfiles,
-  onProfileChange,
 } from './winbeach-db.js';
+import { t } from './app-i18n.js';
+import { $, escapeHtml, initModule } from './winbeach-module.js';
 
 let editingId = null;
-
-function $(id) {
-  return document.getElementById(id);
-}
 
 function connectionLabel(p) {
   return `${p.owner}/${p.repo} · ${p.database}.json`;
@@ -38,7 +34,7 @@ function renderCards() {
   const profiles = getProfiles();
 
   if (!profiles.length) {
-    grid.innerHTML = '<div class="empty-state"><p>Nessuno stabilimento configurato.</p></div>';
+    grid.innerHTML = `<div class="empty-state"><p>${escapeHtml(t('cambia.empty'))}</p></div>`;
     return;
   }
 
@@ -49,14 +45,14 @@ function renderCards() {
         <div class="profile-card-head">
           <i class="fa-solid fa-umbrella-beach" style="color:${active ? '#0084ff' : '#ccc'}"></i>
           <h3>${escapeHtml(p.name)}</h3>
-          ${active ? '<span class="badge badge-green">Attivo</span>' : ''}
+          ${active ? `<span class="badge badge-green">${escapeHtml(t('badge.attivo'))}</span>` : ''}
         </div>
         <p class="profile-conn">${escapeHtml(connectionLabel(p))}</p>
         <div class="profile-card-actions">
-          ${active ? '' : `<button type="button" class="btn btn-primary btn-sm" data-activate="${p.id}">Attiva</button>`}
-          <button type="button" class="btn btn-secondary btn-sm" data-widget="${p.id}" title="Copia link widget"><i class="fa-solid fa-link"></i></button>
+          ${active ? '' : `<button type="button" class="btn btn-primary btn-sm" data-activate="${p.id}">${escapeHtml(t('cambia.activate'))}</button>`}
+          <button type="button" class="btn btn-secondary btn-sm" data-widget="${p.id}" title="${escapeHtml(t('cambia.copyWidgetTitle'))}"><i class="fa-solid fa-link"></i></button>
           <button type="button" class="btn btn-secondary btn-sm" data-edit="${p.id}"><i class="fa-solid fa-pen"></i></button>
-          <button type="button" class="btn btn-danger btn-sm" data-delete="${p.id}" ${profiles.length < 2 ? 'disabled title="Minimo 1 stabilimento"' : ''}><i class="fa-solid fa-trash"></i></button>
+          <button type="button" class="btn btn-danger btn-sm" data-delete="${p.id}" ${profiles.length < 2 ? `disabled title="${escapeHtml(t('cambia.minOneTitle'))}"` : ''}><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>
     `;
@@ -70,8 +66,8 @@ function renderCards() {
       const p = getProfiles().find((x) => x.id === btn.dataset.widget);
       if (!p) return;
       const link = widgetUrl(p);
-      navigator.clipboard?.writeText(link).then(() => alert(`Link widget copiato:\n${link}`))
-        .catch(() => prompt('Link widget prenotazioni:', link));
+      navigator.clipboard?.writeText(link).then(() => alert(`${t('cambia.widgetCopied')}\n${link}`))
+        .catch(() => prompt(t('cambia.widgetPrompt'), link));
     });
   });
   grid.querySelectorAll('[data-edit]').forEach((btn) => {
@@ -82,21 +78,13 @@ function renderCards() {
   });
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 function openModal(id = null) {
   editingId = id;
   const modal = $('profile-modal');
 
   if (id) {
     const p = getProfiles().find((x) => x.id === id);
-    $('modal-title').textContent = 'Modifica stabilimento';
+    $('modal-title').textContent = t('cambia.editFacility');
     $('f-name').value = p?.name || '';
     $('f-owner').value = p?.owner || '';
     $('f-repo').value = p?.repo || '';
@@ -104,7 +92,7 @@ function openModal(id = null) {
     $('f-database').value = p?.database || 'winbeach';
     $('f-token').value = getToken(id) || '';
   } else {
-    $('modal-title').textContent = 'Nuovo stabilimento';
+    $('modal-title').textContent = t('cambia.newFacility');
     $('profile-form').reset();
     $('f-branch').value = 'main';
     $('f-database').value = 'winbeach';
@@ -145,15 +133,17 @@ function activate(id) {
 }
 
 async function removeProfile(id) {
-  if (!confirm('Eliminare questo stabilimento dalla configurazione locale?')) return;
+  if (!confirm(t('cambia.confirmDelete'))) return;
   if (!deleteProfile(id)) {
-    alert('Debe quedar al menos un stabilimento.');
+    alert(t('cambia.minOneProfile'));
     return;
   }
   renderCards();
 }
 
 function bindEvents() {
+  if (window.__cambiaBound) return;
+  window.__cambiaBound = true;
   $('btn-nuovo').addEventListener('click', () => openModal());
   $('profile-form').addEventListener('submit', saveForm);
   $('modal-close').addEventListener('click', closeModal);
@@ -166,15 +156,14 @@ function bindEvents() {
   $('btn-demo')?.addEventListener('click', () => {
     const n = ensureDemoProfiles();
     renderCards();
-    alert(n ? `Aggiunti ${n} stabilimenti demo (BD separate).` : 'I profili demo sono già configurati.');
+    alert(n ? t('cambia.demoAdded').replace('{n}', n) : t('cambia.demoExists'));
   });
   $('profile-modal').addEventListener('click', (e) => {
     if (e.target === $('profile-modal')) closeModal();
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+initModule(async () => {
   bindEvents();
   renderCards();
-  onProfileChange(renderCards);
 });

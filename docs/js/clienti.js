@@ -116,7 +116,7 @@ async function saveCliente(e) {
   const authErr = assertCanWrite();
   if (authErr) { alert(authErr); return; }
   if (!getToken()) {
-    alert('Configura il token GitHub in Cambia stabilimento prima di salvare.');
+    alert(t('err.tokenCambia'));
     return;
   }
 
@@ -130,7 +130,7 @@ async function saveCliente(e) {
   };
 
   if (!cliente.nome) {
-    alert('Il nome è obbligatorio.');
+    alert(t('err.nameRequired'));
     return;
   }
 
@@ -143,7 +143,7 @@ async function saveCliente(e) {
   $('btn-save').textContent = t('common.save');
 
   if (!result.ok) {
-    alert(result.error || 'Errore nel salvataggio');
+    alert(result.error || t('err.saveFailed'));
     return;
   }
 
@@ -156,7 +156,7 @@ async function removeCliente(id) {
   const authErr = assertCanWrite();
   if (authErr) { alert(authErr); return; }
   if (!getToken()) {
-    alert('Configura il token GitHub prima di eliminare.');
+    alert(t('err.tokenDelete'));
     return;
   }
   if (!confirm(t('common.confirmDelete'))) return;
@@ -164,7 +164,7 @@ async function removeCliente(id) {
   const result = await deleteClienteFromDb(id);
   updateStatus();
   if (!result.ok) {
-    alert(result.error || 'Errore');
+    alert(result.error || t('err.generic'));
     return;
   }
   await loadData();
