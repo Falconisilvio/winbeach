@@ -6,54 +6,99 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 25px; background: #ffffff; color: #333; margin: 0; }
-        h1 { font-size: 24px; color: #2c3e50; margin-bottom: 5px; font-weight: 500; }
-        p { color: #7f8c8d; margin-bottom: 25px; font-size: 14px; }
         
-        .sala-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
-        .tavolo-card { background: #fafbfc; border-radius: 12px; border: 1px solid #e0e0e0; padding: 25px 15px; text-align: center; cursor: pointer; transition: 0.2s; border-left: 5px solid #2ecc71; }
+        .header-sala { border-bottom: 2px solid #f4f6fa; padding-bottom: 15px; margin-bottom: 25px; }
+        h1 { font-size: 24px; color: #2c3e50; margin: 0 0 5px 0; font-weight: 500; }
+        p { color: #7f8c8d; margin: 0; font-size: 14px; }
+        
+        /* Titoli delle Zone del Ristorante */
+        .zona-titolo { font-size: 16px; font-weight: 600; color: #2c3e50; background: #f8f9fa; padding: 8px 15px; border-radius: 6px; margin: 25px 0 15px 0; border-left: 4px solid #0b7ef3; display: flex; align-items: center; gap: 10px; }
+        .zona-titolo:first-of-type { margin-top: 0; }
+
+        /* Griglia responsiva dei tavoli */
+        .sala-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
+        
+        /* Card Tavolo */
+        .tavolo-card { background: #fafbfc; border-radius: 10px; border: 1px solid #e0e0e0; padding: 15px 10px; text-align: center; cursor: pointer; transition: 0.2s; border-left: 4px solid #2ecc71; }
         .tavolo-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.05); border-color: #0b7ef3; }
         
-        .tavolo-card i { font-size: 32px; color: #2ecc71; margin-bottom: 10px; }
-        .tavolo-card h3 { margin: 5px 0; color: #2c3e50; font-size: 16px; }
+        .tavolo-card i { font-size: 24px; color: #2ecc71; margin-bottom: 8px; }
+        .tavolo-card h3 { margin: 0 0 4px 0; color: #2c3e50; font-size: 14px; font-weight: 600; }
+        .tavolo-card small { font-size: 11px; font-weight: 500; color: #2ecc71; }
         
+        /* Stato Tavolo Occupato */
         .tavolo-card.occupato { border-left-color: #e74c3c; }
         .tavolo-card.occupato i { color: #e74c3c; }
+        .tavolo-card.occupato small { color: #e74c3c; }
     </style>
 </head>
 <body>
 
-    <h1>Mappa della Sala Ristorante</h1>
-    <p>Seleziona un tavolo per gestire l'ordine nel Punto Vendita.</p>
-
-    <div class="sala-grid">
-        <div class="tavolo-card" onclick="selezionaTavolo('Tavolo 1')">
-            <i class="fa-solid fa-circle-dot"></i>
-            <h3>Tavolo 1</h3>
-            <small style="color: #2ecc71;">Libero</small>
-        </div>
-        <div class="tavolo-card occupato" onclick="selezionaTavolo('Tavolo 2')">
-            <i class="fa-solid fa-utensils"></i>
-            <h3>Tavolo 2</h3>
-            <small style="color: #e74c3c;">In corso</small>
-        </div>
-        <div class="tavolo-card occupato" onclick="selezionaTavolo('Tavolo 3')">
-            <i class="fa-solid fa-utensils"></i>
-            <h3>Tavolo 3</h3>
-            <small style="color: #e74c3c;">In corso</small>
-        </div>
-        <div class="tavolo-card" onclick="selezionaTavolo('Tavolo 4')">
-            <i class="fa-solid fa-circle-dot"></i>
-            <h3>Tavolo 4</h3>
-            <small style="color: #2ecc71;">Libero</small>
-        </div>
+    <div class="header-sala">
+        <h1>Mappa della Sala Ristorante</h1>
+        <p>Seleziona uno dei 50 tavoli disponibili per aprire la comanda touch nel Punto Vendita.</p>
     </div>
 
+    <div class="zona-titolo"><i class="fa-solid fa-house-user"></i> Sala Interna</div>
+    <div class="sala-grid" id="zona-interna"></div>
+
+    <div class="zona-titolo"><i class="fa-solid fa-cloud-sun"></i> Terrazza Vista Mare</div>
+    <div class="sala-grid" id="zona-terrazza"></div>
+
+    <div class="zona-titolo"><i class="fa-solid fa-tree"></i> Giardino</div>
+    <div class="sala-grid" id="zona-giardino"></div>
+
+    <div class="zona-titolo"><i class="fa-solid fa-umbrella-beach"></i> Gazebo Beach</div>
+    <div class="sala-grid" id="zona-gazebo"></div>
+
     <script>
-        function selezionaTavolo(nomeTavolo) {
-            localStorage.setItem('tavoloSelezionato', nomeTavolo);
-            // Invia il comando di cambio pagina puntando a pointsale
-            window.parent.postMessage({ comando: 'cambiaPagina', target: 'point' }, '*');
+        // Funzione per generare i blocchi dei tavoli HTML in automatico
+        function generaMappaTavoli() {
+            const interna = document.getElementById('zona-interna');
+            const terrazza = document.getElementById('zona-terrazza');
+            const giardino = document.getElementById('zona-giardino');
+            const gazebo = document.getElementById('zona-gazebo');
+
+            // Ciclo unico per creare i 50 tavoli distribuiti nelle zone
+            for (let i = 1; i <= 50; i++) {
+                // Simuliamo uno stato occupato casuale (true o false) per fare scena grafica
+                const isOccupato = Math.random() < 0.35; 
+                const statoClasse = isOccupato ? 'occupato' : '';
+                const statoTesto = isOccupato ? 'In corso' : 'Libero';
+                const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+                
+                const tavoloHTML = `
+                    <div class="tavolo-card ${statoClasse}" onclick="selezionaTavolo('Tavolo ${i}')">
+                        <i class="fa-solid ${icona}"></i>
+                        <h3>Tavolo ${i}</h3>
+                        <small>${statoTesto}</small>
+                    </div>
+                `;
+
+                // Smistamento nelle rispettive zone in base al numero del tavolo
+                if (i <= 20) {
+                    interna.innerHTML += tavoloHTML;
+                } else if (i <= 35) {
+                    terrazza.innerHTML += tavoloHTML;
+                } else if (i <= 45) {
+                    giardino.innerHTML += tavoloHTML;
+                } else {
+                    gazebo.innerHTML += tavoloHTML;
+                }
+            }
         }
+
+        // Gestione del click sul singolo tavolo
+        function selezionaTavolo(nomeTavolo) {
+            // Salva il numero del tavolo cliccato
+            localStorage.setItem('tavoloSelezionato', nomeTavolo);
+            
+            // Invia l'ordine di switch alla dashboard caricando 'pointsale'
+            window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+        }
+
+        // Avvia la generazione della mappa dei tavoli al caricamento della pagina
+        window.onload = generaMappaTavoli;
     </script>
 </body>
 </html>
