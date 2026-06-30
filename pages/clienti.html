@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Anagrafica Clienti</title>
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -28,18 +29,20 @@
     <input type="search" id="search-input" placeholder="Cerca per nome, email, telefono…">
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Telefono</th>
-        <th>Stato / Note</th>
-        <th>Azioni</th>
-      </tr>
-    </thead>
-    <tbody id="clienti-tbody"></tbody>
-  </table>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefono</th>
+          <th>Stato / Note</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody id="clienti-tbody"></tbody>
+    </table>
+  </div>
 
   <div id="empty-state" class="empty-state" style="display:none">
     <i class="fa-solid fa-users" style="font-size:2rem;color:#ccc"></i>

@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Tabella Listini</title>
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -11,9 +12,11 @@
     <h2><i class="fa-solid fa-tags" style="color:#e67e22"></i> Tabella Listini</h2>
     <div class="toolbar"><button class="btn btn-warning"><i class="fa-solid fa-plus"></i> Nuovo listino</button></div>
   </div>
-  <table>
-    <thead><tr><th>Listino</th><th>Validità</th><th>Settori</th><th>Stato</th></tr></thead>
-    <tbody><tr><td>Estivo 2026</td><td>01/06 — 15/09</td><td>A, B, C</td><td><span class="badge badge-green">Attivo</span></td></tr><tr><td>Weekend</td><td>Sab-Dom</td><td>A, B</td><td><span class="badge badge-blue">Attivo</span></td></tr><tr><td>Bassa stagione</td><td>01/10 — 31/05</td><td>B, C</td><td><span class="badge badge-gray">Bozza</span></td></tr></tbody>
-  </table>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Listino</th><th>Validità</th><th>Settori</th><th>Stato</th></tr></thead>
+      <tbody><tr><td>Estivo 2026</td><td>01/06 — 15/09</td><td>A, B, C</td><td><span class="badge badge-green">Attivo</span></td></tr><tr><td>Weekend</td><td>Sab-Dom</td><td>A, B</td><td><span class="badge badge-blue">Attivo</span></td></tr><tr><td>Bassa stagione</td><td>01/10 — 31/05</td><td>B, C</td><td><span class="badge badge-gray">Bozza</span></td></tr></tbody>
+    </table>
+  </div>
 </body>
 </html>

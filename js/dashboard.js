@@ -8,6 +8,7 @@ window.addEventListener("load", function () {
 
     // Attiva il motore di gestione dei click e della navigazione fluida
     setupAppNavigation();
+    setupMobileNav();
 });
 
 //=========================================================
@@ -24,6 +25,12 @@ function setupAppNavigation() {
         icon.addEventListener("click", function() {
             sidebarIcons.forEach(i => i.classList.remove("active"));
             this.classList.add("active");
+
+            const layout = document.getElementById("app-layout");
+            if (layout) layout.classList.remove("menu-open");
+            const overlay = document.getElementById("menu-overlay");
+            if (overlay) overlay.classList.remove("show");
+            document.body.classList.remove("menu-lock");
 
             const page = this.getAttribute("data-page");
 
@@ -85,6 +92,40 @@ function setupAppNavigation() {
     }
 }
 
+function setupMobileNav() {
+    const layout = document.getElementById("app-layout");
+    const toggle = document.getElementById("btn-menu-toggle");
+    const overlay = document.getElementById("menu-overlay");
+    if (!layout || !toggle) return;
+
+    function closeMenu() {
+        layout.classList.remove("menu-open");
+        if (overlay) overlay.classList.remove("show");
+        document.body.classList.remove("menu-lock");
+    }
+
+    function openMenu() {
+        layout.classList.add("menu-open");
+        if (overlay) overlay.classList.add("show");
+        document.body.classList.add("menu-lock");
+    }
+
+    toggle.addEventListener("click", function () {
+        if (layout.classList.contains("menu-open")) closeMenu();
+        else openMenu();
+    });
+
+    if (overlay) overlay.addEventListener("click", closeMenu);
+
+    document.querySelectorAll(".leftmenu ul li[data-page], .leftmenu .group[data-page]").forEach(function (item) {
+        item.addEventListener("click", closeMenu);
+    });
+
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 1024) closeMenu();
+    });
+}
+
 function risolviPercorso(nomePagina) {
     if (nomePagina === "struttura") return "struttura.html";
     return `pages/${nomePagina}.html`;
@@ -117,7 +158,12 @@ function createPaymentChart() {
             labels: ["Interamente saldate", "Parzialmente saldate", "Da saldare"],
             datasets: [{ data: [53, 20, 9], backgroundColor: ["#0084FF", "#74B9FF", "#A5D8FF"], borderWidth: 0 }]
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: "70%", plugins: { legend: { position: "right" } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: { legend: { position: window.innerWidth < 768 ? "bottom" : "right" } }
+        }
     });
 }
 
@@ -128,7 +174,12 @@ function createChannelChart() {
             labels: ["Prenotazioni Offline", "Prenotazioni Widget", "Prenotazioni Portale"],
             datasets: [{ data: [62, 30, 20], backgroundColor: ["#F39C12", "#F1C40F", "#FDEBD0"], borderWidth: 0 }]
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: "70%", plugins: { legend: { position: "right" } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: { legend: { position: window.innerWidth < 768 ? "bottom" : "right" } }
+        }
     });
 }
 
