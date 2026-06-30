@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Genera datos de prueba para winbeach.json (githubDB).
- * Uso: node seed-demo.mjs [--out path]
+ * Genera datos de prueba para varias BDs WinBeach en githubDB.
+ * Uso: node seed-demo.mjs [--all]
  */
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, copyFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,6 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const TODAY = '2026-06-30';
 const TOMORROW = '2026-07-01';
 const YESTERDAY = '2026-06-29';
+const GITHUBDB = join(__dirname, '../../githubdb/data');
 
 function isoOffset(days) {
   const d = new Date(TODAY);
@@ -18,201 +19,147 @@ function isoOffset(days) {
   return d.toISOString().slice(0, 10);
 }
 
-function generateCelle() {
-  const rows = [];
+function generateCelle(rows, cols, walkway) {
+  const out = [];
   let id = 1;
   let cella = 1;
-  const ROWS = 14;
-  const COLS = 22;
-  const WALKWAY = 11;
-
-  for (let y = 1; y <= ROWS; y++) {
-    for (let x = 1; x <= COLS; x++) {
-      if (x === WALKWAY) {
-        rows.push([id++, 0, x, y, 'Pasarela', '', null, false]);
+  for (let y = 1; y <= rows; y++) {
+    for (let x = 1; x <= cols; x++) {
+      if (x === walkway) {
+        out.push([id++, 0, x, y, 'Pasarela', '', null, false]);
         continue;
       }
       if (y <= 2) {
-        rows.push([id++, 0, x, y, 'Mare', '', null, false]);
+        out.push([id++, 0, x, y, 'Mare', '', null, false]);
         continue;
       }
-      const settore = y <= 5 ? 'A' : y <= 9 ? 'B' : 'C';
+      const settore = y <= Math.ceil(rows * 0.35) ? 'A' : y <= Math.ceil(rows * 0.65) ? 'B' : 'C';
       const tipo = (x + y) % 7 === 0 ? 'Cabina' : (x + y) % 5 === 0 ? 'Hawaiana' : 'Ombrellone';
-      rows.push([id++, cella++, x, y, tipo, `${tipo} ${cella - 1}`, settore, true]);
+      out.push([id++, cella++, x, y, tipo, `${tipo} ${cella - 1}`, settore, true]);
     }
+  }
+  return out;
+}
+
+function makeClienti(prefix, count) {
+  const nomi = ['Marco', 'Giulia', 'Luca', 'Sofia', 'Andrea', 'Elena', 'Paolo', 'Francesca', 'Davide', 'Chiara'];
+  const cognomi = ['Rossi', 'Bianchi', 'Verdi', 'Russo', 'Ferrari', 'Colombo', 'Ricci', 'Marino', 'Greco', 'Bruno'];
+  return Array.from({ length: count }, (_, i) => {
+    const n = nomi[i % nomi.length];
+    const c = cognomi[(i + 3) % cognomi.length];
+    return [i + 1, n, c, `${prefix}.${n.toLowerCase()}@email.it`, `+39 333 ${1000000 + i}`, i === 0 ? 'Cliente VIP' : ''];
+  });
+}
+
+function makePrenotazioni(clienti, cellaMax, count, seed = 0) {
+  const canali = ['offline', 'widget', 'portale'];
+  const statiPag = ['saldato', 'parziale', 'da_saldare'];
+  const rows = [];
+  for (let i = 0; i < count; i++) {
+    const id = i + 1;
+    const clienteId = (i % clienti.length) + 1;
+    const cella = ((i * 7 + seed) % cellaMax) + 1;
+    const offsetIn = (i % 5) - 2 + (seed % 3);
+    const dur = 2 + (i % 6);
+    const inizio = offsetIn <= 0 ? TODAY : isoOffset(offsetIn);
+    const fine = offsetIn <= 0 ? isoOffset(dur) : isoOffset(offsetIn + dur);
+    const stato = i % 11 === 0 ? 'cancellata' : i % 7 === 0 ? 'in_attesa' : 'confermata';
+    const importo = 35 + (i % 8) * 28;
+    const pagato = stato === 'cancellata' ? 0 : statiPag[i % 3] === 'saldato' ? importo : statiPag[i % 3] === 'parziale' ? Math.round(importo * 0.4) : 0;
+    rows.push([
+      id, clienteId, cella, inizio, fine, stato, '',
+      importo, pagato, canali[i % 3], statiPag[i % 3],
+      inizio === TODAY ? '09:00' : '', inizio <= TODAY && fine >= TODAY, fine === TODAY,
+    ]);
   }
   return rows;
 }
 
-const CLIENTI = [
-  [1, 'Marco', 'Rossi', 'marco.rossi@email.it', '+39 333 1110001', ''],
-  [2, 'Giulia', 'Bianchi', 'giulia.b@email.it', '+39 333 1110002', 'Cliente VIP'],
-  [3, 'Luca', 'Verdi', 'luca.verdi@email.it', '+39 333 1110003', ''],
-  [4, 'Sofia', 'Russo', 'sofia.r@email.it', '+39 333 1110004', ''],
-  [5, 'Andrea', 'Ferrari', 'andrea.f@email.it', '+39 333 1110005', ''],
-  [6, 'Elena', 'Colombo', 'elena.c@email.it', '+39 333 1110006', ''],
-  [7, 'Paolo', 'Ricci', 'paolo.r@email.it', '+39 333 1110007', ''],
-  [8, 'Francesca', 'Marino', 'francesca.m@email.it', '+39 333 1110008', ''],
-  [9, 'Davide', 'Greco', 'davide.g@email.it', '+39 333 1110009', ''],
-  [10, 'Chiara', 'Bruno', 'chiara.b@email.it', '+39 333 1110010', ''],
-  [11, 'Matteo', 'Galli', 'matteo.g@email.it', '+39 333 1110011', ''],
-  [12, 'Valentina', 'Conti', 'valentina.c@email.it', '+39 333 1110012', ''],
-  [13, 'Simone', 'Mancini', 'simone.m@email.it', '+39 333 1110013', ''],
-  [14, 'Alessia', 'Costa', 'alessia.c@email.it', '+39 333 1110014', ''],
-  [15, 'Roberto', 'Fontana', 'roberto.f@email.it', '+39 333 1110015', 'Hotel Riviera'],
-  [16, 'Laura', 'Barbieri', 'laura.b@email.it', '+39 333 1110016', ''],
-  [17, 'Stefano', 'Lombardi', 'stefano.l@email.it', '+39 333 1110017', ''],
-  [18, 'Martina', 'Moretti', 'martina.m@email.it', '+39 333 1110018', ''],
-  [19, 'Giuseppe', 'Caruso', 'giuseppe.c@email.it', '+39 333 1110019', ''],
-  [20, 'Anna', 'Ferrara', 'anna.f@email.it', '+39 333 1110020', ''],
+const DATABASES = [
+  {
+    file: 'winbeach.json',
+    azienda: 'Stabilimento Balneare S.r.l.',
+    grid: { rows: 14, cols: 22, walkway: 11 },
+    clienti: 20,
+    prenotazioni: 35,
+    seed: 0,
+    hotel: 'Hotel Riviera',
+  },
+  {
+    file: 'winbeach-lido-sud.json',
+    azienda: 'Lido Sud di Puglia S.r.l.',
+    grid: { rows: 10, cols: 16, walkway: 8 },
+    clienti: 8,
+    prenotazioni: 12,
+    seed: 11,
+    hotel: 'Hotel Baia Sud',
+  },
+  {
+    file: 'winbeach-lido-europa.json',
+    azienda: 'Lido Europa Beach Club',
+    grid: { rows: 12, cols: 20, walkway: 10 },
+    clienti: 14,
+    prenotazioni: 22,
+    seed: 23,
+    hotel: 'Grand Hotel Europa',
+  },
 ];
 
-/** id, cliente_id, cella, inizio, fine, stato, note, importo, pagato, canale, stato_pag, ora, check_in, check_out */
-const PRENOTAZIONI = [
-  [1, 1, 12, TODAY, isoOffset(7), 'confermata', '', 245, 245, 'offline', 'saldato', '09:30', true, false],
-  [2, 2, 18, TODAY, isoOffset(14), 'confermata', 'VIP', 490, 200, 'widget', 'parziale', '10:15', true, false],
-  [3, 3, 25, TODAY, isoOffset(3), 'confermata', '', 84, 0, 'portale', 'da_saldare', '11:00', false, false],
-  [4, 4, 31, TODAY, TOMORROW, 'confermata', 'Giornaliero', 35, 35, 'offline', 'saldato', '08:45', true, false],
-  [5, 5, 44, TODAY, isoOffset(5), 'in_attesa', '', 140, 0, 'widget', 'da_saldare', '', false, false],
-  [6, 6, 52, isoOffset(-5), TODAY, 'confermata', '', 168, 168, 'offline', 'saldato', '09:00', true, false],
-  [7, 7, 58, isoOffset(-3), TODAY, 'confermata', '', 112, 112, 'portale', 'saldato', '08:30', true, true],
-  [8, 8, 63, isoOffset(-7), TODAY, 'confermata', '', 196, 100, 'offline', 'parziale', '10:00', true, false],
-  [9, 9, 71, isoOffset(-2), isoOffset(5), 'confermata', '', 196, 196, 'widget', 'saldato', '09:15', true, false],
-  [10, 10, 78, isoOffset(-1), isoOffset(6), 'confermata', '', 210, 210, 'offline', 'saldato', '08:00', true, false],
-  [11, 11, 85, TOMORROW, isoOffset(8), 'confermata', '', 252, 0, 'portale', 'da_saldare', '', false, false],
-  [12, 12, 92, TOMORROW, isoOffset(4), 'confermata', '', 112, 112, 'offline', 'saldato', '', false, false],
-  [13, 13, 15, isoOffset(-10), isoOffset(-2), 'confermata', '', 224, 224, 'offline', 'saldato', '', true, true],
-  [14, 14, 22, isoOffset(-4), YESTERDAY, 'confermata', '', 112, 112, 'widget', 'saldato', '', true, true],
-  [15, 15, 38, isoOffset(-14), isoOffset(7), 'confermata', 'Hotel', 455, 455, 'offline', 'saldato', '09:30', true, false],
-  [16, 16, 47, isoOffset(-6), isoOffset(1), 'confermata', '', 196, 50, 'portale', 'parziale', '10:30', true, false],
-  [17, 17, 55, isoOffset(-8), isoOffset(-1), 'cancellata', 'Cliente malato', 0, 0, 'offline', 'da_saldare', '', false, false],
-  [18, 18, 66, isoOffset(-12), isoOffset(-3), 'cancellata', 'Meteo', 0, 0, 'widget', 'da_saldare', '', false, false],
-  [19, 19, 74, isoOffset(-1), isoOffset(2), 'confermata', '', 84, 84, 'offline', 'saldato', '11:30', true, false],
-  [20, 20, 81, isoOffset(-3), isoOffset(4), 'confermata', '', 196, 196, 'portale', 'saldato', '09:45', true, false],
-  [21, 1, 88, isoOffset(-20), isoOffset(-5), 'confermata', 'Stagionale', 650, 650, 'offline', 'saldato', '', true, true],
-  [22, 3, 95, isoOffset(-2), TODAY, 'confermata', '', 56, 56, 'widget', 'saldato', '07:30', true, false],
-  [23, 5, 102, TODAY, isoOffset(2), 'confermata', '', 56, 0, 'portale', 'da_saldare', '12:00', false, false],
-  [24, 7, 108, isoOffset(-5), isoOffset(2), 'confermata', '', 196, 196, 'offline', 'saldato', '08:15', true, false],
-  [25, 9, 115, isoOffset(-7), isoOffset(0), 'confermata', '', 238, 238, 'widget', 'saldato', '09:00', true, false],
-  [26, 11, 5, TODAY, isoOffset(10), 'confermata', 'Cabina', 350, 175, 'offline', 'parziale', '10:45', true, false],
-  [27, 13, 33, isoOffset(-1), TODAY, 'confermata', '', 28, 28, 'offline', 'saldato', '08:50', true, true],
-  [28, 15, 41, TODAY, isoOffset(6), 'confermata', '', 210, 210, 'portale', 'saldato', '09:20', true, false],
-  [29, 17, 49, isoOffset(-9), isoOffset(5), 'confermata', '', 392, 392, 'offline', 'saldato', '', true, false],
-  [30, 19, 57, isoOffset(-4), isoOffset(3), 'confermata', '', 196, 100, 'widget', 'parziale', '10:10', true, false],
-  [31, 2, 68, isoOffset(-15), TODAY, 'confermata', 'Lungo soggiorno', 420, 420, 'offline', 'saldato', '08:00', true, false],
-  [32, 4, 76, TODAY, TODAY, 'confermata', 'Day use', 35, 35, 'offline', 'saldato', '07:00', true, false],
-  [33, 6, 84, isoOffset(-2), TOMORROW, 'confermata', '', 56, 56, 'portale', 'saldato', '09:30', true, false],
-  [34, 8, 91, isoOffset(-6), isoOffset(1), 'in_attesa', '', 196, 0, 'widget', 'da_saldare', '', false, false],
-  [35, 10, 99, isoOffset(-3), isoOffset(7), 'confermata', '', 280, 280, 'offline', 'saldato', '08:40', true, false],
-];
-
-const MOVIMENTI_CASSA = [
-  [1, `${TODAY}T09:30:00`, 'entrata', 'Prenotazione #1 — Marco Rossi', 245, 'contanti', 1, 'reception', ''],
-  [2, `${TODAY}T10:15:00`, 'entrata', 'Acconto prenotazione #2', 200, 'carta', 2, 'reception', ''],
-  [3, `${TODAY}T08:45:00`, 'entrata', 'Prenotazione #4 — giornaliero', 35, 'contanti', 4, 'reception', ''],
-  [4, `${TODAY}T11:00:00`, 'uscita', 'Cambio iniziale cassa', 100, 'contanti', 0, 'reception', ''],
-  [5, `${TODAY}T12:30:00`, 'entrata', 'Bar — consumazioni', 45.5, 'carta', 0, 'bar', ''],
-  [6, `${TODAY}T14:00:00`, 'entrata', 'Prenotazione #32 — day use', 35, 'contanti', 32, 'reception', ''],
-  [7, `${YESTERDAY}T18:00:00`, 'entrata', 'Incasso giornata precedente', 1280, 'contanti', 0, 'reception', ''],
-  [8, `${TODAY}T16:00:00`, 'entrata', 'Prenotazione #28', 210, 'bonifico', 28, 'reception', ''],
-  [9, `${TODAY}T09:00:00`, 'entrata', 'Prenotazione #6 — saldo', 168, 'carta', 6, 'reception', ''],
-  [10, `${TODAY}T10:00:00`, 'entrata', 'Acconto prenotazione #8', 100, 'carta', 8, 'reception', ''],
-];
-
-const LOG_SCONTI = [
-  [1, `${TODAY}T10:00:00`, 'reception', 2, 2, 10, 49, 'Cliente abituale'],
-  [2, `${YESTERDAY}T15:30:00`, 'admin', 15, 15, 5, 22.75, 'Convenzione hotel'],
-  [3, isoOffset(-3) + 'T11:00:00', 'reception', 8, 8, 15, 16.8, 'Promo settimana'],
-];
-
-const LOG_CANCELLAZIONI = [
-  [1, isoOffset(-2) + 'T09:00:00', 17, 17, 168, 34, 'Cliente malato', 'reception'],
-  [2, isoOffset(-5) + 'T14:00:00', 18, 18, 252, 50, 'Meteo avverso', 'admin'],
-  [3, isoOffset(-8) + 'T10:30:00', 21, 1, 650, 0, 'Rimborso totale', 'admin'],
-];
-
-const LOG_MODIFICHE = [
-  [1, `${TODAY}T08:00:00`, 6, 50, 52, 'reception', 'Upgrade settore B→A'],
-  [2, isoOffset(-1) + 'T16:00:00', 10, 72, 78, 'reception', 'Spostamento per manutenzione'],
-  [3, isoOffset(-4) + 'T11:00:00', 20, 70, 81, 'admin', 'Richiesta cliente'],
-];
-
-const MOVIMENTI_MAGAZZINO = [
-  [1, 1, `${TODAY}T07:00:00`, 'uscita', 3, 'Setup mattutino'],
-  [2, 2, `${TODAY}T07:00:00`, 'uscita', 6, 'Setup mattutino'],
-  [3, 3, isoOffset(-1) + 'T18:00:00', 'uscita', 15, 'Vendita teli'],
-  [4, 1, isoOffset(-7) + 'T09:00:00', 'entrata', 20, 'Rifornimento fornitore'],
-];
-
-const PAGAMENTI_STRIPE = [
-  [1, `${TODAY}T10:15:00`, 2, 2, 200, 'card', 'pi_3NxDemo001', 'succeeded'],
-  [2, isoOffset(-1) + 'T14:30:00', 10, 10, 210, 'card', 'pi_3NxDemo002', 'succeeded'],
-  [3, isoOffset(-3) + 'T09:00:00', 16, 16, 50, 'card', 'pi_3NxDemo003', 'succeeded'],
-  [4, `${TODAY}T11:30:00`, 3, 3, 84, 'card', 'pi_3NxDemo004', 'pending'],
-];
-
-const TRASFERIMENTI_STRIPE = [
-  [1, isoOffset(-7) + 'T08:00:00', 2450, 'IT89X0501803200000012345678', 'po_1NxDemo001', 'paid'],
-  [2, isoOffset(-1) + 'T08:00:00', 1890, 'IT89X0501803200000012345678', 'po_1NxDemo002', 'paid'],
-];
-
-const ATTIVITA = [
-  [1, `${TODAY}T07:30:00`, 'Apertura stabilimento', 'completata', 'Marco R.', ''],
-  [2, `${TODAY}T08:00:00`, 'Controllo postazioni settore A', 'in_corso', 'Anna L.', ''],
-  [3, `${TODAY}T12:00:00`, 'Pulizia servizi comuni', 'pianificata', 'Paolo B.', ''],
-  [4, TOMORROW + 'T07:00:00', 'Preparazione arrivi domani', 'pianificata', 'reception', `${PRENOTAZIONI.filter((p) => p[3] === TOMORROW).length} arrivi`],
-];
-
-function seed(db) {
-  const celle = generateCelle();
+function seedDb(db, cfg) {
+  const { rows, cols, walkway } = cfg.grid;
+  const celle = generateCelle(rows, cols, walkway);
   const postazioni = celle.filter((c) => c[7] && c[1] > 0).length;
+  const clienti = makeClienti(cfg.file.replace('.json', '').replace('winbeach-', ''), cfg.clienti);
+  const prenotazioni = makePrenotazioni(clienti, postazioni, cfg.prenotazioni, cfg.seed);
 
-  db.tables.config.rows = [[1, 14, 22, 11, postazioni + 1, '2026-06-01', '2026-09-15', new Date().toISOString()]];
+  db.tables.config.rows = [[1, rows, cols, walkway, postazioni + 1, '2026-06-01', '2026-09-15', new Date().toISOString()]];
   db.tables.celle.rows = celle;
-  db.tables.clienti.rows = CLIENTI;
-  db.tables.prenotazioni.rows = PRENOTAZIONI;
-  db.tables.movimenti_cassa.rows = MOVIMENTI_CASSA;
-  db.tables.log_sconti.rows = LOG_SCONTI;
-  db.tables.log_cancellazioni.rows = LOG_CANCELLAZIONI;
-  db.tables.log_modifiche.rows = LOG_MODIFICHE;
-  db.tables.movimenti_magazzino.rows = MOVIMENTI_MAGAZZINO;
-  db.tables.pagamenti_stripe.rows = PAGAMENTI_STRIPE;
-  db.tables.trasferimenti_stripe.rows = TRASFERIMENTI_STRIPE;
-  db.tables.attivita.rows = ATTIVITA;
+  db.tables.clienti.rows = clienti;
+  db.tables.prenotazioni.rows = prenotazioni;
+  db.tables.azienda.rows = [[1, cfg.azienda, 'IT12345678901', 'Lungomare Europa, 1', 'info@winbeach.it', '+39 080 1234567', '01/06 — 15/09']];
 
-  db.tables.contatori_albergo.rows = [
-    [1, 'Hotel Riviera', 'OMB-2026', 200, 28],
-    [2, 'Grand Beach', 'OMB-2026', 200, 15],
-  ];
-  db.tables.voucher.rows = [
-    [1, 'SUMMER2026', 500, 87, '2026-09-15'],
-    [2, 'WELCOME10', 200, 42, '2026-12-31'],
-  ];
+  const entrate = prenotazioni.filter((p) => p[5] !== 'cancellata').slice(0, 5);
+  db.tables.movimenti_cassa.rows = entrate.map((p, i) => [
+    i + 1, `${TODAY}T${9 + i}:00:00`, 'entrata', `Prenotazione #${p[0]}`, p[8] || p[7], 'contanti', p[0], 'reception', '',
+  ]);
 
+  db.tables.log_sconti.rows = [[1, `${TODAY}T10:00:00`, 'reception', 1, 1, 10, 24, 'Demo']];
+  db.tables.log_cancellazioni.rows = prenotazioni
+    .filter((p) => p[5] === 'cancellata')
+    .map((p, i) => [i + 1, `${YESTERDAY}T09:00:00`, p[0], p[1], p[7], 20, 'Demo', 'reception']);
+  db.tables.contatori_albergo.rows = [[1, cfg.hotel, 'OMB-2026', 100, Math.min(cfg.prenotazioni, 30)]];
+
+  const attive = prenotazioni.filter((p) => p[5] !== 'cancellata');
   return {
-    clienti: CLIENTI.length,
-    prenotazioni: PRENOTAZIONI.length,
-    celle: celle.length,
+    name: cfg.file,
+    clienti: clienti.length,
+    prenotazioni: prenotazioni.length,
     postazioni,
-    arriviOggi: PRENOTAZIONI.filter((p) => p[5] !== 'cancellata' && p[3] === TODAY).length,
-    partenzeOggi: PRENOTAZIONI.filter((p) => p[5] !== 'cancellata' && p[4] === TODAY).length,
-    cancellazioni: PRENOTAZIONI.filter((p) => p[5] === 'cancellata').length,
-    fatturato: PRENOTAZIONI.filter((p) => p[5] !== 'cancellata').reduce((s, p) => s + p[7], 0),
+    arriviOggi: attive.filter((p) => p[3] === TODAY).length,
+    partenzeOggi: attive.filter((p) => p[4] === TODAY).length,
+    fatturato: attive.reduce((s, p) => s + p[7], 0),
   };
 }
 
+const baseSchema = JSON.parse(readFileSync(join(__dirname, 'winbeach.json'), 'utf8'));
+
 const outArg = process.argv.indexOf('--out');
-const outPath = outArg >= 0 ? process.argv[outArg + 1] : join(__dirname, 'winbeach.json');
+if (outArg >= 0) {
+  const db = structuredClone(baseSchema);
+  const stats = seedDb(db, DATABASES[0]);
+  writeFileSync(process.argv[outArg + 1], JSON.stringify(db, null, 2) + '\n');
+  console.log('Seed:', process.argv[outArg + 1], stats);
+  process.exit(0);
+}
 
-const db = JSON.parse(readFileSync(join(__dirname, 'winbeach.json'), 'utf8'));
-const stats = seed(db);
-writeFileSync(outPath, JSON.stringify(db, null, 2) + '\n', 'utf8');
-
-console.log('Seed generado:', outPath);
-console.log('  clienti:', stats.clienti);
-console.log('  prenotazioni:', stats.prenotazioni);
-console.log('  celle:', stats.celle, `(${stats.postazioni} postazioni)`);
-console.log('  arrivi oggi:', stats.arriviOggi);
-console.log('  partenze oggi:', stats.partenzeOggi);
-console.log('  cancellazioni:', stats.cancellazioni);
-console.log('  fatturato:', stats.fatturato, '€');
+const toGenerate = process.argv.includes('--all') ? DATABASES : DATABASES;
+console.log('=== Generando BDs de prueba ===\n');
+for (const cfg of toGenerate) {
+  const db = structuredClone(baseSchema);
+  const stats = seedDb(db, cfg);
+  const localPath = join(__dirname, cfg.file);
+  const remotePath = join(GITHUBDB, cfg.file);
+  writeFileSync(localPath, JSON.stringify(db, null, 2) + '\n');
+  if (existsSync(GITHUBDB)) writeFileSync(remotePath, JSON.stringify(db, null, 2) + '\n');
+  console.log(`${cfg.file}: ${stats.clienti} clienti, ${stats.prenotazioni} prenotazioni, arrivi oggi ${stats.arriviOggi}, €${stats.fatturato}`);
+}
