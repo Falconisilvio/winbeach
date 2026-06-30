@@ -21,7 +21,7 @@ export class GithubDB {
     repo = 'githubdb',
     branch = 'main',
     token = null,
-    fetch = globalThis.fetch,
+    fetch: fetchFn = globalThis.fetch,
     embedder = null,
     _pipelineLoader = null
   }) {
@@ -29,7 +29,8 @@ export class GithubDB {
     this._repo = repo;
     this._branch = branch;
     this._token = token;
-    this._fetch = fetch;
+    // fetch must keep globalThis as `this` — bare reference causes "Illegal invocation"
+    this._fetch = (url, init) => fetchFn.call(globalThis, url, init);
     this._embedder = embedder;
     this._pipelineLoader = _pipelineLoader;
     /** @type {Map<string, object>} per-instance db cache */
