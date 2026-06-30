@@ -542,3 +542,64 @@
   background: var(--wb-surface) !important;
   color: var(--wb-text) !important;
 }
+
+/* ── Ristorante: mappa tavoli, POS, shell ── */
+[data-theme="dark"] html {
+  background: var(--wb-bg);
+}
+
+[data-theme="dark"] body.tavoli-page,
+[data-theme="dark"] body.pointsale-page,
+[data-theme="dark"] body.ristorante-shell {
+  background: var(--wb-bg);
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] .tavoli-page .header-sala {
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .tavoli-page .header-sala h1,
+[data-theme="dark"] .tavoli-page .tavolo-card h3 {
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] .tavoli-page .header-sala p {
+  color: var(--wb-text-muted);
+}
+
+[data-theme="dark"] .tavoli-page .zona-titolo {
+  background: var(--wb-surface-2);
+  color: var(--wb-text);
+  border-left-color: var(--wb-accent);
+}
+
+[data-theme="dark"] .tavoli-page .tavolo-card {
+  background: var(--wb-surface);
+  border-color: var(--wb-border);
+  box-shadow: 0 1px 3px var(--wb-shadow-sm);
+}
+
+[data-theme="dark"] .tavoli-page .tavolo-card:hover {
+  background: var(--wb-surface-hover);
+  border-color: var(--wb-accent);
+  box-shadow: 0 6px 15px var(--wb-shadow);
+}
+
+[data-theme="dark"] .tavoli-page .tavolo-card.occupato {
+  border-left-color: #f87171;
+}
+
+[data-theme="dark"] .tavoli-page .tavolo-card.occupato i,
+[data-theme="dark"] .tavoli-page .tavolo-card.occupato small {
+  color: #f87171;
+}
+
+[data-theme="dark"] .tavoli-page .tavolo-card:not(.occupato) i,
+[data-theme="dark"] .tavoli-page .tavolo-card:not(.occupato) small {
+  color: #4ade80;
+}
+
+[data-theme="dark"] .tavoli-page .tavolo-card:not(.occupato) {
+  border-left-color: #4ade80;
+}
