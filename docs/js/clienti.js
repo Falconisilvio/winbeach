@@ -1,6 +1,4 @@
 import {
-  getDbStatus,
-  getActiveProfile,
   getToken,
   loadClientiFromDb,
   saveClienteToDb,
@@ -8,23 +6,13 @@ import {
 } from './winbeach-db.js';
 import { applyReadOnlyMode, onAuthChange } from './winbeach-auth.js';
 import { t } from './app-i18n.js';
-import { $, escapeHtml, initModule } from './winbeach-module.js';
+import { $, escapeHtml, initModule, updateDbBar } from './winbeach-module.js';
 
 let clienti = [];
 let editingId = null;
 
 function fullName(c) {
   return [c.nome, c.cognome].filter(Boolean).join(' ').trim() || '—';
-}
-
-function updateStatus() {
-  const { state, message } = getDbStatus();
-  const el = $('db-status');
-  if (!el) return;
-  const profile = getActiveProfile();
-  const prefix = profile ? `${profile.name} · ` : '';
-  el.className = `db-status ${state}`;
-  el.textContent = message ? prefix + message : prefix + t('common.ready');
 }
 
 function getFiltered() {
@@ -101,7 +89,7 @@ function closeModal() {
 async function loadData() {
   $('btn-reload').disabled = true;
   const result = await loadClientiFromDb();
-  updateStatus();
+  updateDbBar();
   $('btn-reload').disabled = false;
 
   if (result.ok) {
@@ -138,7 +126,7 @@ async function saveCliente(e) {
   $('btn-save').textContent = t('common.saving');
 
   const result = await saveClienteToDb(cliente, clienti);
-  updateStatus();
+  updateDbBar();
   $('btn-save').disabled = false;
   $('btn-save').textContent = t('common.save');
 
@@ -162,7 +150,7 @@ async function removeCliente(id) {
   if (!confirm(t('common.confirmDelete'))) return;
 
   const result = await deleteClienteFromDb(id);
-  updateStatus();
+  updateDbBar();
   if (!result.ok) {
     alert(result.error || t('err.generic'));
     return;

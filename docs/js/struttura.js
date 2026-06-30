@@ -134,7 +134,7 @@ function updateDbStatusUI() {
   if (!el) return;
   const { state, message } = getDbStatus();
   el.className = `db-status ${state}`;
-  el.textContent = message || 'Sin conexión';
+  el.textContent = message || (typeof window.__wbT === 'function' ? window.__wbT('db.noConnection') : 'Sin conexión');
 }
 
 function applyStrutturaData(data) {
