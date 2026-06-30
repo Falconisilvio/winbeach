@@ -5,31 +5,28 @@
     <title>Sala e Tavoli</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 25px; background: #f4f6fa; margin: 0; }
-        h1 { font-size: 26px; color: #2c3e50; margin-bottom: 5px; }
-        p { color: #7f8c8d; margin-bottom: 25px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 25px; background: #ffffff; color: #333; margin: 0; }
+        h1 { font-size: 24px; color: #2c3e50; margin-bottom: 5px; font-weight: 500; }
+        p { color: #7f8c8d; margin-bottom: 25px; font-size: 14px; }
         
-        .sala-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; }
-        .tavolo-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 25px 15px; text-align: center; cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
-        .tavolo-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: #3498db; }
+        .sala-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
+        .tavolo-card { background: #fafbfc; border-radius: 12px; border: 1px solid #e0e0e0; padding: 25px 15px; text-align: center; cursor: pointer; transition: 0.2s; border-left: 5px solid #2ecc71; }
+        .tavolo-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.05); border-color: #0b7ef3; }
         
-        .tavolo-card i { font-size: 32px; color: #7f8c8d; margin-bottom: 10px; }
-        .tavolo-card h3 { margin: 5px 0; color: #2c3e50; }
+        .tavolo-card i { font-size: 32px; color: #2ecc71; margin-bottom: 10px; }
+        .tavolo-card h3 { margin: 5px 0; color: #2c3e50; font-size: 16px; }
         
-        /* Stati del tavolo */
-        .tavolo-card.occupato { border-left: 5px solid #e74c3c; }
+        .tavolo-card.occupato { border-left-color: #e74c3c; }
         .tavolo-card.occupato i { color: #e74c3c; }
-        .tavolo-card.libero { border-left: 5px solid #2ecc71; }
-        .tavolo-card.libero i { color: #2ecc71; }
     </style>
 </head>
 <body>
 
-    <h1>Mappa della Sala</h1>
-    <p>Seleziona un tavolo per gestire la comanda o emettere il conto.</p>
+    <h1>Mappa della Sala Ristorante</h1>
+    <p>Seleziona un tavolo per gestire l'ordine nel Punto Vendita.</p>
 
     <div class="sala-grid">
-        <div class="tavolo-card libero" onclick="selezionaTavolo('Tavolo 1')">
+        <div class="tavolo-card" onclick="selezionaTavolo('Tavolo 1')">
             <i class="fa-solid fa-circle-dot"></i>
             <h3>Tavolo 1</h3>
             <small style="color: #2ecc71;">Libero</small>
@@ -37,32 +34,25 @@
         <div class="tavolo-card occupato" onclick="selezionaTavolo('Tavolo 2')">
             <i class="fa-solid fa-utensils"></i>
             <h3>Tavolo 2</h3>
-            <small style="color: #e74c3c;">In Corso</small>
+            <small style="color: #e74c3c;">In corso</small>
         </div>
         <div class="tavolo-card occupato" onclick="selezionaTavolo('Tavolo 3')">
             <i class="fa-solid fa-utensils"></i>
             <h3>Tavolo 3</h3>
-            <small style="color: #e74c3c;">In Corso</small>
+            <small style="color: #e74c3c;">In corso</small>
         </div>
-        <div class="tavolo-card libero" onclick="selezionaTavolo('Tavolo 4')">
+        <div class="tavolo-card" onclick="selezionaTavolo('Tavolo 4')">
             <i class="fa-solid fa-circle-dot"></i>
             <h3>Tavolo 4</h3>
-            <small style="color: #2ecc71;">Libero</small>
-        </div>
-        <div class="tavolo-card libero" onclick="selezionaTavolo('Terrazza 1')">
-            <i class="fa-solid fa-umbrella"></i>
-            <h3>Terrazza 1</h3>
             <small style="color: #2ecc71;">Libero</small>
         </div>
     </div>
 
     <script>
         function selezionaTavolo(nomeTavolo) {
-            // Salva il tavolo selezionato nel LocalStorage del browser
             localStorage.setItem('tavoloSelezionato', nomeTavolo);
-            
-            // Invia una notifica al file padre ristorante.html per spostarsi sul menu cassa
-            window.parent.postMessage('apriCassa', '*');
+            // Invia il comando di cambio pagina puntando a pointsale
+            window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
         }
     </script>
 </body>
