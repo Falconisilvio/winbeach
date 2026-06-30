@@ -1,4 +1,5 @@
 import { getSession, logout, onAuthChange, canWrite, userLabel, applyReadOnlyMode } from './winbeach-auth.js';
+import { t, onLangChange, applyAllI18n } from './app-i18n.js';
 
 function renderAuthBar() {
   const label = document.getElementById('user-label');
@@ -12,7 +13,7 @@ function renderAuthBar() {
       label.innerHTML = `<i class="fa-solid fa-user-check"></i> ${userLabel()}`;
       label.className = 'user-label authenticated';
     } else {
-      label.innerHTML = '<i class="fa-solid fa-eye"></i> Sola lettura';
+      label.innerHTML = `<i class="fa-solid fa-eye"></i> ${t('auth.readonlyShort')}`;
       label.className = 'user-label guest';
     }
   }
@@ -35,6 +36,7 @@ function setupAuthBar() {
   });
 
   onAuthChange(() => { renderAuthBar(); applyReadOnlyMode(); });
+  onLangChange(() => { applyAllI18n(document); renderAuthBar(); });
   renderAuthBar();
   applyReadOnlyMode();
 }

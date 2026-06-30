@@ -1,3 +1,5 @@
+import { mergeExtraI18n } from './extra.js';
+
 /** Traducciones por módulo/página — se fusionan en APP_I18N */
 const PAGE_DEFS = {
   booking: {
@@ -463,6 +465,7 @@ const LANGS = ['it', 'en', 'es', 'fr', 'de'];
 
 function buildLangPack(lang) {
   const pack = { ...(COMMON[lang] || COMMON.it) };
+  mergeExtraI18n(pack, lang);
   for (const [slug, defs] of Object.entries(PAGE_DEFS)) {
     const d = defs[lang] || defs.it;
     pack[`page.${slug}.title`] = d[0];

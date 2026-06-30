@@ -3,6 +3,7 @@
  */
 import { getDbStatus, getActiveProfile, getToken, onProfileChange } from './winbeach-db.js';
 import { assertCanWrite, canWrite, applyReadOnlyMode, onAuthChange, userLabel, isAuthenticated } from './winbeach-auth.js';
+import { t } from './app-i18n.js';
 
 export function $(id) {
   return document.getElementById(id);
@@ -49,7 +50,7 @@ export function updateDbBar() {
   const profile = getActiveProfile();
   const prefix = profile ? `${profile.name} · ` : '';
   el.className = `db-status ${state}`;
-  el.textContent = message ? prefix + message : prefix + 'Pronto';
+  el.textContent = message ? prefix + message : prefix + t('common.ready');
 }
 
 export function requireToken() {
@@ -104,11 +105,18 @@ function refreshModule(loadFn) {
   loadFn();
 }
 
+function onLangRefresh(loadFn) {
+  import('./app-i18n.js').then(async (m) => {
+    await m.applyAllI18n(document);
+    refreshModule(loadFn);
+  }).catch(() => {});
+}
+
 export function initModule(loadFn) {
   const boot = async () => {
     try {
-      const { applyI18n } = await import('./app-i18n.js');
-      applyI18n(document);
+      const { applyAllI18n } = await import('./app-i18n.js');
+      await applyAllI18n(document);
       const { initPageI18n } = await import('./page-i18n.js');
       initPageI18n();
     } catch { /* dashboard only */ }
@@ -127,20 +135,12 @@ export function initModule(loadFn) {
     if (e.data?.type === 'winbeach-profile-change' || e.data?.type === 'winbeach-auth-change') {
       boot();
     }
-    if (e.data?.type === 'winbeach-lang-change') {
-      import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
-      import('./page-i18n.js').then((m) => m.applyPageI18n()).catch(() => {});
-    }
+    if (e.data?.type === 'winbeach-lang-change') onLangRefresh(loadFn);
     if (e.data?.type === 'winbeach-theme-change') {
       import('./winbeach-theme.js').then((m) => m.setTheme(e.data.theme, { broadcast: false })).catch(() => {});
     }
   });
-  window.addEventListener('winbeach-lang-change', () => {
-    import('./app-i18n.js').then((m) => {
-      m.applyI18n(document);
-      m.applyPageLabels(document);
-    }).catch(() => {});
-  });
+  window.addEventListener('winbeach-lang-change', () => onLangRefresh(loadFn));
   window.addEventListener('storage', (e) => {
     if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles' || e.key === 'winbeach_session' || e.key === 'winbeach-app-lang') {
       boot();
@@ -161,20 +161,22 @@ export function clienteLabel(c) {
 
 export function pagamentoBadge(stato) {
   const map = {
-    saldato: ['green', 'Saldato'],
-    parziale: ['orange', 'Parziale'],
-    da_saldare: ['red', 'Da saldare'],
+    saldato: ['green', 'badge.saldato'],
+    parziale: ['orange', 'badge.parziale'],
+    da_saldare: ['red', 'badge.da_saldare'],
   };
-  const [t, l] = map[stato] || ['gray', stato || '—'];
-  return badge(l, t);
+  const [type, key] = map[stato] || ['gray', null];
+  const label = key ? t(key) : (stato || '—');
+  return badge(label, type);
 }
 
 export function statoPrenBadge(stato) {
   const map = {
-    confermata: ['green', 'Confermata'],
-    in_attesa: ['orange', 'In attesa'],
-    cancellata: ['red', 'Cancellata'],
+    confermata: ['green', 'badge.confermata'],
+    in_attesa: ['orange', 'badge.in_attesa'],
+    cancellata: ['red', 'badge.cancellata'],
   };
-  const [t, l] = map[stato] || ['gray', stato || '—'];
-  return badge(l, t);
+  const [type, key] = map[stato] || ['gray', null];
+  const label = key ? t(key) : (stato || '—');
+  return badge(label, type);
 }

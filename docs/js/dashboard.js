@@ -220,6 +220,33 @@ function mergeChartOptions(extra = {}) {
     };
 }
 
+function chartLabels() {
+    const T = window.__wbT || ((k) => k);
+    return {
+        payment: [T('chart.paidFull'), T('chart.paidPartial'), T('chart.unpaid')],
+        channel: [T('chart.chanOffline'), T('chart.chanWidget'), T('chart.chanPortal')],
+        presence: T('chart.presence'),
+        arrivals: T('chart.arrivals'),
+        departures: T('chart.departures'),
+    };
+}
+
+function refreshChartsI18n() {
+    const L = chartLabels();
+    const pay = Chart.getChart('chartPayment');
+    if (pay) { pay.data.labels = L.payment; pay.update(); }
+    const ch = Chart.getChart('chartChannel');
+    if (ch) { ch.data.labels = L.channel; ch.update(); }
+    const line1 = Chart.getChart('chartLine1');
+    if (line1?.data.datasets[0]) { line1.data.datasets[0].label = L.presence; line1.update(); }
+    const line2 = Chart.getChart('chartLine2');
+    if (line2?.data.datasets[0]) {
+        line2.data.datasets[0].label = L.arrivals;
+        line2.data.datasets[1].label = L.departures;
+        line2.update();
+    }
+}
+
 function refreshAllChartsTheme() {
     ["chartPayment", "chartChannel", "chartLine1", "chartLine2"].forEach((id) => {
         const c = Chart.getChart(id);
@@ -237,10 +264,11 @@ function refreshAllChartsTheme() {
 }
 
 function createPaymentChart() {
+    const L = chartLabels();
     new Chart(document.getElementById("chartPayment"), {
         type: "doughnut",
         data: {
-            labels: ["Interamente saldate", "Parzialmente saldate", "Da saldare"],
+            labels: L.payment,
             datasets: [{ data: [53, 20, 9], backgroundColor: ["#0084FF", "#74B9FF", "#A5D8FF"], borderWidth: 0 }]
         },
         options: mergeChartOptions({ cutout: "70%" }),
@@ -248,10 +276,11 @@ function createPaymentChart() {
 }
 
 function createChannelChart() {
+    const L = chartLabels();
     new Chart(document.getElementById("chartChannel"), {
         type: "doughnut",
         data: {
-            labels: ["Prenotazioni Offline", "Prenotazioni Widget", "Prenotazioni Portale"],
+            labels: L.channel,
             datasets: [{ data: [62, 30, 20], backgroundColor: ["#F39C12", "#F1C40F", "#FDEBD0"], borderWidth: 0 }]
         },
         options: mergeChartOptions({ cutout: "70%" }),
@@ -270,31 +299,38 @@ function buildDayLabels(days) {
 }
 
 function createPresenceChart() {
+    const L = chartLabels();
     const labels = buildDayLabels(14);
     new Chart(document.getElementById("chartLine1"), {
         type: "line",
         data: {
             labels: labels,
-            datasets: [{ label: "Presenze", data: labels.map(() => 0), borderColor: "#0084FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }]
+            datasets: [{ label: L.presence, data: labels.map(() => 0), borderColor: "#0084FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }]
         },
         options: mergeChartOptions({ plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }),
     });
 }
 
 function createArrivalChart() {
+    const L = chartLabels();
     const labels = buildDayLabels(14);
     new Chart(document.getElementById("chartLine2"), {
         type: "line",
         data: {
             labels: labels,
             datasets: [
-                { label: "Arrivi", data: labels.map(() => 0), borderColor: "#74B9FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 },
-                { label: "Partenze", data: labels.map(() => 0), borderColor: "#A5A5A5", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }
+                { label: L.arrivals, data: labels.map(() => 0), borderColor: "#74B9FF", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 },
+                { label: L.departures, data: labels.map(() => 0), borderColor: "#A5A5A5", backgroundColor: "transparent", borderWidth: 2, tension: 0.4 }
             ]
         },
         options: mergeChartOptions({ plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true } } }),
     });
 }
+
+window.addEventListener("winbeach-lang-change", refreshChartsI18n);
+window.addEventListener("message", (e) => {
+    if (e.data?.type === "winbeach-lang-change") refreshChartsI18n();
+});
 
 window.addEventListener("winbeach-theme-change", refreshAllChartsTheme);
 window.addEventListener("message", (e) => {
