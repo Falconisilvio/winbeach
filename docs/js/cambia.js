@@ -101,6 +101,9 @@ function closeModal() {
 
 async function saveForm(e) {
   e.preventDefault();
+  const { assertAdmin } = await import('./winbeach-auth.js');
+  const err = assertAdmin();
+  if (err) { alert(err); return; }
 
   const profile = saveProfile({
     id: editingId || undefined,

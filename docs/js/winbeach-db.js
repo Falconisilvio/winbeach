@@ -267,6 +267,12 @@ export async function loadStrutturaFromDb() {
 }
 
 export async function saveStrutturaToDb(struttura) {
+  const { assertCanWrite } = await import('./winbeach-auth.js');
+  const authErr = assertCanWrite();
+  if (authErr) {
+    setStatus('error', authErr);
+    return { ok: false, error: authErr };
+  }
   const token = getToken();
   if (!token) {
     const msg = 'Se requiere un token de GitHub para guardar.';
@@ -315,6 +321,12 @@ export async function saveStrutturaToDb(struttura) {
 }
 
 async function queryDb(sql, statusMsg) {
+  const { assertCanWrite } = await import('./winbeach-auth.js');
+  const authErr = assertCanWrite();
+  if (authErr) {
+    setStatus('error', authErr);
+    return { ok: false, error: authErr };
+  }
   const token = getToken();
   if (!token) {
     const msg = 'Se requiere un token de GitHub para guardar.';

@@ -496,6 +496,74 @@ body.menu-lock {
 }
 
 /*=========================================================
+AUTENTICACIÓN / SOLA LECTURA
+=========================================================*/
+.user-auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.user-label {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.user-label.guest {
+    background: rgba(0,0,0,0.06);
+    color: #555;
+}
+
+.user-label.authenticated {
+    background: rgba(0, 132, 255, 0.12);
+    color: #0066cc;
+}
+
+.btn-auth {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 40px;
+}
+
+.btn-auth-out {
+    background: transparent;
+}
+
+.read-only-banner {
+    background: #fff8e6;
+    color: #7a5b00;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #ffe08a;
+    z-index: 9;
+}
+
+.read-only-banner a {
+    color: #0084ff;
+    font-weight: 600;
+}
+
+body.dashboard-read-only .topbar .btn-blue,
+body.read-only #btn-nuovo,
+body.read-only .toolbar .btn-success,
+body.read-only .toolbar .btn-primary:not(.btn-secondary) {
+    display: none !important;
+}
+
+/*=========================================================
 RESPONSIVE — Tablet y móvil
 =========================================================*/
 
@@ -646,6 +714,16 @@ RESPONSIVE — Tablet y móvil
 
     .topbar .toolbar {
         margin-left: auto;
+    }
+
+    .user-auth {
+        order: 3;
+        flex: 1 1 100%;
+        justify-content: flex-end;
+    }
+
+    .user-label {
+        font-size: 11px;
     }
 
     .topbar .btn-blue .btn-label {

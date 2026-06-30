@@ -2,6 +2,7 @@
  * Utilidades compartidas para módulos WinBeach
  */
 import { getDbStatus, getActiveProfile, getToken, onProfileChange } from './winbeach-db.js';
+import { assertCanWrite, canWrite, applyReadOnlyMode, onAuthChange, userLabel, isAuthenticated } from './winbeach-auth.js';
 
 export function $(id) {
   return document.getElementById(id);
@@ -59,6 +60,20 @@ export function requireToken() {
   return true;
 }
 
+/** Usuario identificado + permiso de escritura + token GitHub */
+export function requireWrite() {
+  const authErr = assertCanWrite();
+  if (authErr) {
+    alert(authErr + '\n\nVai su Login per autenticarti.');
+    return false;
+  }
+  if (!getToken()) {
+    alert('Configura il token GitHub in Cambia stabilimento prima di salvare.');
+    return false;
+  }
+  return true;
+}
+
 export function badge(text, type = 'green') {
   return `<span class="badge badge-${type}">${escapeHtml(text)}</span>`;
 }
@@ -73,16 +88,28 @@ export function bindModal(overlayId, closeIds, onSubmit) {
   }
 }
 
+function refreshModule(loadFn) {
+  applyReadOnlyMode();
+  loadFn();
+}
+
 export function initModule(loadFn) {
-  onProfileChange(loadFn);
+  onProfileChange(() => refreshModule(loadFn));
+  onAuthChange(() => refreshModule(loadFn));
   window.addEventListener('message', (e) => {
-    if (e.data?.type === 'winbeach-profile-change') loadFn();
+    if (e.data?.type === 'winbeach-profile-change' || e.data?.type === 'winbeach-auth-change') {
+      refreshModule(loadFn);
+    }
   });
   window.addEventListener('storage', (e) => {
-    if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles') loadFn();
+    if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles' || e.key === 'winbeach_session') {
+      refreshModule(loadFn);
+    }
   });
-  document.addEventListener('DOMContentLoaded', loadFn);
+  document.addEventListener('DOMContentLoaded', () => refreshModule(loadFn));
 }
+
+export { canWrite, applyReadOnlyMode, userLabel, isAuthenticated };
 
 export function clienteLabel(c) {
   if (!c) return '—';

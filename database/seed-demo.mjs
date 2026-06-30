@@ -129,6 +129,15 @@ function seedDb(db, cfg) {
     .map((p, i) => [i + 1, `${YESTERDAY}T09:00:00`, p[0], p[1], p[7], 20, 'Demo', 'reception']);
   db.tables.contatori_albergo.rows = [[1, cfg.hotel, 'OMB-2026', 100, Math.min(cfg.prenotazioni, 30)]];
 
+  const utentiCols = db.tables.utenti.columns.map((c) => c.name);
+  if (!utentiCols.includes('password_hash')) {
+    db.tables.utenti.columns.push({ name: 'password_hash', type: 'TEXT' });
+  }
+  db.tables.utenti.rows = [
+    [1, 'admin', 'admin@winbeach.it', 'Amministratore', TODAY + 'T08:00:00', true, '34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960'],
+    [2, 'reception', 'cassa@winbeach.it', 'Operatore', TODAY + 'T09:00:00', true, '139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c'],
+  ];
+
   const attive = prenotazioni.filter((p) => p[5] !== 'cancellata');
   return {
     name: cfg.file,

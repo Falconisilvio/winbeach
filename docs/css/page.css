@@ -461,6 +461,34 @@ tr:hover td {
   min-width: 560px;
 }
 
+/* Sola lettura — nasconde azioni di scrittura */
+body.read-only #btn-nuovo,
+body.read-only .btn-nuovo,
+body.read-only [data-requires-write],
+body.read-only .toolbar .btn-success,
+body.read-only .toolbar .btn-primary:not(.btn-secondary) {
+  display: none !important;
+}
+
+body.read-only .actions-cell {
+  display: none !important;
+}
+
+.read-only-banner {
+  background: #fff8e6;
+  color: #7a5b00;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-bottom: 1px solid #ffe08a;
+  margin: -12px -12px 12px;
+}
+
+.read-only-banner a {
+  color: #0084ff;
+  font-weight: 600;
+}
+
 /* Touch targets mínimos */
 .btn,
 .modal-close {

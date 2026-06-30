@@ -30,12 +30,21 @@
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text" placeholder="Ricerca cliente, postazione, hotel, voucher...">
         </div>
+        <div class="user-auth" id="user-auth">
+            <span id="user-label" class="user-label guest"><i class="fa-solid fa-eye"></i> Sola lettura</span>
+            <button type="button" class="btn-auth" id="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Accedi</button>
+            <button type="button" class="btn-auth btn-auth-out" id="btn-logout" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> Esci</button>
+        </div>
         <div class="toolbar">
-            <button class="btn-blue">
+            <button class="btn-blue" data-requires-write>
                 <i class="fa-solid fa-plus"></i> <span class="btn-label">Nuova prenotazione</span>
             </button>
         </div>
     </header>
+
+    <div id="read-only-banner" class="read-only-banner" hidden>
+        <i class="fa-solid fa-lock"></i> Modalità sola lettura — <a href="login.html">Accedi</a> per modificare i dati
+    </div>
 
     <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
 
@@ -255,5 +264,6 @@
     <script src="js/dashboard.js"></script>
     <script type="module" src="js/dashboard-profiles.js"></script>
     <script type="module" src="js/dashboard-stats.js"></script>
+    <script type="module" src="js/dashboard-auth.js"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import {
   deleteClienteFromDb,
   onProfileChange,
 } from './winbeach-db.js';
+import { applyReadOnlyMode, onAuthChange } from './winbeach-auth.js';
 
 let clienti = [];
 let editingId = null;
@@ -122,8 +123,11 @@ async function loadData() {
 
 async function saveCliente(e) {
   e.preventDefault();
+  const { assertCanWrite } = await import('./winbeach-auth.js');
+  const authErr = assertCanWrite();
+  if (authErr) { alert(authErr); return; }
   if (!getToken()) {
-    alert('Introduce el token de GitHub en Struttura → Base de datos antes de guardar.');
+    alert('Configura il token GitHub in Cambia stabilimento prima di salvare.');
     return;
   }
 
@@ -159,8 +163,11 @@ async function saveCliente(e) {
 }
 
 async function removeCliente(id) {
+  const { assertCanWrite } = await import('./winbeach-auth.js');
+  const authErr = assertCanWrite();
+  if (authErr) { alert(authErr); return; }
   if (!getToken()) {
-    alert('Introduce el token de GitHub en Struttura → Base de datos antes de eliminar.');
+    alert('Configura il token GitHub prima di eliminare.');
     return;
   }
   if (!confirm('Eliminare questo cliente?')) return;
@@ -189,5 +196,7 @@ function bindEvents() {
 document.addEventListener('DOMContentLoaded', async () => {
   bindEvents();
   onProfileChange(loadData);
+  onAuthChange(() => { applyReadOnlyMode(); });
+  applyReadOnlyMode();
   await loadData();
 });

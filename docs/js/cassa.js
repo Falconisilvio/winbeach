@@ -1,5 +1,5 @@
 import { loadTable, saveTableRow } from './winbeach-db.js';
-import { $, escapeHtml, formatEuro, todayIso, nowIso, updateDbBar, requireToken, bindModal, initModule, badge } from './winbeach-module.js';
+import { $, escapeHtml, formatEuro, todayIso, nowIso, updateDbBar, requireWrite, bindModal, initModule, badge } from './winbeach-module.js';
 
 let movimenti = [];
 
@@ -34,7 +34,7 @@ async function load() {
 
 async function save(e) {
   e.preventDefault();
-  if (!requireToken()) return;
+  if (!requireWrite()) return;
   const tipo = $('f-tipo').value;
   const row = {
     data: nowIso(),
