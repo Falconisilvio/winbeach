@@ -28,7 +28,7 @@ async function get(url) {
 async function testPages() {
   console.log('\n=== Páginas GitHub Pages ===');
   const pagesDir = join(__dirname, '../pages');
-  const pages = ['index.html', 'struttura.html', ...readdirSync(pagesDir).map((f) => `pages/${f}`)];
+  const pages = ['index.html', 'struttura.html', 'widget.html', 'manifest.webmanifest', ...readdirSync(pagesDir).map((f) => `pages/${f}`)];
   for (const p of pages) {
     await get(`${LIVE}/${p}`);
     console.log(`  ✓ ${p}`);
@@ -39,8 +39,9 @@ async function testJsModules() {
   console.log('\n=== Módulos JS críticos ===');
   const mods = [
     'js/githubdb/client.js', 'js/winbeach-db.js', 'js/winbeach-module.js',
-    'js/dashboard-stats.js', 'js/dashboard-profiles.js', 'js/cambia.js',
-    'js/booking.js', 'js/clienti.js', 'js/spiaggia.js', 'js/cassa.js',
+    'js/dashboard-stats.js', 'js/dashboard-profiles.js', 'js/dashboard-search.js',
+    'js/cambia.js', 'js/booking.js', 'js/clienti.js', 'js/spiaggia.js', 'js/cassa.js',
+    'js/widget.js', 'js/winbeach-export.js', 'js/winbeach-pwa.js',
   ];
   for (const m of mods) {
     const txt = await get(`${LIVE}/${m}`).then((r) => r.text());
