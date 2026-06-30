@@ -157,6 +157,8 @@ window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina, opts
                     || "light";
                 try {
                     iframe.contentWindow.postMessage({ type: "winbeach-theme-change", theme: theme }, "*");
+                    const lang = localStorage.getItem("winbeach-app-lang") || "it";
+                    iframe.contentWindow.postMessage({ type: "winbeach-lang-change", lang: lang }, "*");
                 } catch { /* ignore */ }
             });
         }

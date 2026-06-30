@@ -1,4 +1,5 @@
 import { loadPrenotazioniFromDb, savePrenotazioneToDb } from './winbeach-db.js';
+import { t } from './app-i18n.js';
 import {
   $, escapeHtml, formatDate, formatEuro, todayIso, tomorrowIso, updateDbBar,
   clienteLabel, statoPrenBadge, pagamentoBadge, initModule, requireWrite,
@@ -21,7 +22,8 @@ function filterRows() {
 
 function render() {
   const rows = filterRows();
-  $('page-subtitle').textContent = `${isArrivi ? 'Arrivi' : 'Partenze'} — ${formatDate(targetDate)}`;
+  const label = isArrivi ? t('common.arrivals') : t('common.departures');
+  $('page-subtitle').textContent = `${label} — ${formatDate(targetDate)}`;
   $('stat-total').textContent = rows.length;
   $('stat-check').textContent = isArrivi
     ? rows.filter((p) => p.check_in).length
@@ -30,14 +32,14 @@ function render() {
   $('data-tbody').innerHTML = rows.map((p) => `
     <tr>
       <td>${clienteLabel(p.cliente)}</td>
-      <td>Post. ${p.cella || '—'}</td>
+      <td>${t('common.spot')} ${p.cella || '—'}</td>
       <td>${p.ora_arrivo || '—'}</td>
       <td>${pagamentoBadge(p.stato_pagamento)}</td>
       <td>${p.canale || 'offline'}</td>
       <td>${statoPrenBadge(p.stato)}</td>
       <td class="actions-cell">
-        ${isArrivi ? `<button class="btn btn-success btn-sm" data-checkin="${p.id}" ${p.check_in ? 'disabled' : ''}>Check-in</button>` : ''}
-        ${!isArrivi ? `<button class="btn btn-warning btn-sm" data-checkout="${p.id}" ${p.check_out ? 'disabled' : ''}>Check-out</button>` : ''}
+        ${isArrivi ? `<button class="btn btn-success btn-sm" data-checkin="${p.id}" ${p.check_in ? 'disabled' : ''}>${t('common.checkin')}</button>` : ''}
+        ${!isArrivi ? `<button class="btn btn-warning btn-sm" data-checkout="${p.id}" ${p.check_out ? 'disabled' : ''}>${t('common.checkout')}</button>` : ''}
       </td>
     </tr>
   `).join('') || '<tr><td colspan="7">Nessun record per questa data.</td></tr>';

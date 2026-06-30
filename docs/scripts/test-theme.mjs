@@ -31,7 +31,8 @@ const all = [...root, ...pages];
 const missing = [];
 for (const file of all) {
   const html = readFileSync(join(DOCS, file), 'utf8');
-  if (!html.includes('theme-init.js')) missing.push(file);
+  if (!html.includes('theme-init.js')) missing.push(`${file} (sin theme-init)`);
+  if (!html.includes('lang-init.js')) missing.push(`${file} (sin lang-init)`);
   const usesPage = html.includes('page.css') || html.includes('dashboard.css')
     || html.includes('widget.css') || html.includes('struttura.css');
   if (usesPage && !html.match(/theme\.css|page\.css|dashboard\.css|widget\.css|struttura\.css/)) {
@@ -45,4 +46,4 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`✅ ${all.length} páginas HTML con theme-init.js`);
+console.log(`✅ ${all.length} páginas HTML con theme-init.js y lang-init.js`);

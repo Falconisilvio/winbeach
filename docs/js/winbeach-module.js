@@ -109,6 +109,8 @@ export function initModule(loadFn) {
     try {
       const { applyI18n } = await import('./app-i18n.js');
       applyI18n(document);
+      const { initPageI18n } = await import('./page-i18n.js');
+      initPageI18n();
     } catch { /* dashboard only */ }
     if (!window.__wbToastInit) {
       try {
@@ -127,13 +129,17 @@ export function initModule(loadFn) {
     }
     if (e.data?.type === 'winbeach-lang-change') {
       import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
+      import('./page-i18n.js').then((m) => m.applyPageI18n()).catch(() => {});
     }
     if (e.data?.type === 'winbeach-theme-change') {
       import('./winbeach-theme.js').then((m) => m.setTheme(e.data.theme, { broadcast: false })).catch(() => {});
     }
   });
   window.addEventListener('winbeach-lang-change', () => {
-    import('./app-i18n.js').then((m) => m.applyI18n(document)).catch(() => {});
+    import('./app-i18n.js').then((m) => {
+      m.applyI18n(document);
+      m.applyPageLabels(document);
+    }).catch(() => {});
   });
   window.addEventListener('storage', (e) => {
     if (e.key === 'winbeach_active_profile' || e.key === 'winbeach_profiles' || e.key === 'winbeach_session' || e.key === 'winbeach-app-lang') {

@@ -56,7 +56,7 @@ async function testAssets() {
     'widget.html', 'manifest.webmanifest', 'sw.js', 'icons/icon.svg',
     'js/widget.js', 'js/winbeach-export.js', 'js/winbeach-pwa.js',
     'js/app-i18n.js', 'js/i18n/app.js', 'js/winbeach-toast.js', 'js/winbeach-pdf.js',
-    'js/theme-init.js', 'js/winbeach-theme.js', 'css/theme.css', 'css/dark-mode.css',
+    'js/theme-init.js', 'js/lang-init.js', 'js/page-i18n.js', 'js/winbeach-theme.js', 'css/theme.css', 'css/dark-mode.css',
     'css/widget.css',
   ];
   for (const f of required) {
@@ -77,6 +77,7 @@ async function main() {
   console.log('\n--- Avvio server locale ---');
   const server = await startServer();
   try {
+    await runNode('test-links.mjs', { TEST_BASE: BASE });
     await runNode('test-web.mjs', { TEST_BASE: BASE });
   } finally {
     server.kill();

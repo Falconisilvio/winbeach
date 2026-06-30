@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="js/theme-init.js"></script>
+  <script src="js/lang-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Accesso — WinBeach</title>
   <link rel="stylesheet" href="css/page.css">
@@ -31,6 +32,8 @@
     .login-card button[type=submit]:disabled { opacity: 0.6; }
     .demo-hint { margin-top: 20px; font-size: 0.8rem; color: #888; text-align: center; line-height: 1.5; }
     .back-link { display: block; text-align: center; margin-top: 16px; color: #0084ff; text-decoration: none; font-size: 0.9rem; }
+    .login-lang { position: fixed; top: 16px; left: 16px; }
+    .login-lang select { padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd; }
     .login-theme {
       position: fixed; top: 16px; right: 16px;
       width: 44px; height: 44px; border-radius: 10px;
@@ -40,35 +43,45 @@
   </style>
 </head>
 <body class="login-page">
-  <button type="button" class="login-theme theme-toggle" id="btn-theme-toggle" data-theme-toggle aria-label="Tema scuro/chiaro">
+  <button type="button" class="login-theme theme-toggle" id="btn-theme-toggle" data-theme-toggle data-i18n-aria="theme.toggle" aria-label="Theme">
     <i class="fa-solid fa-moon" aria-hidden="true"></i>
   </button>
+  <label class="login-lang"><select id="login-lang" aria-label="Language"></select></label>
   <div class="login-card">
     <div class="login-logo"><i class="fa-solid fa-umbrella-beach"></i></div>
-    <h1>Beach Manager</h1>
-    <p class="login-sub">Accedi per modificare prenotazioni, clienti e dati operativi</p>
+    <h1 data-i18n="login.title">Beach Manager</h1>
+    <p class="login-sub" data-i18n="login.subtitle">Accedi per modificare prenotazioni, clienti e dati operativi</p>
     <div id="login-error" class="login-error" role="alert"></div>
     <form id="login-form">
       <div class="form-group">
-        <label for="username">Utente</label>
+        <label for="username" data-i18n="login.user">Utente</label>
         <input type="text" id="username" name="username" autocomplete="username" required placeholder="admin">
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password" data-i18n="login.password">Password</label>
         <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••">
       </div>
-      <button type="submit" id="btn-submit">Entra</button>
+      <button type="submit" id="btn-submit" data-i18n="login.submit">Entra</button>
     </form>
-    <p class="demo-hint">
-      Demo: <strong>admin</strong> / admin (Amministratore)<br>
-      <strong>reception</strong> / reception (Operatore)
+    <p class="demo-hint" data-i18n="login.demo">
+      Demo: admin / admin — reception / reception
     </p>
-    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Continua in sola lettura</a>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="login.readonly">Continua in sola lettura</span></a>
   </div>
   <script type="module" src="js/login.js"></script>
   <script type="module">
     import { initThemeUi } from './js/winbeach-theme.js';
+    import { APP_LANGS, setAppLang, getAppLang, applyI18n } from './js/app-i18n.js';
     initThemeUi();
+    const sel = document.getElementById('login-lang');
+    APP_LANGS.forEach(({ code, label }) => {
+      const o = document.createElement('option');
+      o.value = code; o.textContent = label;
+      sel.appendChild(o);
+    });
+    sel.value = getAppLang();
+    sel.addEventListener('change', () => setAppLang(sel.value));
+    applyI18n(document);
   </script>
 </body>
 </html>

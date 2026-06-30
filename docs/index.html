@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <script src="js/theme-init.js"></script>
+    <script src="js/lang-init.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Beach Manager Dashboard</title>
     <meta name="theme-color" content="#0084ff">
@@ -56,7 +57,7 @@
     </header>
 
     <div id="read-only-banner" class="read-only-banner" hidden>
-        <i class="fa-solid fa-lock"></i> Modalità sola lettura — <a href="login.html">Accedi</a> per modificare i dati
+        <i class="fa-solid fa-lock"></i> <span data-i18n="auth.readonly">Sola lettura</span> — <a href="login.html" data-i18n="banner.readonlyLink">Accedi</a> <span data-i18n="banner.readonlySuffix">per modificare i dati</span>
     </div>
 
     <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
@@ -171,16 +172,16 @@
                         <i class="fa-solid fa-gear"></i>
                         <span data-i18n="menu.impostazioni">Impostazioni</span>
                     </li>
-                    <li data-page="elementi">Elementi</li>
-                    <li data-page="servizi">Servizi</li>
-                    <li data-page="settori">Settori</li>
-                    <li data-page="struttura">Struttura</li>
-                    <li data-page="listini">Listini</li>
-                    <li data-page="tariffe">Tariffe</li>
-                    <li data-page="capitaneria">Capitaneria</li>
-                    <li data-page="esercizi">Esercizi</li>
-                    <li data-page="azienda">Azienda</li>
-                    <li data-page="utenti">Utenti</li>
+                    <li data-page="elementi" data-i18n="menu.elementi">Elementi</li>
+                    <li data-page="servizi" data-i18n="menu.servizi">Servizi</li>
+                    <li data-page="settori" data-i18n="menu.settori">Settori</li>
+                    <li data-page="struttura" data-i18n="menu.struttura">Struttura</li>
+                    <li data-page="listini" data-i18n="nav.listini">Listini</li>
+                    <li data-page="tariffe" data-i18n="menu.tariffe">Tariffe</li>
+                    <li data-page="capitaneria" data-i18n="menu.capitaneria">Capitaneria</li>
+                    <li data-page="esercizi" data-i18n="menu.esercizi">Esercizi</li>
+                    <li data-page="azienda" data-i18n="menu.azienda">Azienda</li>
+                    <li data-page="utenti" data-i18n="menu.utenti">Utenti</li>
                 </div>
             </ul>
         </nav>
