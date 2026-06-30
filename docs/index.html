@@ -29,23 +29,23 @@
     <div class="layout">
 
         <aside class="sidebar">
-            <div class="icon active" data-page="dashboard" id="btn-sidebar-dashboard">
+            <div class="icon active" data-page="spiaggia" id="btn-sidebar-dashboard">
                 <i class="fa-solid fa-umbrella-beach"></i>
                 <span>Spiaggia</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="booking">
                 <i class="fa-regular fa-calendar-days"></i>
                 <span>Booking</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="planner">
                 <i class="fa-solid fa-list"></i>
                 <span>Planner</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="listini">
                 <i class="fa-regular fa-rectangle-list"></i>
                 <span>Listini</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="cassa">
                 <i class="fa-solid fa-cash-register"></i>
                 <span>Cassa</span>
             </div>
@@ -57,7 +57,7 @@
                 <i class="fa-regular fa-user"></i>
                 <span>Clienti</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="qr-scan">
                 <i class="fa-solid fa-qrcode"></i>
                 <span>QR scan</span>
             </div>
@@ -65,11 +65,11 @@
                 <i class="fa-solid fa-gear"></i>
                 <span>Impostazioni</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="cambia">
                 <i class="fa-solid fa-right-left"></i>
                 <span>Cambia</span>
             </div>
-            <div class="icon" data-page="dashboard">
+            <div class="icon" data-page="guida">
                 <i class="fa-regular fa-circle-question"></i>
                 <span>Guida</span>
             </div>
@@ -153,24 +153,24 @@
                     <div class="card arrivi">
                         <h3>Arrivi</h3>
                         <div class="number">150</div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="arrivi-oggi">Dettaglio →</a>
                     </div>
                     <div class="card partenze">
                         <h3>Partenze</h3>
                         <div class="number">100</div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="partenze-oggi">Dettaglio →</a>
                     </div>
                     <div class="card cancellazioni">
                         <h3>Cancellazioni</h3>
                         <div class="number-inline">
                             <span class="number">20</span><span class="subtext">/1000€</span>
                         </div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="log-cancellazioni">Dettaglio →</a>
                     </div>
                     <div class="card occupazione">
                         <h3>Tasso di occupazione</h3>
                         <div class="number">50%</div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="statistiche-settore">Dettaglio →</a>
                     </div>
 
                     <div class="card pagamenti">
@@ -178,14 +178,14 @@
                         <div class="chart-container">
                             <canvas id="chartPayment"></canvas>
                         </div>
-                        <a href="#" class="view-detail">Dettaglio →</a>
+                        <a href="#" class="view-detail" data-nav="pagamenti-stripe">Dettaglio →</a>
                     </div>
                     <div class="card canale">
                         <h3>Prenotazioni per canale</h3>
                         <div class="chart-container">
                             <canvas id="chartChannel"></canvas>
                         </div>
-                        <a href="#" class="view-detail">Dettaglio →</a>
+                        <a href="#" class="view-detail" data-nav="tutte-prenotazioni">Dettaglio →</a>
                     </div>
 
                     <div class="card fatturato">
@@ -198,19 +198,19 @@
                     <div class="card presenze">
                         <h3>Presenze</h3>
                         <div class="number">200</div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="statistiche-ombrellone">Dettaglio →</a>
                     </div>
                     <div class="card sconti">
                         <h3>Sconti</h3>
                         <div class="number-inline">
                             <span class="number">10</span><span class="subtext">/500€</span>
                         </div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="log-sconti">Dettaglio →</a>
                     </div>
                     <div class="card carrello">
                         <h3>Carrello Medio</h3>
                         <div class="number">40€</div>
-                        <a href="#">Dettaglio →</a>
+                        <a href="#" data-nav="statistiche-durata">Dettaglio →</a>
                     </div>
 
                     <div class="card grafico1">

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Tutte le Prenotazioni</title>
+  <link rel="stylesheet" href="../css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+  <div class="header">
+    <h2><i class="fa-solid fa-list-check" style="color:#0084ff"></i> Tutte le Prenotazioni</h2>
+    <div class="toolbar"><button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nuova prenotazione</button></div>
+  </div><div class="filters"><input type="search" placeholder="Cerca cliente..."><select><option>Tutti gli stati</option><option>Confermata</option><option>In attesa</option></select></div>
+  <table>
+    <thead><tr><th>ID</th><th>Cliente</th><th>Dal</th><th>Al</th><th>Postazione</th><th>Importo</th><th>Stato</th></tr></thead>
+    <tbody><tr><td>#1042</td><td>Mario Rossi</td><td>28/06</td><td>05/07</td><td>A12</td><td>420 €</td><td><span class="badge badge-green">Confermata</span></td></tr><tr><td>#1043</td><td>Laura Bianchi</td><td>30/06</td><td>07/07</td><td>B4</td><td>350 €</td><td><span class="badge badge-blue">Parziale</span></td></tr><tr><td>#1044</td><td>Giuseppe Verdi</td><td>01/07</td><td>03/07</td><td>C8</td><td>180 €</td><td><span class="badge badge-orange">In attesa</span></td></tr></tbody>
+  </table>
+</body>
+</html>
