@@ -8,6 +8,7 @@ import {
 } from './winbeach-db.js';
 import { canWrite, isAuthenticated } from './winbeach-auth.js';
 import { formatEuro, formatDate, todayIso } from './winbeach-module.js';
+import { t, applyAllI18n, onLangChange } from './app-i18n.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -26,23 +27,44 @@ let config = getConfig();
 let step = 1;
 let data = null;
 let selectedCella = null;
+let lastSummary = '';
+
+function applyWidgetI18n() {
+  applyAllI18n(document);
+  const docTitle = t('page.widget.docTitle');
+  if (docTitle !== 'page.widget.docTitle') document.title = docTitle;
+  refreshDynamicText();
+}
+
+function refreshDynamicText() {
+  if (data) {
+    const n = data.celle.filter((c) => c.cella > 0).length;
+    $('widget-status').textContent = t('widget.spotsCount', { n });
+  }
+  if (step === 2) renderSlots();
+  if (step === 2 || step === 3) updatePrice();
+  if (step === 4 && $('success-msg')) {
+    const registered = $('success-msg').dataset.mode === 'registered';
+    $('success-msg').textContent = registered ? t('widget.successRegistered') : t('widget.successSent');
+  }
+}
 
 async function loadData() {
-  $('widget-status').textContent = 'Caricamento disponibilità…';
+  $('widget-status').textContent = t('widget.loading');
   const db = new GithubDB({ ...config, token: null });
   await db.refresh(config.database);
   const tables = ['celle', 'clienti', 'prenotazioni', 'tariffe', 'settori'];
   const loaded = {};
-  for (const t of tables) {
+  for (const tbl of tables) {
     try {
-      loaded[t] = (await db.table(config.database, t)).objects();
+      loaded[tbl] = (await db.table(config.database, tbl)).objects();
     } catch {
-      loaded[t] = [];
+      loaded[tbl] = [];
     }
   }
   data = loaded;
   $('widget-facility').textContent = config.name;
-  $('widget-status').textContent = `${loaded.celle.filter((c) => c.cella > 0).length} postazioni · lettura pubblica`;
+  $('widget-status').textContent = t('widget.spotsCount', { n: loaded.celle.filter((c) => c.cella > 0).length });
 }
 
 function showStep(n) {
@@ -71,7 +93,7 @@ function renderSlots() {
   const free = getFreeSlots();
   const grid = $('widget-slots');
   if (!free.length) {
-    grid.innerHTML = '<p class="widget-note">Nessuna postazione libera per queste date.</p>';
+    grid.innerHTML = `<p class="widget-note">${t('widget.noSlots')}</p>`;
     selectedCella = null;
     return;
   }
@@ -97,10 +119,28 @@ function updatePrice() {
     $('w-inizio').value,
     $('w-fine').value,
   );
-  el.textContent = imp ? `Da ${formatEuro(imp)}` : 'Prezzo su richiesta';
+  el.textContent = imp ? t('widget.priceFrom', { price: formatEuro(imp) }) : t('widget.priceOnRequest');
+}
+
+function buildSummary(ref, prenotazione, nome, cognome, email, telefono) {
+  return [
+    t('widget.summary.ref', { ref }),
+    t('widget.summary.facility', { name: config.name }),
+    t('widget.summary.spot', { n: selectedCella }),
+    t('widget.summary.dates', { from: formatDate(prenotazione.data_inizio), to: formatDate(prenotazione.data_fine) }),
+    t('widget.summary.client', { name: `${nome} ${cognome}`.trim() }),
+    t('widget.summary.email', { email }),
+    t('widget.summary.phone', { phone: telefono }),
+  ].join('\n');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  applyWidgetI18n();
+  onLangChange(applyWidgetI18n);
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'winbeach-lang-change') applyWidgetI18n();
+  });
+
   $('w-inizio')?.addEventListener('change', () => {
     const f = $('w-fine');
     if (f.value && f.value < $('w-inizio').value) {
@@ -119,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   $('btn-step1')?.addEventListener('click', () => {
     if ($('w-fine').value < $('w-inizio').value) {
-      alert('Data fine non valida.');
+      alert(t('err.invalidEndDate'));
       return;
     }
     selectedCella = null;
@@ -129,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   $('btn-back2')?.addEventListener('click', () => showStep(1));
   $('btn-step2')?.addEventListener('click', () => {
-    if (!selectedCella) { alert('Seleziona una postazione.'); return; }
+    if (!selectedCella) { alert(t('widget.selectSpot')); return; }
     showStep(3);
   });
 
@@ -141,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cognome = $('w-cognome').value.trim();
     const email = $('w-email').value.trim();
     const telefono = $('w-telefono').value.trim();
-    if (!nome) { alert('Inserisci il nome.'); return; }
+    if (!nome) { alert(t('widget.errName')); return; }
 
     const prenotazione = {
       cliente_id: 0,
@@ -166,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const overlap = findPrenotazioneOverlap(prenotazione, data.prenotazioni);
     if (overlap) {
-      alert('Postazione non più disponibile. Torna indietro e scegli un\'altra.');
+      alert(t('widget.errOverlap'));
       showStep(2);
       renderSlots();
       return;
@@ -179,42 +219,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       const cliente = { nome, cognome, email, telefono, note: 'Widget' };
       const cliRes = await saveClienteToDb(cliente, data.clienti);
       if (!cliRes.ok) {
-        alert(cliRes.error || 'Errore salvataggio cliente.');
+        alert(cliRes.error || t('widget.errSaveClient'));
         $('btn-submit').disabled = false;
         return;
       }
       prenotazione.cliente_id = cliRes.id;
       const preRes = await savePrenotazioneToDb(prenotazione, data.prenotazioni);
       if (!preRes.ok) {
-        alert(preRes.error || 'Errore salvataggio prenotazione.');
+        alert(preRes.error || t('widget.errSaveBooking'));
         $('btn-submit').disabled = false;
         return;
       }
       $('success-ref').textContent = `#${preRes.id}`;
-      $('success-msg').textContent = 'Prenotazione registrata in attesa di conferma.';
+      $('success-msg').dataset.mode = 'registered';
+      $('success-msg').textContent = t('widget.successRegistered');
+      lastSummary = buildSummary(`#${preRes.id}`, prenotazione, nome, cognome, email, telefono);
     } else {
       const ref = `WB-${Date.now().toString(36).toUpperCase()}`;
       $('success-ref').textContent = ref;
-      $('success-msg').textContent = 'Richiesta inviata. Lo stabilimento ti contatterà per confermare.';
-      const summary = [
-        `Riferimento: ${ref}`,
-        `Stabilimento: ${config.name}`,
-        `Postazione: ${selectedCella}`,
-        `Date: ${formatDate(prenotazione.data_inizio)} – ${formatDate(prenotazione.data_fine)}`,
-        `Cliente: ${nome} ${cognome}`,
-        `Email: ${email}`,
-        `Tel: ${telefono}`,
-      ].join('\n');
-      $('success-copy').dataset.summary = summary;
+      $('success-msg').dataset.mode = 'sent';
+      $('success-msg').textContent = t('widget.successSent');
+      lastSummary = buildSummary(ref, prenotazione, nome, cognome, email, telefono);
     }
+    $('success-copy').dataset.summary = lastSummary;
 
     showStep(4);
     $('btn-submit').disabled = false;
   });
 
   $('success-copy')?.addEventListener('click', () => {
-    const text = $('success-copy').dataset.summary || '';
-    navigator.clipboard?.writeText(text).then(() => alert('Copiato negli appunti.'));
+    const text = $('success-copy').dataset.summary || lastSummary || '';
+    navigator.clipboard?.writeText(text).then(() => alert(t('widget.copied')));
   });
 
   $('btn-new')?.addEventListener('click', () => {

@@ -102,7 +102,7 @@ function fillCellaSelect(selectedCella = null) {
   celle.filter((c) => c.cella > 0 && c.attivo).sort((a, b) => a.cella - b.cella).forEach((c) => {
     const o = document.createElement('option');
     o.value = c.cella;
-    o.textContent = `Post. ${c.cella} — ${c.elemento} (${c.settore || '?'})`;
+    o.textContent = `${t('common.spot')} ${c.cella} — ${c.elemento} (${c.settore || '?'})`;
     if (selectedCella === c.cella) o.selected = true;
     sel.appendChild(o);
   });

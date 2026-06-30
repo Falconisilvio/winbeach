@@ -5,11 +5,7 @@ import { loadTable, saveTableRow, deleteTableRow } from './winbeach-db.js';
 import {
   $, escapeHtml, updateDbBar, requireWrite, bindModal, initModule, badge,
 } from './winbeach-module.js';
-
-async function t(key) {
-  const { t: tr } = await import('./app-i18n.js');
-  return tr(key);
-}
+import { t } from './app-i18n.js';
 
 export function createTableCrud(config) {
   let rows = [];
@@ -35,8 +31,8 @@ export function createTableCrud(config) {
       const cells = config.columns.map((c) => {
         if (c.render) return `<td>${c.render(r)}</td>`;
         if (c.type === 'bool') {
-          const yes = config.yesLabel || 'Sì';
-          const no = config.noLabel || 'No';
+          const yes = t('common.yes');
+          const no = t('common.no');
           return `<td>${r[c.key] ? badge(yes, 'green') : badge(no, 'gray')}</td>`;
         }
         if (c.type === 'euro') return `<td>${Number(r[c.key] || 0).toLocaleString('it-IT')} €</td>`;
@@ -59,7 +55,7 @@ export function createTableCrud(config) {
     const modal = $(config.modalId || 'data-modal');
     if (id) {
       const r = rows.find((x) => x.id === id);
-      $(config.modalTitleId || 'modal-title').textContent = config.editTitle || '';
+      $(config.modalTitleId || 'modal-title').textContent = t(config.editTitleKey || 'common.edit');
       config.formFields.forEach((f) => {
         const el = $(f.id);
         if (!el) return;
@@ -68,7 +64,7 @@ export function createTableCrud(config) {
         else el.value = v ?? '';
       });
     } else {
-      $(config.modalTitleId || 'modal-title').textContent = config.newTitle || '';
+      $(config.modalTitleId || 'modal-title').textContent = t(config.newTitleKey || 'btn.new');
       config.formFields.forEach((f) => {
         const el = $(f.id);
         if (!el) return;
@@ -113,8 +109,8 @@ export function createTableCrud(config) {
       else row[f.field] = el.value.trim();
     });
     const btn = $('btn-save');
-    const saving = await t('common.saving');
-    const saveLbl = await t('common.save');
+    const saving = t('common.saving');
+    const saveLbl = t('common.save');
     if (btn) { btn.disabled = true; btn.textContent = saving; }
     await saveTableRow(config.table, row, config.fields, rows, 'common.saving');
     updateDbBar();
@@ -130,7 +126,7 @@ export function createTableCrud(config) {
       if (err) { alert(err); return; }
     }
     if (!requireWrite()) return;
-    if (!confirm(await t('common.confirmDelete'))) return;
+    if (!confirm(t('common.confirmDelete'))) return;
     await deleteTableRow(config.table, id);
     updateDbBar();
     await load();
@@ -144,18 +140,15 @@ export function createTableCrud(config) {
   }
 
   initModule(async () => {
-    const yesLabel = await t('common.yes');
-    const noLabel = await t('common.no');
-    config.yesLabel = yesLabel;
-    config.noLabel = noLabel;
-    if (!config.newTitle) config.newTitle = await t('btn.new');
-    if (!config.editTitle) config.editTitle = await t('common.edit');
     const saveBtn = $('btn-save');
-    if (saveBtn) saveBtn.textContent = await t('common.save');
+    if (saveBtn) saveBtn.textContent = t('common.save');
     const cancelBtn = $('btn-cancel');
-    if (cancelBtn) cancelBtn.textContent = await t('common.cancel');
+    if (cancelBtn) cancelBtn.textContent = t('common.cancel');
     const emptyP = document.querySelector('#empty-state p');
-    if (emptyP && !emptyP.dataset.i18n) emptyP.textContent = await t('common.noRecords');
+    if (emptyP && !emptyP.dataset.i18n) {
+      emptyP.dataset.i18n = 'common.noRecords';
+      emptyP.textContent = t('common.noRecords');
+    }
     bind();
     await load();
     const q = new URLSearchParams(window.location.search).get('q');

@@ -3,8 +3,6 @@ import { createTableCrud } from './table-crud.js';
 createTableCrud({
   table: 'trasferimenti_stripe',
   fields: ['data', 'importo', 'conto', 'stripe_payout_id', 'stato'],
-  newTitle: 'Nuovo',
-  editTitle: 'Modifica',
   columns: [{ key:'data' }, { key:'importo', type:'euro' }, { key:'conto' }, { key:'stato' }],
   formFields: [
     { id:'f-data', field:'data', label:'Data' },

@@ -3,8 +3,6 @@ import { createTableCrud } from './table-crud.js';
 createTableCrud({
   table: 'log_sconti',
   fields: ['data', 'operatore', 'cliente_id', 'prenotazione_id', 'sconto_pct', 'importo', 'motivo'],
-  newTitle: 'Nuovo',
-  editTitle: 'Modifica',
   columns: [{ key:'data' }, { key:'operatore' }, { key:'sconto_pct' }, { key:'importo', type:'euro' }, { key:'motivo' }],
   formFields: [
     { id:'f-data', field:'data', label:'Data' },

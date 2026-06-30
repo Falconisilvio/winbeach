@@ -4,6 +4,7 @@ import {
   loadTable,
   onProfileChange,
 } from './winbeach-db.js';
+import { t, onLangChange } from './app-i18n.js';
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -20,6 +21,28 @@ function clienteLabel(c) {
 
 let cache = null;
 let debounceTimer = null;
+let lastQuery = '';
+
+const TYPE_ICON = {
+  cliente: 'fa-user',
+  prenotazione: 'fa-calendar-days',
+  voucher: 'fa-ticket',
+  hotel: 'fa-hotel',
+  postazione: 'fa-umbrella-beach',
+};
+
+const TYPE_KEYS = {
+  cliente: 'search.type.cliente',
+  prenotazione: 'search.type.prenotazione',
+  voucher: 'search.type.voucher',
+  hotel: 'search.type.hotel',
+  postazione: 'search.type.postazione',
+};
+
+function typeLabel(type) {
+  const key = TYPE_KEYS[type];
+  return key ? t(key) : type;
+}
 
 async function ensureData() {
   if (cache) return cache;
@@ -75,7 +98,7 @@ function buildResults(q) {
         type: 'prenotazione',
         page: 'booking',
         label: `#${p.id} — ${name}`,
-        meta: `Post. ${p.cella || '—'} · ${String(p.data_inizio).slice(0, 10)}`,
+        meta: t('search.meta.spot', { cell: p.cella || '—', date: String(p.data_inizio).slice(0, 10) }),
         q: String(p.id),
       });
     }
@@ -88,7 +111,7 @@ function buildResults(q) {
         type: 'voucher',
         page: 'contatori-voucher',
         label: v.codice,
-        meta: `Emessi ${v.emessi} · utilizzati ${v.utilizzati}`,
+        meta: t('search.meta.voucher', { issued: v.emessi, used: v.utilizzati }),
         q: v.codice,
       });
     }
@@ -101,7 +124,7 @@ function buildResults(q) {
         type: 'hotel',
         page: 'contatori-albergo',
         label: h.albergo,
-        meta: `Codice ${h.codice} · ${h.utilizzato}/${h.totale}`,
+        meta: t('search.meta.hotel', { code: h.codice, used: h.utilizzato, total: h.totale }),
         q: h.albergo || h.codice,
       });
     }
@@ -114,8 +137,8 @@ function buildResults(q) {
       results.unshift({
         type: 'postazione',
         page: 'spiaggia',
-        label: `Postazione ${n}`,
-        meta: 'Vista mappa spiaggia',
+        label: t('search.spotLabel', { n }),
+        meta: t('search.beachMap'),
         q: null,
       });
     }
@@ -124,25 +147,9 @@ function buildResults(q) {
   return results.slice(0, limit);
 }
 
-const TYPE_ICON = {
-  cliente: 'fa-user',
-  prenotazione: 'fa-calendar-days',
-  voucher: 'fa-ticket',
-  hotel: 'fa-hotel',
-  postazione: 'fa-umbrella-beach',
-};
-
-const TYPE_LABEL = {
-  cliente: 'Cliente',
-  prenotazione: 'Prenotazione',
-  voucher: 'Voucher',
-  hotel: 'Hotel',
-  postazione: 'Postazione',
-};
-
 function renderDropdown(listEl, items, q) {
   if (!items.length) {
-    listEl.innerHTML = `<div class="search-dropdown-empty">Nessun risultato per «${escapeHtml(q)}»</div>`;
+    listEl.innerHTML = `<div class="search-dropdown-empty">${escapeHtml(t('search.noResults', { q }))}</div>`;
     listEl.hidden = false;
     return;
   }
@@ -151,7 +158,7 @@ function renderDropdown(listEl, items, q) {
       <span class="search-result-icon"><i class="fa-solid ${TYPE_ICON[item.type]}"></i></span>
       <span class="search-result-body">
         <span class="search-result-label">${escapeHtml(item.label)}</span>
-        <span class="search-result-meta">${escapeHtml(TYPE_LABEL[item.type])} · ${escapeHtml(item.meta)}</span>
+        <span class="search-result-meta">${escapeHtml(typeLabel(item.type))} · ${escapeHtml(item.meta)}</span>
       </span>
     </button>
   `).join('');
@@ -181,14 +188,20 @@ let wrap;
 
 async function runSearch() {
   const q = input.value.trim().toLowerCase();
+  lastQuery = q;
   if (q.length < 2) {
     hideDropdown(listEl);
     return;
   }
-  listEl.innerHTML = '<div class="search-dropdown-loading">Ricerca…</div>';
+  listEl.innerHTML = `<div class="search-dropdown-loading">${escapeHtml(t('search.loading'))}</div>`;
   listEl.hidden = false;
   await ensureData();
   renderDropdown(listEl, buildResults(q), q);
+}
+
+function refreshOpenDropdown() {
+  if (!listEl || listEl.hidden || lastQuery.length < 2) return;
+  if (cache) renderDropdown(listEl, buildResults(lastQuery), lastQuery);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -218,4 +231,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   onProfileChange(invalidateCache);
+  onLangChange(refreshOpenDropdown);
 });

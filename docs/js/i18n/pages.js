@@ -254,6 +254,13 @@ const PAGE_DEFS = {
     fr: ['Caisse restaurant', 'Point de vente tactile — commandes et bar.', 'Caisse restaurant'],
     de: ['Restaurant-Kasse', 'Touch-Kasse — Bestellungen und Bar.', 'Restaurant-Kasse'],
   },
+  widget: {
+    it: ['Prenota', 'Prenotazione online — canale widget', 'Prenota — WinBeach'],
+    en: ['Book', 'Online booking — widget channel', 'Book — WinBeach'],
+    es: ['Reservar', 'Reserva online — canal widget', 'Reservar — WinBeach'],
+    fr: ['Réserver', 'Réservation en ligne — canal widget', 'Réserver — WinBeach'],
+    de: ['Buchen', 'Online-Buchung — Widget-Kanal', 'Buchen — WinBeach'],
+  },
   guida: {
     it: ['Guida WinBeach Web', 'Manuale operativo completo.', 'Guida'],
     en: ['WinBeach Web Guide', 'Complete operational manual.', 'Guide'],

@@ -3,8 +3,6 @@ import { createTableCrud } from './table-crud.js';
 createTableCrud({
   table: 'contatori_albergo',
   fields: ['albergo', 'codice', 'totale', 'utilizzato'],
-  newTitle: 'Nuovo',
-  editTitle: 'Modifica',
   columns: [{ key:'albergo' }, { key:'codice' }, { key:'totale' }, { key:'utilizzato' }],
   formFields: [
     { id:'f-albergo', field:'albergo', label:'Albergo *' },

@@ -3,8 +3,6 @@ import { createTableCrud } from './table-crud.js';
 createTableCrud({
   table: 'tariffe',
   fields: ['tassa', 'giornaliero', 'settimanale', 'quindicinale', 'mensile', 'listino_id'],
-  newTitle: 'Nuovo',
-  editTitle: 'Modifica',
   columns: [{ key:'tassa' }, { key:'giornaliero', type:'euro' }, { key:'settimanale', type:'euro' }, { key:'quindicinale', type:'euro' }, { key:'mensile', type:'euro' }],
   formFields: [
     { id:'f-tassa', field:'tassa', label:'Tassa *' },
