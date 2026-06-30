@@ -21,6 +21,8 @@ function crudPage(p) {
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <script src="../js/theme-init.js"></script>
+  <script src="../js/lang-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>${p.title}</title>
   <link rel="stylesheet" href="../css/page.css">
@@ -30,19 +32,19 @@ function crudPage(p) {
   <div class="header">
     <h2><i class="fa-solid ${p.icon}" style="color:${p.color}"></i> ${p.title}</h2>
     <div class="toolbar">
-      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button>
-      <button type="button" class="btn btn-primary" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuovo</button>
+      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn.reload">Ricarica</span></button>
+      <button type="button" class="btn btn-primary" id="btn-nuovo"><i class="fa-solid fa-plus"></i> <span data-i18n="btn.new">Nuovo</span></button>
     </div>
   </div>
-  <div class="db-bar"><span><i class="fa-solid fa-database"></i> Base dati</span><div id="db-status" class="db-status idle">…</div></div>
-  <div class="filters"><input type="search" id="search-input" placeholder="Cerca…"></div>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> <span data-i18n="common.db">Base dati</span></span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="filters"><input type="search" id="search-input" data-i18n-placeholder="common.search" placeholder="Cerca…"></div>
   <div class="table-scroll"><table><thead><tr>${th}<th>Azioni</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
-  <div id="empty-state" class="empty-state" style="display:none"><p>Nessun record.</p></div>
+  <div id="empty-state" class="empty-state" style="display:none"><p data-i18n="common.noRecords">Nessun record.</p></div>
   <div class="modal-overlay" id="data-modal">
     <div class="modal">
-      <div class="modal-header"><h3 id="modal-title">Nuovo</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
+      <div class="modal-header"><h3 id="modal-title">Nuovo</h3><button type="button" class="modal-close" id="modal-close" data-i18n-aria="common.close" aria-label="Chiudi">&times;</button></div>
       <form id="data-form"><div class="modal-body"><div class="form-grid">${form}</div></div>
-        <div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button><button type="submit" class="btn btn-primary" id="btn-save">Salva</button></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel" data-i18n="common.cancel">Annulla</button><button type="submit" class="btn btn-primary" id="btn-save" data-i18n="common.save">Salva</button></div>
       </form>
     </div>
   </div>

@@ -7,9 +7,9 @@
 <link rel="stylesheet" href="../css/page.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></head>
 <body data-mode="arrivi-domani">
 <div class="header"><h2><i class="fa-solid fa-calendar-plus" style="color:#3498db"></i> Arrivi Domani</h2>
-<div class="toolbar"><button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button></div></div>
+<div class="toolbar"><button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn.reload">Ricarica</span></button></div></div>
 <p class="subtitle" id="page-subtitle"></p>
-<div class="db-bar"><span><i class="fa-solid fa-database"></i> Base dati</span><div id="db-status" class="db-status idle">…</div></div>
+<div class="db-bar"><span><i class="fa-solid fa-database"></i> <span data-i18n="common.db">Base dati</span></span><div id="db-status" class="db-status idle">…</div></div>
 <div class="stats-row"><div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">Arrivi previsti</div></div>
 <div class="stat-box"><div class="num" id="stat-check">0</div><div class="lbl">Check-in effettuati</div></div></div>
 <div class="table-scroll"><table><thead><tr><th>Cliente</th><th>Postazione</th><th>Orario</th><th>Pagamento</th><th>Canale</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="data-tbody"></tbody></table></div>

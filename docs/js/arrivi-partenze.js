@@ -10,6 +10,18 @@ const [dir, when] = MODE.split('-');
 const targetDate = when === 'domani' ? tomorrowIso() : todayIso();
 const isArrivi = dir === 'arrivi';
 
+const CHANNEL_KEYS = {
+  offline: 'channel.offline',
+  widget: 'channel.widget',
+  portale: 'channel.portal',
+};
+
+function channelLabel(canale) {
+  const key = CHANNEL_KEYS[canale] || CHANNEL_KEYS.offline;
+  const label = t(key);
+  return label !== key ? label : (canale || t('channel.offline'));
+}
+
 let prenotazioni = [];
 
 function filterRows() {
@@ -35,7 +47,7 @@ function render() {
       <td>${t('common.spot')} ${p.cella || '—'}</td>
       <td>${p.ora_arrivo || '—'}</td>
       <td>${pagamentoBadge(p.stato_pagamento)}</td>
-      <td>${p.canale || 'offline'}</td>
+      <td>${escapeHtml(channelLabel(p.canale))}</td>
       <td>${statoPrenBadge(p.stato)}</td>
       <td class="actions-cell">
         ${isArrivi ? `<button class="btn btn-success btn-sm" data-checkin="${p.id}" ${p.check_in ? 'disabled' : ''}>${t('common.checkin')}</button>` : ''}

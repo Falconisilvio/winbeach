@@ -20,7 +20,7 @@
       <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-plus"></i> <span data-i18n="cassa.newMovement">Nuovo movimento</span></button>
     </div>
   </div>
-  <div class="db-bar"><span><i class="fa-solid fa-database"></i> Base dati</span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> <span data-i18n="common.db">Base dati</span></span><div id="db-status" class="db-status idle">…</div></div>
   <div class="stats-row">
     <div class="stat-box"><div class="num" id="stat-entrate">0 €</div><div class="lbl">Entrate oggi</div></div>
     <div class="stat-box"><div class="num" id="stat-uscite">0 €</div><div class="lbl">Uscite oggi</div></div>
@@ -29,7 +29,7 @@
   <div class="table-scroll"><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrizione</th><th>Importo</th><th>Operatore</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
   <div class="modal-overlay" id="data-modal">
     <div class="modal">
-      <div class="modal-header"><h3 data-i18n="cassa.newMovement">Nuovo movimento</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
+      <div class="modal-header"><h3 data-i18n="cassa.newMovement">Nuovo movimento</h3><button type="button" class="modal-close" id="modal-close" data-i18n-aria="common.close" aria-label="Chiudi">&times;</button></div>
       <form id="data-form"><div class="modal-body"><div class="form-grid">
         <div class="form-group"><label for="f-tipo">Tipo</label><select id="f-tipo"><option value="entrata">Entrata</option><option value="uscita">Uscita</option></select></div>
         <div class="form-group"><label for="f-importo">Importo €</label><input type="number" id="f-importo" step="0.01" required></div>
@@ -38,7 +38,7 @@
         <div class="form-group"><label for="f-pren">Prenotazione ID</label><input type="number" id="f-pren"></div>
         <div class="form-group"><label for="f-op">Operatore</label><input id="f-op" value="operatore1"></div>
         <div class="form-group" style="grid-column:1/-1"><label for="f-note">Note</label><input id="f-note"></div>
-      </div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button><button type="submit" class="btn btn-success">Salva</button></div></form>
+      </div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel" data-i18n="common.cancel">Annulla</button><button type="submit" class="btn btn-success" data-i18n="common.save">Salva</button></div></form>
     </div>
   </div>
   <script type="module" src="../js/cassa.js"></script>

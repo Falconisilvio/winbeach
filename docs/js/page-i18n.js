@@ -364,9 +364,11 @@ export function applyPageI18n() {
     if (doc !== docKey) document.title = doc;
   }
 
-  const sub = t(subKey);
   const subEl = document.querySelector('.subtitle') || document.getElementById('page-subtitle');
-  if (subEl && sub !== subKey) subEl.textContent = sub;
+  if (subEl && !subEl.dataset.i18n) {
+    const sub = t(subKey);
+    if (sub !== subKey) subEl.textContent = sub;
+  }
 
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const key = el.dataset.i18n;
