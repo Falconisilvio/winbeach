@@ -19,6 +19,7 @@ const unitTests = [
   'test-guida-i18n.mjs',
   'test-i18n.mjs',
   'test-auth.mjs',
+  'test-theme.mjs',
 ];
 
 function runNode(script, env = {}) {

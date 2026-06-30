@@ -460,3 +460,85 @@
 [data-theme="dark"] .subtitle {
   color: var(--wb-text-muted);
 }
+
+/* ── Struttura (variables + controles) ── */
+[data-theme="dark"] {
+  --sand: #2d3a28;
+  --sand-dark: #1e2a1a;
+  --sea: #2d6aa0;
+  --sea-deep: #1e4a6e;
+  --walkway: #5c4d2a;
+  --walkway-light: #7a6048;
+  --active-green: #3d7a4a;
+  --active-green-dark: #2d5c38;
+  --inactive: #3d4f66;
+  --panel-bg: #1a2332;
+  --border: #4a5d78;
+  --text: #e8edf4;
+  --accent: #4dabff;
+}
+
+[data-theme="dark"] body.struttura-page {
+  background: linear-gradient(180deg, #0f1a28 0%, var(--wb-bg) 120px);
+}
+
+[data-theme="dark"] .btn-icon,
+[data-theme="dark"] .tipo-card,
+[data-theme="dark"] .tassa-card {
+  background: var(--wb-surface-2);
+  color: var(--wb-text);
+  border-color: var(--wb-border);
+}
+
+[data-theme="dark"] .btn-icon:hover,
+[data-theme="dark"] .tipo-card:hover,
+[data-theme="dark"] .tassa-card:hover {
+  background: var(--wb-surface-hover);
+}
+
+[data-theme="dark"] .prossimo-row input,
+[data-theme="dark"] .numeracion-controls input,
+[data-theme="dark"] .numeracion-controls select {
+  background: var(--wb-input-bg);
+  border-color: var(--wb-input-border);
+  color: var(--wb-text);
+}
+
+/* ── Widget slots ── */
+[data-theme="dark"] .widget-slot {
+  background: #1e4d32;
+  border-color: #2d6a4a;
+  color: #a7f3c0;
+}
+
+[data-theme="dark"] .widget-slot.disabled {
+  background: var(--wb-surface-3);
+  border-color: var(--wb-border);
+  color: var(--wb-text-muted);
+}
+
+[data-theme="dark"] .widget-note,
+[data-theme="dark"] .widget-status {
+  color: var(--wb-text-muted);
+}
+
+/* ── Comunes extra ── */
+[data-theme="dark"] .guide-list li {
+  border-color: var(--wb-border-light);
+  color: var(--wb-text-secondary);
+}
+
+[data-theme="dark"] .modal-header h3 {
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] select option {
+  background: var(--wb-surface);
+  color: var(--wb-text);
+}
+
+[data-theme="dark"] #qr-reader,
+[data-theme="dark"] #qr-reader__dashboard {
+  background: var(--wb-surface) !important;
+  color: var(--wb-text) !important;
+}
