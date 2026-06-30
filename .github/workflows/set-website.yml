@@ -2,10 +2,13 @@ name: Configurar URL en About
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/set-website.yml'
 
 permissions:
   contents: read
-  administration: write
 
 jobs:
   set-website:
