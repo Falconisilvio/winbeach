@@ -9,6 +9,7 @@ import {
   saveToken,
   getDbStatus,
   getActiveProfile,
+  profileDisplayName,
   loadStrutturaFromDb,
   saveStrutturaToDb,
   onProfileChange,
@@ -125,7 +126,7 @@ function initDbPanel() {
   if (dbField) dbField.value = cfg.database;
   document.getElementById('db-token').value = getToken();
   const nameEl = document.getElementById('db-profile-name');
-  if (nameEl) nameEl.textContent = profile?.name || '—';
+  if (nameEl) nameEl.textContent = profile ? profileDisplayName(profile) : '—';
   updateDbStatusUI();
 }
 

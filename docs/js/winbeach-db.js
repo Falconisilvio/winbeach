@@ -21,11 +21,58 @@ import { t } from './app-i18n.js';
 
 let lastStatus = { state: 'idle', key: null, params: {}, raw: '' };
 
+const DEMO_PROFILE_BY_DB = {
+  winbeach: 'profile.demo.main',
+  'winbeach-lido-sud': 'profile.demo.lidoSud',
+  'winbeach-lido-europa': 'profile.demo.lidoEuropa',
+};
+
+const DEMO_PROFILE_BY_NAME = {
+  'Stabilimento principale': 'profile.demo.main',
+  'Lido Sud': 'profile.demo.lidoSud',
+  'Lido Europa': 'profile.demo.lidoEuropa',
+};
+
+/** Nombre de perfil para UI (traduce perfiles demo; el resto queda como está). */
+export function profileDisplayName(profile) {
+  if (!profile) return '';
+  const dbKey = DEMO_PROFILE_BY_DB[profile.database];
+  if (dbKey) {
+    const label = t(dbKey);
+    if (label !== dbKey) return label;
+  }
+  const nameKey = DEMO_PROFILE_BY_NAME[profile.name?.trim()];
+  if (nameKey) {
+    const label = t(nameKey);
+    if (label !== nameKey) return label;
+  }
+  return profile.name?.trim() || '';
+}
+
+function resolveProfileParam(value) {
+  if (!value) return value;
+  const active = getActiveProfile();
+  if (active && value === active.name) return profileDisplayName(active);
+  const key = DEMO_PROFILE_BY_NAME[value];
+  if (key) {
+    const label = t(key);
+    if (label !== key) return label;
+  }
+  return value;
+}
+
+function resolveStatusParams(params = {}) {
+  const out = { ...params };
+  if (out.profile != null) out.profile = resolveProfileParam(out.profile);
+  return out;
+}
+
 export function resolveDbStatusMessage(status = lastStatus) {
   if (status.raw) return status.raw;
   if (!status.key) return '';
+  const params = resolveStatusParams(status.params);
   let s = t(status.key);
-  for (const [k, v] of Object.entries(status.params || {})) {
+  for (const [k, v] of Object.entries(params)) {
     s = s.replaceAll(`{${k}}`, String(v));
   }
   return s;

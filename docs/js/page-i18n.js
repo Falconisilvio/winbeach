@@ -382,6 +382,8 @@ export function applyPageI18n() {
   });
 
   applyAutoLabels();
+
+  import('./winbeach-module.js').then((m) => m.updateDbBar?.()).catch(() => {});
 }
 
 let listenersBound = false;

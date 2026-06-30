@@ -1,9 +1,9 @@
 /**
  * Utilidades compartidas para módulos WinBeach
  */
-import { getDbStatus, getActiveProfile, getToken, onProfileChange } from './winbeach-db.js';
+import { getDbStatus, getActiveProfile, getToken, onProfileChange, profileDisplayName } from './winbeach-db.js';
 import { assertCanWrite, canWrite, applyReadOnlyMode, onAuthChange, userLabel, isAuthenticated } from './winbeach-auth.js';
-import { t } from './app-i18n.js';
+import { t, onLangChange } from './app-i18n.js';
 
 export function $(id) {
   return document.getElementById(id);
@@ -48,7 +48,7 @@ export function updateDbBar() {
   if (!el) return;
   const { state, message } = getDbStatus();
   const profile = getActiveProfile();
-  const prefix = profile ? `${profile.name} · ` : '';
+  const prefix = profile ? `${profileDisplayName(profile)} · ` : '';
   el.className = `db-status ${state}`;
   el.textContent = message ? prefix + message : (profile ? prefix + t('common.ready') : t('common.ready'));
 }
@@ -61,6 +61,10 @@ window.addEventListener('winbeach-lang-change', refreshDbBarOnLangChange);
 window.addEventListener('message', (e) => {
   if (e.data?.type === 'winbeach-lang-change') refreshDbBarOnLangChange();
 });
+window.addEventListener('storage', (e) => {
+  if (e.key === 'winbeach-app-lang') refreshDbBarOnLangChange();
+});
+onLangChange(refreshDbBarOnLangChange);
 
 export function requireToken() {
   if (!getToken()) {

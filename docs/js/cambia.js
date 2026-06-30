@@ -8,6 +8,7 @@ import {
   saveToken,
   testActiveProfile,
   ensureDemoProfiles,
+  profileDisplayName,
 } from './winbeach-db.js';
 import { t } from './app-i18n.js';
 import { $, escapeHtml, initModule } from './winbeach-module.js';
@@ -44,7 +45,7 @@ function renderCards() {
       <div class="profile-card ${active ? 'active' : ''}" data-id="${p.id}">
         <div class="profile-card-head">
           <i class="fa-solid fa-umbrella-beach" style="color:${active ? '#0084ff' : '#ccc'}"></i>
-          <h3>${escapeHtml(p.name)}</h3>
+          <h3>${escapeHtml(profileDisplayName(p))}</h3>
           ${active ? `<span class="badge badge-green">${escapeHtml(t('badge.attivo'))}</span>` : ''}
         </div>
         <p class="profile-conn">${escapeHtml(connectionLabel(p))}</p>
