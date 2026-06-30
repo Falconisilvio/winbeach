@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Partenze Oggi</title>
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -16,9 +17,11 @@
     <div class="stat-box"><div class="num">25</div><div class="lbl">Completate</div></div>
     <div class="stat-box"><div class="num">3</div><div class="lbl">Da saldare</div></div>
   </div>
-  <table>
-    <thead><tr><th>Cliente</th><th>Postazione</th><th>Orario</th><th>Saldo</th><th>Stato</th></tr></thead>
-    <tbody><tr><td>Anna Neri</td><td>A5</td><td>17:00</td><td>0 €</td><td><span class="badge badge-green">Saldato</span></td></tr><tr><td>Paolo Blu</td><td>D2</td><td>18:30</td><td>25 €</td><td><span class="badge badge-orange">Parziale</span></td></tr></tbody>
-  </table>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Cliente</th><th>Postazione</th><th>Orario</th><th>Saldo</th><th>Stato</th></tr></thead>
+      <tbody><tr><td>Anna Neri</td><td>A5</td><td>17:00</td><td>0 €</td><td><span class="badge badge-green">Saldato</span></td></tr><tr><td>Paolo Blu</td><td>D2</td><td>18:30</td><td>25 €</td><td><span class="badge badge-orange">Parziale</span></td></tr></tbody>
+    </table>
+  </div>
 </body>
 </html>

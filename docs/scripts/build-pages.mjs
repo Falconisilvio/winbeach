@@ -9,6 +9,7 @@ const head = (title) => `<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>${title}</title>
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -22,10 +23,12 @@ const header = (icon, color, title, btn = '') => `
   </div>`;
 
 const table = (headers, rows) => `
-  <table>
-    <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
-  </table>`;
+  <div class="table-scroll">
+    <table>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table>
+  </div>`;
 
 const stats = (items) => `
   <div class="stats-row">${items.map(([n, l]) => `

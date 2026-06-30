@@ -338,3 +338,186 @@ tr:hover td {
   gap: 8px;
   padding: 12px 20px 20px;
 }
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.table-scroll table {
+  min-width: 560px;
+}
+
+/* Touch targets mínimos */
+.btn,
+.modal-close {
+  min-height: 44px;
+}
+
+.btn-sm {
+  min-height: 36px;
+  min-width: 36px;
+}
+
+/* ── Tablet ── */
+@media (max-width: 1024px) {
+  body {
+    padding: 16px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Móvil ── */
+@media (max-width: 768px) {
+  body {
+    padding: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  h2 {
+    font-size: 1.15rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header h2 {
+    text-align: left;
+  }
+
+  .toolbar {
+    width: 100%;
+  }
+
+  .toolbar .btn {
+    flex: 1;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters input,
+  .filters select {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-box {
+    padding: 10px;
+  }
+
+  .stat-box .num {
+    font-size: 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .db-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .db-bar .db-status {
+    min-width: 0;
+  }
+
+  .chart-placeholder {
+    padding: 24px 16px;
+  }
+
+  .grid-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .card-item {
+    padding: 14px;
+  }
+
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-width: none;
+    border-radius: 16px 16px 0 0;
+    max-height: 92dvh;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+
+  .actions-cell .btn-sm {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 8px 12px;
+  }
+}
+
+/* ── Móvil pequeño ── */
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    flex-direction: column;
+  }
+
+  .toolbar .btn {
+    width: 100%;
+  }
+}

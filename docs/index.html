@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Beach Manager Dashboard</title>
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -11,9 +11,12 @@
 <body>
 
     <header class="topbar">
+        <button type="button" class="menu-toggle" id="btn-menu-toggle" aria-label="Apri menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
         <div class="logo">
             <i class="fa-solid fa-umbrella-beach"></i>
-            <span>Beach Manager</span>
+            <span class="logo-text">Beach Manager</span>
         </div>
         <div class="search">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -21,12 +24,14 @@
         </div>
         <div class="toolbar">
             <button class="btn-blue">
-                <i class="fa-solid fa-plus"></i> Nuova prenotazione
+                <i class="fa-solid fa-plus"></i> <span class="btn-label">Nuova prenotazione</span>
             </button>
         </div>
     </header>
 
-    <div class="layout">
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="layout" id="app-layout">
 
         <aside class="sidebar">
             <div class="icon active" data-page="spiaggia" id="btn-sidebar-dashboard">
