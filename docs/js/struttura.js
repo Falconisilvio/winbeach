@@ -2,6 +2,15 @@
  * Configuración de playa — Procedimiento 1
  * Por cada cuadrado: tipo de elemento, activo/alquilable, tasa (settore) y número (cella).
  */
+import {
+  getDbConfig,
+  saveDbConfig,
+  getToken,
+  saveToken,
+  getDbStatus,
+  loadStrutturaFromDb,
+  saveStrutturaToDb,
+} from './winbeach-db.js';
 
 const ELEMENTOS = [
   { id: 'Ombrellone', label: 'Sombrilla', attivo: true, icon: '☂' },
@@ -93,13 +102,91 @@ function formatSettore(settore, attivo) {
   return attivo && settore ? settore : '.F.';
 }
 
-function init() {
+async function init() {
   buildLegends();
   buildGrid();
   bindEvents();
-  loadDemoLayout();
+  initDbPanel();
+  await tryLoadFromDatabase();
   refreshExport();
   updateStats();
+}
+
+function initDbPanel() {
+  const cfg = getDbConfig();
+  document.getElementById('db-owner').value = cfg.owner;
+  document.getElementById('db-repo').value = cfg.repo;
+  document.getElementById('db-branch').value = cfg.branch;
+  document.getElementById('db-token').value = getToken();
+  updateDbStatusUI();
+}
+
+function updateDbStatusUI() {
+  const el = document.getElementById('db-status');
+  if (!el) return;
+  const { state, message } = getDbStatus();
+  el.className = `db-status ${state}`;
+  el.textContent = message || 'Sin conexión';
+}
+
+function applyStrutturaData(data) {
+  state.rows = data.rows;
+  state.cols = data.cols;
+  state.walkwayCol = data.walkwayCol;
+  state.prossimo = data.prossimo;
+  state.cells = {};
+
+  document.getElementById('grid-rows').value = state.rows;
+  document.getElementById('grid-cols').value = state.cols;
+  document.getElementById('prossimo').value = state.prossimo;
+
+  data.cells.forEach((c) => {
+    const cell = getCell(c.x, c.y);
+    cell.cella = c.cella;
+    cell.elemento = c.elemento;
+    cell.desc = c.desc;
+    cell.attivo = c.attivo;
+    cell.settore = c.settore;
+  });
+
+  buildGrid();
+}
+
+function getStrutturaSnapshot() {
+  const cells = [];
+  for (let y = 1; y <= state.rows; y++) {
+    for (let x = 1; x <= state.cols; x++) {
+      const data = getCell(x, y);
+      if (!data.elemento) continue;
+      cells.push({ ...data });
+    }
+  }
+  return {
+    rows: state.rows,
+    cols: state.cols,
+    walkwayCol: state.walkwayCol,
+    prossimo: state.prossimo,
+    cells,
+  };
+}
+
+async function tryLoadFromDatabase() {
+  const result = await loadStrutturaFromDb();
+  updateDbStatusUI();
+
+  if (result.ok && result.data) {
+    applyStrutturaData(result.data);
+    return;
+  }
+
+  if (result.ok && result.empty) {
+    loadDemoLayout();
+    return;
+  }
+
+  if (!result.ok) {
+    loadDemoLayout();
+  }
 }
 
 function buildLegends() {
@@ -564,6 +651,48 @@ function bindEvents() {
     buildGrid();
     refreshExport();
     updateStats();
+  });
+
+  document.getElementById('btn-db-save-config').addEventListener('click', () => {
+    saveDbConfig({
+      owner: document.getElementById('db-owner').value.trim(),
+      repo: document.getElementById('db-repo').value.trim(),
+      branch: document.getElementById('db-branch').value.trim(),
+    });
+    saveToken(document.getElementById('db-token').value.trim());
+    updateDbStatusUI();
+    const el = document.getElementById('db-status');
+    el.className = 'db-status ok';
+    el.textContent = 'Configuración guardada en el navegador.';
+  });
+
+  document.getElementById('btn-db-load').addEventListener('click', async () => {
+    saveToken(document.getElementById('db-token').value.trim());
+    const result = await loadStrutturaFromDb();
+    updateDbStatusUI();
+    if (result.ok && result.data) {
+      applyStrutturaData(result.data);
+      refreshExport();
+      updateStats();
+    } else if (result.ok && result.empty) {
+      loadDemoLayout();
+      refreshExport();
+      updateStats();
+    }
+  });
+
+  document.getElementById('btn-db-save').addEventListener('click', async () => {
+    saveToken(document.getElementById('db-token').value.trim());
+    const btn = document.getElementById('btn-db-save');
+    btn.disabled = true;
+    btn.textContent = 'Guardando…';
+    const result = await saveStrutturaToDb(getStrutturaSnapshot());
+    updateDbStatusUI();
+    btn.disabled = false;
+    btn.textContent = 'Guardar en BD';
+    if (!result.ok && result.error) {
+      alert(result.error);
+    }
   });
 }
 
