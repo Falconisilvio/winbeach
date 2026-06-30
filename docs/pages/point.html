@@ -2,215 +2,166 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Cassa e Comande</title>
+    <title>Punto Vendita Ristorante</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f4f6fa; padding: 15px; height: 100vh; display: flex; flex-direction: column; }
+        body { background: #ffffff; padding: 20px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .cassa-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .tavolo-badge { background: #e74c3c; color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .cassa-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f4f6fa; padding-bottom: 15px; margin-bottom: 15px; }
+        .tavolo-badge { background: #0b7ef3; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
-        .main-container { display: flex; flex: 1; gap: 15px; overflow: hidden; }
+        .main-container { display: flex; flex: 1; gap: 20px; overflow: hidden; }
 
-        /* AREA PRODOTTI (SINISTRA) */
-        .prodotti-section { flex: 1.3; display: flex; flex-direction: column; gap: 12px; }
-        
-        /* Categorie Orizzontali */
-        .categorie-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .cat-btn { background: white; border: 1px solid #dcdde1; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-        .cat-btn.active { background: #2c3e50; color: white; border-color: #2c3e50; }
+        /* SINISTRA: PRODOTTI E CATEGORIE */
+        .prodotti-section { flex: 1.3; display: flex; flex-direction: column; gap: 15px; }
+        .categorie-bar { display: flex; gap: 10px; }
+        .cat-btn { background: #f8f9fa; border: 1px solid #dcdde1; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .cat-btn.active { background: #0b7ef3; color: white; border-color: #0b7ef3; }
 
-        /* Sottocategorie */
-        .sottocategorie-bar { display: flex; gap: 8px; overflow-x: auto; }
-        .sub-btn { background: #eef2f7; border: none; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; }
-        .sub-btn.active { background: #3498db; color: white; }
-
-        /* Griglia Tastiera Articoli */
         .tastiera-articoli { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; flex: 1; padding-right: 5px; }
-        .articolo-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; height: 100px; }
-        .articolo-card:hover { border-color: #3498db; background: #fafbfc; }
+        .articolo-card { background: #fcfcfc; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px 10px; text-align: center; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; height: 95px; transition: 0.15s; }
+        .articolo-card:hover { border-color: #0b7ef3; background: #f4f9ff; transform: translateY(-2px); }
         .articolo-card .name { font-size: 13px; font-weight: 500; color: #333; }
-        .articolo-card .price { font-weight: bold; color: #2ecc71; font-size: 14px; margin-top: 5px; }
+        .articolo-card .price { font-weight: bold; color: #2ecc71; font-size: 14px; }
 
-        /* AREA COMANDA / XBROWSE (DESTRA) */
-        .comanda-section { flex: 1; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; }
-        .comanda-title { background: #f8f9fa; padding: 12px 15px; font-size: 15px; font-weight: bold; color: #2c3e50; border-bottom: 1px solid #eee; }
+        /* DESTRA: XBROWSE COMANDA */
+        .comanda-section { flex: 1; border: 1px solid #e0e0e0; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; background: #fafbfc; }
+        .comanda-title { background: #f1f3f5; padding: 12px; font-size: 14px; font-weight: bold; color: #2c3e50; border-bottom: 1px solid #e0e0e0; }
         
-        /* Griglia XBrowse */
-        .xbrowse-container { flex: 1; overflow-y: auto; }
+        .xbrowse-container { flex: 1; overflow-y: auto; background: white; }
         .xbrowse { width: 100%; border-collapse: collapse; }
-        .xbrowse th, .xbrowse td { padding: 10px 12px; font-size: 14px; text-align: left; border-bottom: 1px solid #f2f2f2; }
-        .xbrowse th { background: #fcfcfc; color: #7f8c8d; font-weight: 600; font-size: 12px; text-transform: uppercase; }
-        .xbrowse td .btn-del { border: none; background: transparent; color: #e74c3c; cursor: pointer; }
+        .xbrowse th, .xbrowse td { padding: 10px 12px; font-size: 13px; text-align: left; border-bottom: 1px solid #f2f2f2; }
+        .xbrowse th { background: #f8f9fa; color: #7f8c8d; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+        .xbrowse td .btn-del { border: none; background: transparent; color: #e74c3c; cursor: pointer; font-size: 14px; }
 
-        /* Totali e Invio */
-        .comanda-totali { padding: 15px; border-top: 2px solid #f4f6fa; background: #fcfcfc; }
+        .comanda-totali { padding: 15px; border-top: 1px solid #e0e0e0; background: #f1f3f5; }
         .tot-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #2c3e50; }
-        .btn-cassa { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-salva { background: #2ecc71; margin-bottom: 8px; }
+        .btn-invia { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; color: white; background: #2ecc71; display: flex; justify-content: center; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
 
     <div class="cassa-header">
-        <h2 style="font-size: 18px;"><i class="fa-solid fa-cash-register" style="color: #3498db; margin-right: 8px;"></i> Punto Vendita Ristorante</h2>
-        <div class="tavolo-badge" id="lbl-tavolo">Nessun Tavolo</div>
+        <h2 style="font-size: 20px; font-weight: 500;"><i class="fa-solid fa-cash-register" style="color: #0b7ef3; margin-right: 8px;"></i> Cassa Ristorante (Point of Sale)</h2>
+        <div class="tavolo-badge" id="lbl-tavolo">Caricamento...</div>
     </div>
 
     <div class="main-container">
-        
         <div class="prodotti-section">
             <div class="categorie-bar">
-                <button class="cat-btn active" onclick="cambiaCategoria('Ristorante')">Ristorante</button>
-                <button class="cat-btn" onclick="cambiaCategoria('Bevande')">Bevande</button>
-                <button class="cat-btn" onclick="cambiaCategoria('Bar')">Bar & Caffetteria</button>
+                <button class="cat-btn active" onclick="cambiaCategoria('Ristorante', this)">Ristorante</button>
+                <button class="cat-btn" onclick="cambiaCategoria('Bevande', this)">Bevande</button>
+                <button class="cat-btn" onclick="cambiaCategoria('Bar', this)">Bar & Caffetteria</button>
             </div>
-
-            <div class="sottocategorie-bar" id="sub-container">
-                <button class="sub-btn active">Primi Piatti</button>
-                <button class="sub-btn">Secondi di Pesce</button>
-                <button class="sub-btn">Contorni</button>
-            </div>
-
-            <div class="tastiera-articoli" id="grid-prodotti">
-                </div>
+            <div class="tastiera-articoli" id="grid-prodotti"></div>
         </div>
 
         <div class="comanda-section">
-            <div class="comanda-title"><i class="fa-solid fa-list-check"></i> Articoli in Comanda</div>
-            
+            <div class="comanda-title"><i class="fa-solid fa-list-check"></i> Righe Comanda Attiva</div>
             <div class="xbrowse-container">
                 <table class="xbrowse">
                     <thead>
                         <tr>
-                            <th>Descrizione</th>
-                            <th style="text-align: center; width: 60px;">Q.tà</th>
-                            <th style="text-align: right; width: 80px;">Prezzo</th>
+                            <th>Articolo</th>
+                            <th style="text-align: center; width: 50px;">Q.tà</th>
+                            <th style="text-align: right; width: 80px;">Totale</th>
                             <th style="text-align: center; width: 40px;"></th>
                         </tr>
                     </thead>
-                    <tbody id="xbrowse-body">
-                        </tbody>
+                    <tbody id="xbrowse-body"></tbody>
                 </table>
             </div>
-
             <div class="comanda-totali">
                 <div class="tot-row">
-                    <span>TOTALE CONTO</span>
+                    <span>TOTALE CONTO:</span>
                     <span id="txt-totale">0.00 €</span>
                 </div>
-                <button class="btn-cassa btn-salva" onclick="salvaComanda()"><i class="fa-solid fa-print"></i> Invia in Cucina</button>
+                <button class="btn-invia" onclick="inviaComanda()"><i class="fa-solid fa-print"></i> Stampa Comanda Cucina</button>
             </div>
         </div>
-
     </div>
 
     <script>
-        // Database Demo Prodotti
-        const prodottiMenu = {
+        const menuDati = {
             'Ristorante': [
-                { id: 1, nome: 'Spaghetti alle Vongole', prezzo: 14.00 },
-                { id: 2, nome: 'Risotto alla Marinara', prezzo: 15.00 },
-                { id: 3, nome: 'Frittura Mista Beach', prezzo: 18.00 },
-                { id: 4, nome: 'Grigliata di Pesce', prezzo: 22.00 },
-                { id: 5, nome: 'Insalata Verde', prezzo: 5.00 }
+                { nome: 'Spaghetti Vongole', prezzo: 14.00 },
+                { nome: 'Risotto Marinara', prezzo: 15.00 },
+                { nome: 'Frittura Pesce Mista', prezzo: 18.00 }
             ],
             'Bevande': [
-                { id: 6, nome: 'Acqua Naturale 1L', prezzo: 2.50 },
-                { id: 7, nome: 'Acqua Frizzante 1L', prezzo: 2.50 },
-                { id: 8, nome: 'Coca Cola Lattina', prezzo: 3.50 },
-                { id: 9, nome: 'Vino Bianco della Casa 1/4', prezzo: 5.00 },
-                { id: 10, nome: 'Birra Ichnusa', prezzo: 4.00 }
+                { nome: 'Acqua Minerale 1L', prezzo: 2.50 },
+                { nome: 'Coca Cola Lattina', prezzo: 3.50 },
+                { nome: 'Vino Bianco Calice', prezzo: 4.00 }
             ],
             'Bar': [
-                { id: 11, nome: 'Caffè Espresso', prezzo: 1.50 },
-                { id: 12, nome: 'Cappuccino', prezzo: 2.00 },
-                { id: 13, nome: 'Cornetto Vuoto', prezzo: 1.20 }
+                { nome: 'Caffè Espresso', prezzo: 1.50 },
+                { nome: 'Amaro della Casa', prezzo: 3.50 }
             ]
         };
 
-        let comandaCorrente = [];
+        let carrello = [];
 
-        // Caricamento Iniziale Pagina
         window.addEventListener('load', function() {
-            // Legge il tavolo passato dal click nel file tavoli.html
-            const tavolo = localStorage.getItem('tavoloSelezionato') || 'Tavolo Aperto';
-            document.getElementById('lbl-tavolo').innerText = tavolo;
-            
-            // Carica la prima categoria di default
-            cambiaCategoria('Ristorante');
+            const t = localStorage.getItem('tavoloSelezionato') || 'Vendita al Banco';
+            document.getElementById('lbl-tavolo').innerText = t;
+            caricaArticoli('Ristorante');
         });
 
-        // Cambia gli articoli visibili a schermo
-        function cambiaCategoria(catNome) {
+        function cambiaCategoria(cat, btn) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            btn.classList.add('active');
+            caricaArticoli(cat);
+        }
 
-            const container = document.getElementById('grid-prodotti');
-            container.innerHTML = '';
-
-            prodottiMenu[catNome].forEach(prod => {
-                container.innerHTML += `
-                    <div class="articolo-card" onclick="aggiungiAComanda('${prod.nome}', ${prod.prezzo})">
-                        <div class="name">${prod.nome}</div>
-                        <div class="price">${prod.prezzo.toFixed(2)} €</div>
-                    </div>
-                `;
+        function caricaArticoli(cat) {
+            const grid = document.getElementById('grid-prodotti');
+            grid.innerHTML = '';
+            menuDati[cat].forEach(p => {
+                grid.innerHTML += `
+                    <div class="articolo-card" onclick="aggiungiProdotto('${p.nome}', ${p.prezzo})">
+                        <div class="name">${p.nome}</div>
+                        <div class="price">${p.prezzo.toFixed(2)} €</div>
+                    </div>`;
             });
         }
 
-        // Funzione Aggiungi elemento nel XBrowse della comanda
-        function aggiungiAComanda(nome, prezzo) {
-            // Cerca se l'articolo è già presente per incrementare la quantità
-            let esistente = comandaCorrente.find(item => item.nome === nome);
-            if (esistente) {
-                esistente.qta += 1;
-            } else {
-                comandaCorrente.push({ nome: nome, qta: 1, prezzo: prezzo });
-            }
-            renderXBrowse();
+        function aggiungiProdotto(nome, prezzo) {
+            let item = carrello.find(i => i.nome === nome);
+            if(item) { item.qta++; } 
+            else { carrello.push({ nome: nome, qta: 1, prezzo: prezzo }); }
+            aggiornaXBrowse();
         }
 
-        // Rimuovi elemento da XBrowse
-        function rimuoviDaComanda(index) {
-            comandaCorrente.splice(index, 1);
-            renderXBrowse();
+        function rimuoviProdotto(idx) {
+            carrello.splice(idx, 1);
+            aggiornaXBrowse();
         }
 
-        // Aggiorna visivamente la tabella XBrowse di destra
-        function renderXBrowse() {
+        function aggiornaXBrowse() {
             const tbody = document.getElementById('xbrowse-body');
             tbody.innerHTML = '';
-            let totale = 0;
+            let totaleConto = 0;
 
-            comandaCorrente.forEach((item, index) => {
-                let subtotale = item.qta * item.prezzo;
-                totale += subtotale;
-
+            carrello.forEach((item, idx) => {
+                let rigaTot = item.qta * item.prezzo;
+                totaleConto += rigaTot;
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${item.nome}</strong></td>
-                        <td style="text-align: center;">${item.qta}</td>
-                        <td style="text-align: right;">${subtotale.toFixed(2)} €</td>
-                        <td style="text-align: center;">
-                            <button class="btn-del" onclick="rimuoviDaComanda(${index})"><i class="fa-regular fa-trash-can"></i></button>
-                        </td>
-                    </tr>
-                `;
+                        <td style="text-align:center;">${item.qta}</td>
+                        <td style="text-align:right;">${rigaTot.toFixed(2)} €</td>
+                        <td style="text-align:center;"><button class="btn-del" onclick="rimuoviProdotto(${idx})"><i class="fa-regular fa-trash-can"></i></button></td>
+                    </tr>`;
             });
-
-            document.getElementById('txt-totale').innerText = totale.toFixed(2) + ' €';
+            document.getElementById('txt-totale').innerText = totaleConto.toFixed(2) + ' €';
         }
 
-        function salvaComanda() {
-            if(comandaCorrente.length === 0) {
-                alert("Inserisci almeno un prodotto nella comanda!");
-                return;
-            }
-            alert("Comanda inviata con successo alle stampanti di reparto!");
-            comandaCorrente = [];
-            renderXBrowse();
+        function inviaComanda() {
+            if(carrello.length === 0) return alert("Comanda vuota!");
+            alert("Comanda inviata in Cucina!");
+            carrello = [];
+            aggiornaXBrowse();
         }
     </script>
 </body>
