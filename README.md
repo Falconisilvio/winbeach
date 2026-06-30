@@ -25,9 +25,10 @@ En el primer procedimiento se configura la playa:
 
 Los archivos de la demo están en la carpeta [`docs/`](docs/):
 
-- `docs/index.html`
-- `docs/styles.css`
-- `docs/app.js`
+- `docs/index.html` — Dashboard (entrada)
+- `docs/css/` — Estilos (dashboard, struttura)
+- `docs/js/` — Lógica (dashboard, configuración playa)
+- `docs/pages/` — Módulos (struttura, clienti, servizi…)
 
 ## Repositorio
 

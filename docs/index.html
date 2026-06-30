@@ -1,115 +1,244 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuración Playa — Procedimiento 1</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beach Manager Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header class="app-header">
-    <h1>Configuración de la Playa</h1>
-    <p class="subtitle">Procedimiento 1 — Tipos de elemento, tasas y numeración</p>
-  </header>
 
-  <div class="app-layout">
-    <aside class="sidebar">
-      <section class="panel">
-        <h2>Numeración</h2>
-        <div class="numeracion-controls">
-          <label for="prossimo">Próximo</label>
-          <div class="prossimo-row">
-            <button type="button" id="btn-minus" class="btn-icon" title="Disminuir">−</button>
-            <input type="number" id="prossimo" value="1" min="1">
-            <button type="button" id="btn-plus" class="btn-icon" title="Aumentar">+</button>
-          </div>
-          <button type="button" id="btn-reset-num" class="btn-secondary">Reiniciar</button>
+    <header class="topbar">
+        <div class="logo">
+            <i class="fa-solid fa-umbrella-beach"></i>
+            <span>Beach Manager</span>
         </div>
-      </section>
-
-      <section class="panel">
-        <h2>Leyenda — Elementos</h2>
-        <ul id="element-legend" class="legend-list"></ul>
-      </section>
-
-      <section class="panel">
-        <h2>Tasas (Settore)</h2>
-        <ul id="rate-legend" class="legend-list rates"></ul>
-      </section>
-
-      <section class="panel">
-        <h2>Selección</h2>
-        <div class="tool-buttons">
-          <button type="button" class="tool-btn active" data-mode="elemento" title="Asignar tipo de elemento">
-            <span class="tool-icon">▦</span> Sección elementos
-          </button>
-          <button type="button" class="tool-btn" data-mode="tarifa" title="Asignar tasa A, B, C...">
-            <span class="tool-icon">$</span> Sección tarifas
-          </button>
-          <button type="button" class="tool-btn" data-mode="numeracion" title="Numerar celdas activas">
-            <span class="tool-icon">#</span> Numeración celdas
-          </button>
-          <button type="button" class="tool-btn" data-mode="borrar" title="Borrar celda">
-            <span class="tool-icon">✕</span> Borrar una celda
-          </button>
+        <div class="search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" placeholder="Ricerca cliente, postazione, hotel, voucher...">
         </div>
-      </section>
-
-      <section class="panel">
-        <h2>Estructura</h2>
-        <div class="structure-controls">
-          <label>Filas <input type="number" id="grid-rows" value="14" min="4" max="50"></label>
-          <label>Columnas <input type="number" id="grid-cols" value="22" min="8" max="60"></label>
-          <button type="button" id="btn-apply-size" class="btn-secondary">Aplicar tamaño</button>
+        <div class="toolbar">
+            <button class="btn-blue">
+                <i class="fa-solid fa-plus"></i> Nuova prenotazione
+            </button>
         </div>
-        <div class="action-buttons">
-          <button type="button" id="btn-auto-number" class="btn-primary">Numerar automático</button>
-          <button type="button" id="btn-count" class="btn-secondary">Contar elementos</button>
-          <button type="button" id="btn-save" class="btn-primary">Guardar estructura</button>
-          <button type="button" id="btn-load" class="btn-secondary">Cargar archivo</button>
-          <input type="file" id="file-input" accept=".txt,.csv" hidden>
-        </div>
-      </section>
+    </header>
 
-      <section class="panel stats-panel">
-        <h2>Resumen</h2>
-        <div id="stats" class="stats"></div>
-      </section>
-    </aside>
+    <div class="layout">
 
-    <main class="main-area">
-      <div class="beach-container">
-        <div class="sea-border" aria-hidden="true"></div>
-        <div id="beach-grid" class="beach-grid" role="grid" aria-label="Cuadrícula de la playa"></div>
-      </div>
-      <p class="hint" id="mode-hint">Modo: Sección elementos — clic en una celda para asignar el elemento seleccionado.</p>
-    </main>
-  </div>
+        <aside class="sidebar">
+            <div class="icon active" data-page="dashboard" id="btn-sidebar-dashboard">
+                <i class="fa-solid fa-umbrella-beach"></i>
+                <span>Spiaggia</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Booking</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-solid fa-list"></i>
+                <span>Planner</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-regular fa-rectangle-list"></i>
+                <span>Listini</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-solid fa-cash-register"></i>
+                <span>Cassa</span>
+            </div>
+            <div class="icon" data-page="dashboard" id="btn-sidebar-statistiche">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Statistiche</span>
+            </div>
+            <div class="icon" data-page="clienti">
+                <i class="fa-regular fa-user"></i>
+                <span>Clienti</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-solid fa-qrcode"></i>
+                <span>QR scan</span>
+            </div>
+            <div class="icon" data-page="impostazioni" id="btn-sidebar-impostazioni">
+                <i class="fa-solid fa-gear"></i>
+                <span>Impostazioni</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-solid fa-right-left"></i>
+                <span>Cambia</span>
+            </div>
+            <div class="icon" data-page="dashboard">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Guida</span>
+            </div>
+        </aside>
 
-  <section class="export-panel">
-    <div class="export-header">
-      <h2>Archivo de configuración</h2>
-      <button type="button" id="btn-download" class="btn-primary">Descargar .txt</button>
-      <button type="button" id="btn-copy" class="btn-secondary">Copiar</button>
+        <nav class="leftmenu">
+            <h2 id="btn-menu-dashboard" style="cursor: pointer;">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </h2>
+            <ul>
+                <li class="group">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    Arrivi e partenze
+                </li>
+                <li data-page="arrivi-oggi">Arrivi oggi</li>
+                <li data-page="partenze-oggi">Partenze oggi</li>
+                <li data-page="arrivi-domani">Arrivi domani</li>
+                <li data-page="partenze-domani">Partenze domani</li>
+                <li data-page="modifiche-ombrelloni">Modifiche ombrelloni</li>
+                <li data-page="tutte-prenotazioni">Tutte le prenotazioni</li>
+
+                <li class="group">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    Statistiche stabilimento
+                </li>
+                <li data-page="statistiche-ombrellone">Statistiche per ombrellone</li>
+                <li data-page="statistiche-settore">Statistiche per settore</li>
+                <li data-page="statistiche-durata">Statistiche per durata</li>
+                <li data-page="pagamenti-stripe">Pagamenti Stripe</li>
+                <li data-page="trasferimenti-stripe">Trasferimenti Stripe</li>
+
+                <li class="group">
+                    <i class="fa-solid fa-file-lines"></i>
+                    Log e flussi
+                </li>
+                <li data-page="log-sconti">Log sconti</li>
+                <li data-page="log-cancellazioni">Log cancellazioni</li>
+                <li data-page="flussi-cassa">Flussi di cassa</li>
+
+                <li class="group">
+                    <i class="fa-solid fa-calculator"></i>
+                    Contatori
+                </li>
+                <li data-page="contatori-albergo">Contatori Albergo</li>
+                <li data-page="contatori-voucher">Contatori Voucher</li>
+
+                <li class="group" data-page="magazzino" style="cursor:pointer;">
+                    <i class="fa-solid fa-warehouse"></i>
+                    Magazzino
+                </li>
+
+                <div id="submenu-impostazioni" class="hidden-menu">
+                    <li class="group">
+                        <i class="fa-solid fa-gear"></i>
+                        Impostazioni
+                    </li>
+                    <li data-page="elementi">Elementi</li>
+                    <li data-page="servizi">Servizi</li>
+                    <li data-page="settori">Settori</li>
+                    <li data-page="struttura">Struttura</li>
+                    <li data-page="listini">Listini</li>
+                    <li data-page="tariffe">Tariffe</li>
+                    <li data-page="capitaneria">Capitaneria</li>
+                    <li data-page="esercizi">Esercizi</li>
+                    <li data-page="azienda">Azienda</li>
+                    <li data-page="utenti">Utenti</li>
+                </div>
+            </ul>
+        </nav>
+
+        <main class="content">
+
+            <div id="dashboard-view">
+                <div class="content-header">
+                    <h1>Dashboard</h1>
+                    <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
+                </div>
+
+                <div class="dashboard">
+                    <div class="card arrivi">
+                        <h3>Arrivi</h3>
+                        <div class="number">150</div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+                    <div class="card partenze">
+                        <h3>Partenze</h3>
+                        <div class="number">100</div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+                    <div class="card cancellazioni">
+                        <h3>Cancellazioni</h3>
+                        <div class="number-inline">
+                            <span class="number">20</span><span class="subtext">/1000€</span>
+                        </div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+                    <div class="card occupazione">
+                        <h3>Tasso di occupazione</h3>
+                        <div class="number">50%</div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+
+                    <div class="card pagamenti">
+                        <h3>Prenotazioni per stato pagamenti</h3>
+                        <div class="chart-container">
+                            <canvas id="chartPayment"></canvas>
+                        </div>
+                        <a href="#" class="view-detail">Dettaglio →</a>
+                    </div>
+                    <div class="card canale">
+                        <h3>Prenotazioni per canale</h3>
+                        <div class="chart-container">
+                            <canvas id="chartChannel"></canvas>
+                        </div>
+                        <a href="#" class="view-detail">Dettaglio →</a>
+                    </div>
+
+                    <div class="card fatturato">
+                        <h3>Fatturato</h3>
+                        <div class="number-inline">
+                            <span class="number">50.000</span><span class="currency">€</span>
+                            <i class="fa-regular fa-eye eye-icon"></i>
+                        </div>
+                    </div>
+                    <div class="card presenze">
+                        <h3>Presenze</h3>
+                        <div class="number">200</div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+                    <div class="card sconti">
+                        <h3>Sconti</h3>
+                        <div class="number-inline">
+                            <span class="number">10</span><span class="subtext">/500€</span>
+                        </div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+                    <div class="card carrello">
+                        <h3>Carrello Medio</h3>
+                        <div class="number">40€</div>
+                        <a href="#">Dettaglio →</a>
+                    </div>
+
+                    <div class="card grafico1">
+                        <div class="card-header">
+                            <h3>Grafico Presenze</h3>
+                            <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
+                        </div>
+                        <div class="line-chart-container">
+                            <canvas id="chartLine1"></canvas>
+                        </div>
+                    </div>
+                    <div class="card grafico2">
+                        <div class="card-header">
+                            <h3>Grafico Arrivi/Partenze</h3>
+                            <button class="date-button">10/11/2021 - 17/11/2021 <i class="fa-regular fa-calendar"></i></button>
+                        </div>
+                        <div class="line-chart-container">
+                            <canvas id="chartLine2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="procedure-view" style="display: none;"></div>
+
+        </main>
     </div>
-    <div class="table-wrapper">
-      <table id="export-table" class="export-table">
-        <thead>
-          <tr>
-            <th>CELDA</th>
-            <th>X</th>
-            <th>Y</th>
-            <th>ELEMENTO</th>
-            <th>DESC</th>
-            <th>SETTORE</th>
-            <th>ATTIVO</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
 
-  <script src="app.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

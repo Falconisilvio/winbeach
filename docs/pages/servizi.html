@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestione Servizi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #ffffff; color: #333; margin: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f4f6fa; padding-bottom: 15px; margin-bottom: 20px; }
+        h2 { margin: 0; color: #222; font-weight: 500; }
+        .grid-servizi { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 25px; }
+        .card-servizio { border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; text-align: center; background: #fafafa; }
+        .card-servizio i { font-size: 36px; color: #e67e22; margin-bottom: 15px; }
+        .card-servizio h3 { margin: 5px 0; font-size: 18px; }
+        .card-servizio .prezzo { font-size: 20px; font-weight: bold; color: #2c3e50; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2><i class="fa-solid fa-bell-concierge" style="color: #e67e22; margin-right: 10px;"></i> Servizi Extra</h2>
+    </div>
+    
+    <div class="grid-servizi">
+        <div class="card-servizio">
+            <i class="fa-solid fa-hot-tub-person"></i>
+            <h3>Ingresso SPA</h3>
+            <div class="prezzo">15,00 € <small>/giorno</small></div>
+        </div>
+        <div class="card-servizio">
+            <i class="fa-solid fa-goped"></i>
+            <h3>Noleggio Pedalò</h3>
+            <div class="prezzo">10,00 € <small>/ora</small></div>
+        </div>
+        <div class="card-servizio">
+            <i class="fa-solid fa-wifi"></i>
+            <h3>Wi-Fi Premium</h3>
+            <div class="prezzo">5,00 € <small>/settimana</small></div>
+        </div>
+    </div>
+</body>
+</html>

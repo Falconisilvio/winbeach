@@ -1,0 +1,372 @@
+/*=========================================================
+RESET E LAYOUT BASE
+=========================================================*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f4f6fa;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/*=========================================================
+TOP BAR (Barra Superiore Gialla)
+=========================================================*/
+.topbar {
+    background: #FFCC00;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 10;
+}
+
+.topbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+    width: 220px;
+}
+
+.topbar .search {
+    flex: 1;
+    max-width: 500px;
+    position: relative;
+    margin-left: 20px;
+}
+
+.topbar .search input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.topbar .search .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.topbar .btn-blue {
+    background: #00A8FF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/*=========================================================
+STRUTTURA SCHERMATA INTERNA (Sidebar + Menu)
+=========================================================*/
+.layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar Grigia Scura Verticale */
+.sidebar {
+    width: 75px;
+    background: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.sidebar .icon {
+    width: 100%;
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #555;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.sidebar .icon i {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.sidebar .icon.active {
+    background: #FFF9E6;
+    color: #FFCC00;
+    border-left: 4px solid #FFCC00;
+    font-weight: bold;
+}
+
+/* Leftmenu Bianco Testuale */
+.leftmenu {
+    width: 250px;
+    background: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.leftmenu h2 {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 20px 15px 20px;
+    color: #0b7ef3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.leftmenu ul {
+    list-style: none;
+}
+
+.leftmenu ul li {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+}
+
+.leftmenu ul li:hover:not(.group) {
+    background: #eef2f7;
+}
+
+.leftmenu ul li.group {
+    font-weight: bold;
+    color: #222;
+    padding-top: 20px;
+    padding-bottom: 8px;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.leftmenu ul li.active-item {
+    background: #e8f0fe;
+    color: #0b7ef3;
+    font-weight: 500;
+}
+
+/*=========================================================
+GESTIONE SOTTOMENU IMPOSTAZIONI NASCONDI/MOSTRA
+=========================================================*/
+.hidden-menu {
+    display: none;
+    background: #f1f3f5;
+    margin-top: 10px;
+    border-top: 1px dashed #ccc;
+}
+
+.hidden-menu.show {
+    display: block;
+}
+
+/*=========================================================
+AREA CONTENUTO E GRIGLIA DASHBOARD
+=========================================================*/
+.content {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+    background: #f4f6fa;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.content h1 {
+    font-size: 32px;
+    font-weight: 500;
+    color: #222;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 240px 1fr 240px;
+    gap: 18px;
+    grid-template-areas:
+    "arrivi        pagamenti   fatturato"
+    "partenze      pagamenti   presenze"
+    "cancellazioni canale      sconti"
+    "occupazione   canale      carrello"
+    "grafico1      grafico2    grafico2";
+}
+
+.arrivi        { grid-area: arrivi; }
+.partenze      { grid-area: partenze; }
+.cancellazioni { grid-area: cancellazioni; }
+.occupazione   { grid-area: occupazione; }
+.pagamenti     { grid-area: pagamenti; }
+.canale        { grid-area: canale; }
+.fatturato     { grid-area: fatturato; }
+.presenze      { grid-area: presenze; }
+.sconti        { grid-area: sconti; }
+.carrello      { grid-area: carrello; }
+.grafico1      { grid-area: grafico1; }
+.grafico2      { grid-area: grafico2; }
+
+/*=========================================================
+STILE DELLE CARD E DEI NUMERI
+=========================================================*/
+.card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.04);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: .25s;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.08);
+}
+
+.card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card a {
+    color: #0b7ef3;
+    text-decoration: none;
+    font-size: 14px;
+    align-self: flex-end;
+}
+
+.number {
+    font-size: 46px;
+    font-weight: 300;
+    color: #222;
+}
+
+.number-inline {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.number-inline .subtext {
+    font-size: 20px;
+    color: #888;
+    font-weight: 400;
+}
+
+.number-inline .currency {
+    font-size: 32px;
+    font-weight: 300;
+    color: #222;
+}
+
+.eye-icon {
+    margin-left: auto;
+    color: #00A8FF;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.arrivi, .partenze, .cancellazioni, .occupazione,
+.fatturato, .presenze, .sconti, .carrello {
+    min-height: 140px;
+}
+
+.pagamenti, .canale {
+    min-height: 310px;
+}
+
+.chart-container {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 180px;
+}
+
+.view-detail {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.grafico1, .grafico2 {
+    min-height: 360px;
+}
+
+.line-chart-container {
+    width: 100%;
+    height: 260px;
+}
+
+.date-button {
+    background: #ffffff;
+    border: 1px solid #d7d7d7;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+}
+
+/*=========================================================
+STILE DEL FRAME PER LE PROCEDURE DINAMICHE
+=========================================================*/
+.procedure-iframe {
+    width: 100%;
+    height: calc(100vh - 110px);
+    border: none;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+        "arrivi fatturato" "partenze presenze" "cancellazioni sconti" "occupazione carrello" "pagamenti canale" "grafico1 grafico1" "grafico2 grafico2";
+    }
+}
+@media (max-width: 768px) {
+    .layout { flex-direction: column; }
+    .sidebar, .leftmenu { width: 100%; height: auto; }
+    .dashboard { grid-template-columns: 1fr; grid-template-areas: none; }
+    .card { grid-area: auto !important; }
+}
