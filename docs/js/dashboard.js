@@ -324,14 +324,19 @@ function animateNumbers() {
 }
 
 
+// Incolla questo blocco alla fine del tuo file dashboard.js
 window.addEventListener('message', function(event) {
     if (event.data && event.data.comando === 'cambiaPagina') {
-        const targetPage = event.data.target; // Sarà 'point'
+        // Prende il target convertendolo in minuscolo per evitare conflitti (es. pointsale)
+        const targetPage = event.data.target.toLowerCase(); 
         
-        // Trova l'elemento della sidebar che ha data-page="point" e cliccalo
+        // Cerca l'elemento della lista del menu che ha data-page="pointsale"
         const voceMenu = document.querySelector(`.leftmenu ul li[data-page="${targetPage}"]`);
+        
         if (voceMenu) {
-            voceMenu.click();
+            voceMenu.click(); // Forziamo il click della dashboard per caricare pointsale.html
+        } else {
+            console.error("Impossibile trovare la voce di menu con data-page: " + targetPage);
         }
     }
 });
