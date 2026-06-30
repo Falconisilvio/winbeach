@@ -1,12 +1,12 @@
 import {
-  getDbStatus, getActiveProfile, getToken, loadPrenotazioniFromDb,
+  getActiveProfile, getToken, loadPrenotazioniFromDb,
   savePrenotazioneToDb, deletePrenotazioneFromDb, onProfileChange,
   loadTable, calcImportoFromTariffe, findPrenotazioneOverlap,
 } from './winbeach-db.js';
 import { t } from './app-i18n.js';
 import {
   $, formatDate, formatEuro, todayIso, clienteLabel,
-  statoPrenBadge, pagamentoBadge, initModule,
+  statoPrenBadge, pagamentoBadge, initModule, updateDbBar,
 } from './winbeach-module.js';
 import { exportTableCsv } from './winbeach-export.js';
 import { printTableReport } from './winbeach-pdf.js';
@@ -32,15 +32,6 @@ function statiOptions() {
     { id: 'in_attesa', label: t('filter.pending') },
     { id: 'cancellata', label: t('filter.cancelled') },
   ];
-}
-
-function updateStatus() {
-  const el = $('db-status');
-  if (!el) return;
-  const { state, message } = getDbStatus();
-  const profile = getActiveProfile();
-  el.className = `db-status ${state}`;
-  el.textContent = (profile ? `${profile.name} · ` : '') + (message || t('common.ready'));
 }
 
 function updateStats() {
@@ -153,7 +144,7 @@ function closeModal() { $('prenotazione-modal').classList.remove('open'); editin
 async function loadData() {
   $('btn-reload').disabled = true;
   const [result, tarRes] = await Promise.all([loadPrenotazioniFromDb(), loadTable('tariffe')]);
-  updateStatus();
+  updateDbBar();
   $('btn-reload').disabled = false;
   if (result.ok) {
     prenotazioni = result.data || [];
@@ -201,7 +192,7 @@ async function savePrenotazione(e) {
   }
   $('btn-save').disabled = true;
   const result = await savePrenotazioneToDb(prenotazione, prenotazioni);
-  updateStatus();
+  updateDbBar();
   $('btn-save').disabled = false;
   if (!result.ok) { alert(result.error); return; }
   closeModal(); await loadData();
@@ -213,7 +204,7 @@ async function removePrenotazione(id) {
   if (authErr) { alert(authErr); return; }
   if (!getToken() || !confirm(t('booking.confirmDelete'))) return;
   await deletePrenotazioneFromDb(id);
-  updateStatus();
+  updateDbBar();
   await loadData();
 }
 

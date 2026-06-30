@@ -116,7 +116,7 @@ export function createTableCrud(config) {
     const saving = await t('common.saving');
     const saveLbl = await t('common.save');
     if (btn) { btn.disabled = true; btn.textContent = saving; }
-    await saveTableRow(config.table, row, config.fields, rows, `${saving} ${config.table}…`);
+    await saveTableRow(config.table, row, config.fields, rows, 'common.saving');
     updateDbBar();
     if (btn) { btn.disabled = false; btn.textContent = saveLbl; }
     closeModal();

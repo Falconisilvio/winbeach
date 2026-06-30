@@ -91,6 +91,8 @@ const AUTO_STAT = {
   'In scadenza oggi': 'stat.expiringToday',
   'Check-in effettuati': 'stat.checkedIn',
   'Check-out effettuati': 'stat.checkedOut',
+  'Arrivi previsti': 'stat.arrivalsExpected',
+  'Partenze previste': 'stat.departuresExpected',
 };
 
 const FILTER_OPT_KEYS = ['filter.allStatus', 'filter.confirmed', 'filter.pending', 'filter.cancelled'];

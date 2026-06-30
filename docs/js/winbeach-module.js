@@ -50,8 +50,17 @@ export function updateDbBar() {
   const profile = getActiveProfile();
   const prefix = profile ? `${profile.name} · ` : '';
   el.className = `db-status ${state}`;
-  el.textContent = message ? prefix + message : prefix + t('common.ready');
+  el.textContent = message ? prefix + message : (profile ? prefix + t('common.ready') : t('common.ready'));
 }
+
+function refreshDbBarOnLangChange() {
+  updateDbBar();
+}
+
+window.addEventListener('winbeach-lang-change', refreshDbBarOnLangChange);
+window.addEventListener('message', (e) => {
+  if (e.data?.type === 'winbeach-lang-change') refreshDbBarOnLangChange();
+});
 
 export function requireToken() {
   if (!getToken()) {

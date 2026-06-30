@@ -17,7 +17,37 @@ const DEFAULT_CONNECTION = {
   database: 'winbeach',
 };
 
-let lastStatus = { state: 'idle', message: '' };
+import { t } from './app-i18n.js';
+
+let lastStatus = { state: 'idle', key: null, params: {}, raw: '' };
+
+export function resolveDbStatusMessage(status = lastStatus) {
+  if (status.raw) return status.raw;
+  if (!status.key) return '';
+  let s = t(status.key);
+  for (const [k, v] of Object.entries(status.params || {})) {
+    s = s.replaceAll(`{${k}}`, String(v));
+  }
+  return s;
+}
+
+function setStatus(state, key, params = {}) {
+  lastStatus = { state, key, params, raw: '' };
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('winbeach-db-status', {
+      detail: { state, key, params, message: resolveDbStatusMessage({ state, key, params, raw: '' }) },
+    }));
+  }
+}
+
+function setStatusRaw(state, raw) {
+  lastStatus = { state, key: null, params: {}, raw: String(raw ?? '') };
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('winbeach-db-status', {
+      detail: { state, raw, message: lastStatus.raw },
+    }));
+  }
+}
 
 function newId() {
   return crypto.randomUUID();
@@ -190,20 +220,13 @@ export function saveToken(token, profileId = null) {
 }
 
 export function getDbStatus() {
-  return { ...lastStatus };
+  return { ...lastStatus, message: resolveDbStatusMessage(lastStatus) };
 }
 
 export function onProfileChange(callback) {
   const handler = (e) => callback(e.detail);
   window.addEventListener('winbeach-profile-change', handler);
   return () => window.removeEventListener('winbeach-profile-change', handler);
-}
-
-function setStatus(state, message) {
-  lastStatus = { state, message };
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('winbeach-db-status', { detail: { state, message } }));
-  }
 }
 
 function createClient() {
@@ -226,7 +249,7 @@ function sqlEscape(value) {
 export async function loadStrutturaFromDb() {
   const cfg = getDbConfig();
   const profile = getActiveProfile();
-  setStatus('loading', `${profile?.name || 'BD'}: cargando…`);
+  setStatus('loading', 'db.loadingStructure', { profile: profile?.name || 'BD' });
 
   try {
     const db = createClient();
@@ -238,12 +261,12 @@ export async function loadStrutturaFromDb() {
     const celleRows = celleTable.objects();
 
     if (!configRows.length && !celleRows.length) {
-      setStatus('empty', `${profile?.name}: vacía — diseño demo.`);
+      setStatus('empty', 'db.structureEmpty', { profile: profile?.name || 'BD' });
       return { ok: true, empty: true };
     }
 
     const config = configRows[0] || {};
-    setStatus('ok', `${profile?.name}: ${celleRows.length} celdas`);
+    setStatus('ok', 'db.structureCells', { profile: profile?.name || 'BD', n: celleRows.length });
     return {
       ok: true,
       data: {
@@ -264,7 +287,7 @@ export async function loadStrutturaFromDb() {
     };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
@@ -273,18 +296,17 @@ export async function saveStrutturaToDb(struttura) {
   const { assertCanWrite } = await import('./winbeach-auth.js');
   const authErr = assertCanWrite();
   if (authErr) {
-    setStatus('error', authErr);
+    setStatusRaw('error', authErr);
     return { ok: false, error: authErr };
   }
   const token = getToken();
   if (!token) {
-    const msg = 'Se requiere un token de GitHub para guardar.';
-    setStatus('error', msg);
-    return { ok: false, error: msg };
+    setStatus('error', 'err.tokenSave');
+    return { ok: false, error: t('err.tokenSave') };
   }
 
   const cfg = getDbConfig();
-  setStatus('saving', 'Guardando… (10–30 s)');
+  setStatus('saving', 'db.savingWait');
 
   const now = new Date().toISOString();
   const cells = struttura.cells.filter((c) => c.elemento);
@@ -310,49 +332,48 @@ export async function saveStrutturaToDb(struttura) {
     const result = await db.query(cfg.database, sqlParts.join('; '));
     if (!result.ok) {
       const msg = result.error || 'Error SQL';
-      setStatus('error', msg);
+      setStatusRaw('error', msg);
       return { ok: false, error: msg };
     }
     await db.refresh(cfg.database);
-    setStatus('ok', `Guardado: ${cells.length} celdas`);
+    setStatus('ok', 'db.structureSaved', { n: cells.length });
     return { ok: true, cells: cells.length };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
 
-async function queryDb(sql, statusMsg) {
+async function queryDb(sql, statusKey = 'db.savingWait') {
   const { assertCanWrite } = await import('./winbeach-auth.js');
   const authErr = assertCanWrite();
   if (authErr) {
-    setStatus('error', authErr);
+    setStatusRaw('error', authErr);
     return { ok: false, error: authErr };
   }
   const token = getToken();
   if (!token) {
-    const msg = 'Se requiere un token de GitHub para guardar.';
-    setStatus('error', msg);
-    return { ok: false, error: msg };
+    setStatus('error', 'err.tokenSave');
+    return { ok: false, error: t('err.tokenSave') };
   }
 
   const cfg = getDbConfig();
-  setStatus('saving', statusMsg || 'Guardando… (10–30 s)');
+  setStatus('saving', statusKey);
 
   try {
     const db = createClient();
     const result = await db.query(cfg.database, sql);
     if (!result.ok) {
       const msg = result.error || 'Error SQL';
-      setStatus('error', msg);
+      setStatusRaw('error', msg);
       return { ok: false, error: msg };
     }
     await db.refresh(cfg.database);
     return { ok: true, result };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
@@ -364,18 +385,18 @@ function nextId(rows) {
 
 export async function loadClientiFromDb() {
   const profile = getActiveProfile();
-  setStatus('loading', `${profile?.name}: clienti…`);
+  setStatus('loading', 'db.loadingClients', { profile: profile?.name || 'BD' });
 
   try {
     const cfg = getDbConfig();
     const db = createClient();
     await db.refresh(cfg.database);
     const rows = (await db.table(cfg.database, 'clienti')).objects();
-    setStatus('ok', `${rows.length} clienti`);
+    setStatus('ok', 'db.clientsCount', { n: rows.length });
     return { ok: true, data: rows };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
@@ -386,20 +407,20 @@ export async function saveClienteToDb(cliente, existingRows = []) {
     ? `UPDATE clienti SET nome = ${sqlEscape(cliente.nome)}, cognome = ${sqlEscape(cliente.cognome)}, email = ${sqlEscape(cliente.email)}, telefono = ${sqlEscape(cliente.telefono)}, note = ${sqlEscape(cliente.note || '')} WHERE id = ${id}`
     : `INSERT INTO clienti (id, nome, cognome, email, telefono, note) VALUES (${id}, ${sqlEscape(cliente.nome)}, ${sqlEscape(cliente.cognome)}, ${sqlEscape(cliente.email)}, ${sqlEscape(cliente.telefono)}, ${sqlEscape(cliente.note || '')})`;
 
-  const res = await queryDb(sql, 'Guardando cliente…');
-  if (res.ok) setStatus('ok', 'Cliente guardado');
+  const res = await queryDb(sql, 'db.savingClient');
+  if (res.ok) setStatus('ok', 'db.clientSaved');
   return res.ok ? { ok: true, id } : res;
 }
 
 export async function deleteClienteFromDb(id) {
-  const res = await queryDb(`DELETE FROM clienti WHERE id = ${id}`, 'Eliminando…');
-  if (res.ok) setStatus('ok', 'Cliente eliminado');
+  const res = await queryDb(`DELETE FROM clienti WHERE id = ${id}`, 'db.deleting');
+  if (res.ok) setStatus('ok', 'db.clientDeleted');
   return res;
 }
 
 export async function loadPrenotazioniFromDb() {
   const profile = getActiveProfile();
-  setStatus('loading', `${profile?.name}: prenotazioni…`);
+  setStatus('loading', 'db.loadingBookings', { profile: profile?.name || 'BD' });
 
   try {
     const cfg = getDbConfig();
@@ -416,11 +437,11 @@ export async function loadPrenotazioniFromDb() {
       cellaInfo: celle.find((c) => c.cella === p.cella) || null,
     }));
 
-    setStatus('ok', `${data.length} prenotazioni`);
+    setStatus('ok', 'db.bookingsCount', { n: data.length });
     return { ok: true, data, clienti, celle };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
@@ -468,37 +489,37 @@ export function findPrenotazioneOverlap({ id, cella, data_inizio, data_fine, sta
 
 export async function savePrenotazioneToDb(prenotazione, existingRows = []) {
   const id = prenotazione.id || nextId(existingRows);
-  const res = await queryDb(prenotazioneSql(prenotazione, id), 'Guardando prenotazione…');
-  if (res.ok) setStatus('ok', 'Prenotazione salvata');
+  const res = await queryDb(prenotazioneSql(prenotazione, id), 'db.savingBooking');
+  if (res.ok) setStatus('ok', 'db.bookingSaved');
   return res.ok ? { ok: true, id } : res;
 }
 
 export async function deletePrenotazioneFromDb(id) {
-  const res = await queryDb(`DELETE FROM prenotazioni WHERE id = ${id}`, 'Eliminando…');
-  if (res.ok) setStatus('ok', 'Prenotazione eliminata');
+  const res = await queryDb(`DELETE FROM prenotazioni WHERE id = ${id}`, 'db.deleting');
+  if (res.ok) setStatus('ok', 'db.bookingDeleted');
   return res;
 }
 
 /** Carga genérica de tabla */
 export async function loadTable(tableName) {
   const profile = getActiveProfile();
-  setStatus('loading', `${profile?.name}: ${tableName}…`);
+  setStatus('loading', 'db.loadingTable', { profile: profile?.name || 'BD', table: tableName });
   try {
     const cfg = getDbConfig();
     const db = createClient();
     await db.refresh(cfg.database);
     const rows = (await db.table(cfg.database, tableName)).objects();
-    setStatus('ok', `${rows.length} righe`);
+    setStatus('ok', 'db.rowsCount', { n: rows.length });
     return { ok: true, data: rows };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
 
 /** Guarda fila genérica (INSERT o UPDATE) */
-export async function saveTableRow(tableName, row, fields, existingRows = [], statusMsg = 'Salvando…') {
+export async function saveTableRow(tableName, row, fields, existingRows = [], statusKey = 'common.saving') {
   const id = row.id || nextId(existingRows);
   const payload = { ...row, id };
   const sets = fields.map((f) => {
@@ -517,18 +538,18 @@ export async function saveTableRow(tableName, row, fields, existingRows = [], st
   const sql = row.id
     ? `UPDATE ${tableName} SET ${sets.join(', ')} WHERE id = ${id}`
     : `INSERT INTO ${tableName} (${cols}) VALUES (${vals})`;
-  const res = await queryDb(sql, statusMsg);
+  const res = await queryDb(sql, statusKey);
   return res.ok ? { ok: true, id } : res;
 }
 
 export async function deleteTableRow(tableName, id) {
-  return queryDb(`DELETE FROM ${tableName} WHERE id = ${id}`, 'Eliminando…');
+  return queryDb(`DELETE FROM ${tableName} WHERE id = ${id}`, 'db.deleting');
 }
 
 /** Carga todo el dataset operativo */
 export async function loadOperationalData() {
   const profile = getActiveProfile();
-  setStatus('loading', `${profile?.name}: dati…`);
+  setStatus('loading', 'db.loadingData', { profile: profile?.name || 'BD' });
   try {
     const cfg = getDbConfig();
     const db = createClient();
@@ -550,7 +571,7 @@ export async function loadOperationalData() {
       ...p,
       cliente: clientiMap[p.cliente_id] || null,
     }));
-    setStatus('ok', 'Dati caricati');
+    setStatus('ok', 'db.dataLoaded');
     return { ok: true, data };
   } catch (err) {
     return { ok: false, error: err.message || String(err) };
@@ -657,16 +678,16 @@ export function ensureDemoProfiles() {
 export async function testActiveProfile() {
   const cfg = getDbConfig();
   const profile = getActiveProfile();
-  setStatus('loading', `Probando ${profile?.name}…`);
+  setStatus('loading', 'db.testing', { profile: profile?.name || 'BD' });
 
   try {
     const db = createClient();
     await db.refresh(cfg.database);
-    setStatus('ok', `Conectado: ${cfg.owner}/${cfg.repo} → ${cfg.database}`);
+    setStatus('ok', 'db.connected', { owner: cfg.owner, repo: cfg.repo, database: cfg.database });
     return { ok: true };
   } catch (err) {
     const msg = err.message || String(err);
-    setStatus('error', msg);
+    setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
 }
