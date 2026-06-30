@@ -1,0 +1,16 @@
+[
+  {
+    "cognome": "Rossi",
+    "nome": "Mario",
+    "email": "mario.rossi@email.it",
+    "telefono": "06123456",
+    "indirizzo": "Via Roma 45, Roma"
+  },
+  {
+    "cognome": "Bianchi",
+    "nome": "Laura",
+    "email": "laura.bianchi@email.com",
+    "telefono": "333987654",
+    "indirizzo": "Corso Milano 12, Milano"
+  }
+]
