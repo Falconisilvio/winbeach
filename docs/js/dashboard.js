@@ -67,10 +67,12 @@ function setupAppNavigation() {
     }
 }
 
-const PAGES_DISPONIBILI = new Set(["struttura", "clienti", "servizi"]);
+const PAGES_IN_CARTELLA = new Set(["clienti", "servizi"]);
 
-function risolviPagina(nomePagina) {
-    return PAGES_DISPONIBILI.has(nomePagina) ? nomePagina : "template";
+function risolviPercorso(nomePagina) {
+    if (nomePagina === "struttura") return "struttura.html";
+    if (PAGES_IN_CARTELLA.has(nomePagina)) return `pages/${nomePagina}.html`;
+    return "pages/template.html";
 }
 
 // Cambia l'area di destra inserendo un iframe dinamico o ripristinando la dashboard nativa
@@ -83,10 +85,10 @@ function caricaProceduraEsterna(nomePagina) {
         procedureView.innerHTML = "";
         dashboardView.style.display = "block";
     } else {
-        const pagina = risolviPagina(nomePagina);
+        const percorso = risolviPercorso(nomePagina);
         dashboardView.style.display = "none";
         procedureView.style.display = "block";
-        procedureView.innerHTML = `<iframe src="pages/${pagina}.html" class="procedure-iframe" title="${nomePagina}"></iframe>`;
+        procedureView.innerHTML = `<iframe src="${percorso}" class="procedure-iframe" title="${nomePagina}"></iframe>`;
     }
 }
 
