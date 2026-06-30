@@ -22,7 +22,8 @@ export function showToast(type, message, ms = 4000) {
   const root = ensureContainer();
   const el = document.createElement('div');
   el.className = `wb-toast wb-toast-${type}`;
-  el.innerHTML = `<span>${escapeHtml(message)}</span><button type="button" class="wb-toast-close" aria-label="Chiudi">&times;</button>`;
+  const closeLbl = (typeof window !== 'undefined' && window.__wbT) ? window.__wbT('common.close') : 'Chiudi';
+  el.innerHTML = `<span>${escapeHtml(message)}</span><button type="button" class="wb-toast-close" aria-label="${escapeHtml(closeLbl)}">&times;</button>`;
   const close = () => {
     el.classList.add('wb-toast-out');
     setTimeout(() => el.remove(), 200);

@@ -17,7 +17,7 @@
       <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn.reload">Ricarica</span></button>
       <button type="button" class="btn btn-secondary" id="btn-export"><i class="fa-solid fa-file-csv"></i> <span data-i18n="btn.exportCsv">Esporta CSV</span></button>
       <button type="button" class="btn btn-secondary" id="btn-pdf"><i class="fa-solid fa-file-pdf"></i> <span data-i18n="btn.exportPdf">Esporta PDF</span></button>
-      <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuovo movimento</button>
+      <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-plus"></i> <span data-i18n="cassa.newMovement">Nuovo movimento</span></button>
     </div>
   </div>
   <div class="db-bar"><span><i class="fa-solid fa-database"></i> Base dati</span><div id="db-status" class="db-status idle">…</div></div>
@@ -29,7 +29,7 @@
   <div class="table-scroll"><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrizione</th><th>Importo</th><th>Operatore</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
   <div class="modal-overlay" id="data-modal">
     <div class="modal">
-      <div class="modal-header"><h3>Nuovo movimento</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
+      <div class="modal-header"><h3 data-i18n="cassa.newMovement">Nuovo movimento</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
       <form id="data-form"><div class="modal-body"><div class="form-grid">
         <div class="form-group"><label for="f-tipo">Tipo</label><select id="f-tipo"><option value="entrata">Entrata</option><option value="uscita">Uscita</option></select></div>
         <div class="form-group"><label for="f-importo">Importo €</label><input type="number" id="f-importo" step="0.01" required></div>

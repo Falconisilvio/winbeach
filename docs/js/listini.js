@@ -3,8 +3,6 @@ import { createTableCrud } from './table-crud.js';
 createTableCrud({
   table: 'listini',
   fields: ['nome', 'validita', 'settori', 'stato'],
-  newTitle: 'Nuovo',
-  editTitle: 'Modifica',
   columns: [{ key:'nome' }, { key:'validita' }, { key:'settori' }, { key:'stato' }],
   formFields: [
     { id:'f-nome', field:'nome', label:'Nome *' },

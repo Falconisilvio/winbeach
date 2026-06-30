@@ -2,16 +2,19 @@ import { loadTable, saveTableRow } from './winbeach-db.js';
 import { $, escapeHtml, formatEuro, todayIso, nowIso, updateDbBar, requireWrite, bindModal, initModule, badge } from './winbeach-module.js';
 import { exportTableCsv } from './winbeach-export.js';
 import { printTableReport } from './winbeach-pdf.js';
+import { t } from './app-i18n.js';
 
-const EXPORT_COLS = [
-  { key: 'data', label: 'Data', format: (m) => String(m.data).slice(0, 16) },
-  { key: 'tipo', label: 'Tipo' },
-  { key: 'descrizione', label: 'Descrizione' },
-  { key: 'importo', label: 'Importo' },
-  { key: 'metodo', label: 'Metodo' },
-  { key: 'operatore', label: 'Operatore' },
-  { key: 'note', label: 'Note' },
-];
+function getExportCols() {
+  return [
+    { key: 'data', label: t('col.date'), format: (m) => String(m.data).slice(0, 16) },
+    { key: 'tipo', label: t('col.type'), format: (m) => (m.tipo === 'entrata' ? t('cassa.income') : t('cassa.expense')) },
+    { key: 'descrizione', label: t('col.description') },
+    { key: 'importo', label: t('col.amount') },
+    { key: 'metodo', label: t('label.method') },
+    { key: 'operatore', label: t('col.operator') },
+    { key: 'note', label: t('col.notes') },
+  ];
+}
 
 let movimenti = [];
 
@@ -30,7 +33,7 @@ function render() {
   tbody.innerHTML = movimenti.map((m) => `
     <tr>
       <td>${escapeHtml(String(m.data).slice(0, 16))}</td>
-      <td>${m.tipo === 'entrata' ? badge('Entrata', 'green') : badge('Uscita', 'red')}</td>
+      <td>${m.tipo === 'entrata' ? badge(t('cassa.income'), 'green') : badge(t('cassa.expense'), 'red')}</td>
       <td>${escapeHtml(m.descrizione)}</td>
       <td>${m.tipo === 'entrata' ? '+' : '-'}${formatEuro(m.importo)}</td>
       <td>${escapeHtml(m.operatore || '—')}</td>
@@ -67,13 +70,13 @@ initModule(async () => {
   $('btn-nuovo')?.addEventListener('click', () => $('data-modal')?.classList.add('open'));
   $('btn-reload')?.addEventListener('click', load);
   $('btn-export')?.addEventListener('click', () => {
-    exportTableCsv(`cassa-${todayIso()}.csv`, EXPORT_COLS, movimenti);
+    exportTableCsv(`cassa-${todayIso()}.csv`, getExportCols(), movimenti);
   });
   $('btn-pdf')?.addEventListener('click', () => {
     printTableReport({
-      title: document.title || 'Cassa',
+      title: document.title || t('page.cassa.docTitle'),
       subtitle: todayIso(),
-      columns: EXPORT_COLS,
+      columns: getExportCols(),
       rows: movimenti,
     });
   });

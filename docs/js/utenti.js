@@ -4,8 +4,6 @@ createTableCrud({
   table: 'utenti',
   requireAdmin: true,
   fields: ['username', 'email', 'ruolo', 'ultimo_accesso', 'attivo'],
-  newTitle: 'Nuovo',
-  editTitle: 'Modifica',
   columns: [{ key:'username' }, { key:'ruolo' }, { key:'email' }, { key:'attivo', type:'bool' }],
   formFields: [
     { id:'f-username', field:'username', label:'Username *' },

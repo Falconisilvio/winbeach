@@ -13,7 +13,7 @@
 <body>
   <div class="header">
     <h2><i class="fa-solid fa-umbrella-beach" style="color:#00a8ff"></i> Spiaggia — Occupazione</h2>
-    <div class="toolbar"><button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button></div>
+    <div class="toolbar"><button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> <span data-i18n="btn.reload">Ricarica</span></button></div>
   </div>
   <div class="db-bar"><span><i class="fa-solid fa-database"></i> Base dati</span><div id="db-status" class="db-status idle">…</div></div>
   <div class="filters"><label>Data <input type="date" id="data-spiaggia"></label></div>
@@ -29,7 +29,7 @@
     <div class="modal modal-sm">
       <div class="modal-header">
         <h3 id="detail-title">Postazione</h3>
-        <button type="button" class="modal-close" id="detail-close" aria-label="Chiudi">&times;</button>
+        <button type="button" class="modal-close" id="detail-close" data-i18n-aria="common.close" aria-label="Chiudi">&times;</button>
       </div>
       <div class="modal-body" id="detail-body"></div>
       <div class="modal-footer" id="detail-actions"></div>

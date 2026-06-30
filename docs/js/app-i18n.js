@@ -7,9 +7,15 @@ export function getAppLang() {
   return localStorage.getItem(STORAGE_KEY) || 'it';
 }
 
-export function t(key) {
+export function t(key, params) {
   const lang = getAppLang();
-  return APP_I18N[lang]?.[key] ?? APP_I18N.it[key] ?? key;
+  let s = APP_I18N[lang]?.[key] ?? APP_I18N.it[key] ?? key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      s = s.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return s;
 }
 
 function broadcastLang(code) {

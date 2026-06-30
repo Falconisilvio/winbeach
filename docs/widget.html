@@ -18,7 +18,7 @@
     <header class="widget-header">
       <i class="fa-solid fa-umbrella-beach"></i>
       <h1 id="widget-facility">Stabilimento</h1>
-      <p>Prenotazione online — canale widget</p>
+      <p data-i18n="widget.channel">Prenotazione online — canale widget</p>
     </header>
 
     <div class="widget-steps" aria-hidden="true">
@@ -29,58 +29,58 @@
     </div>
 
     <section class="widget-card" id="step-1">
-      <h2><i class="fa-regular fa-calendar"></i> 1. Scegli le date</h2>
+      <h2><i class="fa-regular fa-calendar"></i> <span data-i18n="widget.step1">1. Scegli le date</span></h2>
       <div class="form-grid-2">
         <div class="form-row">
-          <label for="w-inizio">Arrivo</label>
+          <label for="w-inizio" data-i18n="label.arrival">Arrivo</label>
           <input type="date" id="w-inizio" required>
         </div>
         <div class="form-row">
-          <label for="w-fine">Partenza</label>
+          <label for="w-fine" data-i18n="label.departure">Partenza</label>
           <input type="date" id="w-fine" required>
         </div>
       </div>
       <div class="widget-actions">
-        <button type="button" class="btn btn-primary" id="btn-step1">Continua</button>
+        <button type="button" class="btn btn-primary" id="btn-step1" data-i18n="widget.continue">Continua</button>
       </div>
     </section>
 
     <section class="widget-card hidden" id="step-2">
-      <h2><i class="fa-solid fa-umbrella-beach"></i> 2. Scegli postazione</h2>
-      <p class="widget-note">Postazioni libere per il periodo selezionato:</p>
+      <h2><i class="fa-solid fa-umbrella-beach"></i> <span data-i18n="widget.step2">2. Scegli postazione</span></h2>
+      <p class="widget-note" data-i18n="widget.step2Note">Postazioni libere per il periodo selezionato:</p>
       <div class="widget-slots" id="widget-slots"></div>
       <p class="widget-price" id="widget-price"></p>
       <div class="widget-actions">
-        <button type="button" class="btn btn-secondary" id="btn-back2">Indietro</button>
-        <button type="button" class="btn btn-primary" id="btn-step2">Continua</button>
+        <button type="button" class="btn btn-secondary" id="btn-back2" data-i18n="widget.back">Indietro</button>
+        <button type="button" class="btn btn-primary" id="btn-step2" data-i18n="widget.continue">Continua</button>
       </div>
     </section>
 
     <section class="widget-card hidden" id="step-3">
-      <h2><i class="fa-regular fa-user"></i> 3. I tuoi dati</h2>
+      <h2><i class="fa-regular fa-user"></i> <span data-i18n="widget.step3">3. I tuoi dati</span></h2>
       <form id="widget-form">
         <div class="form-grid-2">
           <div class="form-row">
-            <label for="w-nome">Nome *</label>
+            <label for="w-nome" data-i18n="label.nomeReq">Nome *</label>
             <input type="text" id="w-nome" required autocomplete="given-name">
           </div>
           <div class="form-row">
-            <label for="w-cognome">Cognome</label>
+            <label for="w-cognome" data-i18n="label.cognome">Cognome</label>
             <input type="text" id="w-cognome" autocomplete="family-name">
           </div>
         </div>
         <div class="form-row">
-          <label for="w-email">Email</label>
+          <label for="w-email" data-i18n="col.email">Email</label>
           <input type="email" id="w-email" autocomplete="email">
         </div>
         <div class="form-row">
-          <label for="w-telefono">Telefono</label>
+          <label for="w-telefono" data-i18n="col.phone">Telefono</label>
           <input type="tel" id="w-telefono" autocomplete="tel">
         </div>
-        <p class="widget-note">La prenotazione resta <strong>in attesa</strong> fino a conferma dello stabilimento.</p>
+        <p class="widget-note" data-i18n="widget.pendingNote" data-i18n-html="1">La prenotazione resta <strong>in attesa</strong> fino a conferma dello stabilimento.</p>
         <div class="widget-actions">
-          <button type="button" class="btn btn-secondary" id="btn-back3">Indietro</button>
-          <button type="submit" class="btn btn-primary" id="btn-submit">Invia richiesta</button>
+          <button type="button" class="btn btn-secondary" id="btn-back3" data-i18n="widget.back">Indietro</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit" data-i18n="widget.submit">Invia richiesta</button>
         </div>
       </form>
     </section>
@@ -88,20 +88,20 @@
     <section class="widget-card hidden" id="step-4">
       <div class="widget-success">
         <i class="fa-solid fa-circle-check"></i>
-        <h2>Grazie!</h2>
+        <h2 data-i18n="widget.thanks">Grazie!</h2>
         <p id="success-msg"></p>
         <p class="widget-price" id="success-ref"></p>
-        <button type="button" class="btn btn-secondary" id="success-copy"><i class="fa-solid fa-copy"></i> Copia riepilogo</button>
+        <button type="button" class="btn btn-secondary" id="success-copy"><i class="fa-solid fa-copy"></i> <span data-i18n="widget.copySummary">Copia riepilogo</span></button>
         <div class="widget-actions">
-          <button type="button" class="btn btn-primary" id="btn-new">Nuova prenotazione</button>
+          <button type="button" class="btn btn-primary" id="btn-new" data-i18n="widget.newBooking">Nuova prenotazione</button>
         </div>
       </div>
     </section>
 
     <p class="widget-status" id="widget-status"></p>
     <p class="widget-note" style="text-align:center">
-      <a href="index.html">Area staff</a> ·
-      <a href="login.html">Accedi</a> per salvare direttamente in base dati
+      <a href="index.html" data-i18n="widget.staffArea">Area staff</a> ·
+      <a href="login.html" data-i18n="widget.loginSave">Accedi per salvare direttamente in base dati</a>
     </p>
   </div>
 

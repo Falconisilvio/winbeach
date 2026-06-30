@@ -38,6 +38,15 @@ const AUTO_TH = {
   'Q.tà': 'col.qty',
   Totale: 'col.total',
   Indirizzo: 'col.address',
+  Tipo: 'col.type',
+  Descrizione: 'col.description',
+  Operatore: 'col.operator',
+  Settore: 'col.sector',
+  Prenotazioni: 'col.bookings',
+  'Stima ricavo': 'col.revenueEst',
+  Fatturato: 'col.revenue',
+  Durata: 'col.duration',
+  Orario: 'col.time',
 };
 
 const AUTO_LABEL = {
@@ -59,6 +68,13 @@ const AUTO_LABEL = {
   Canale: 'col.channel',
   'Stato pagamento': 'label.paymentStatus',
   'Ora arrivo': 'col.arrivalTime',
+  Descrizione: 'label.description',
+  Metodo: 'label.method',
+  'Prenotazione ID': 'label.bookingId',
+  Operatore: 'label.operator',
+  Data: 'label.date',
+  Arrivo: 'label.arrival',
+  Partenza: 'label.departure',
 };
 
 const SELECT_OPT_BY_ID = {
@@ -71,6 +87,10 @@ const SELECT_OPT_BY_ID = {
     offline: 'channel.offline',
     widget: 'channel.widget',
     portale: 'channel.portal',
+  },
+  'f-tipo': {
+    entrata: 'cassa.income',
+    uscita: 'cassa.expense',
   },
 };
 
@@ -93,6 +113,16 @@ const AUTO_STAT = {
   'Check-out effettuati': 'stat.checkedOut',
   'Arrivi previsti': 'stat.arrivalsExpected',
   'Partenze previste': 'stat.departuresExpected',
+  Postazioni: 'stat.spots',
+  Occupate: 'stat.occupied',
+  Libere: 'stat.free',
+  Occupazione: 'stat.occupancy',
+  'Entrate oggi': 'cassa.incomeToday',
+  'Uscite oggi': 'cassa.expenseToday',
+  'Saldo cassa': 'cassa.balance',
+  'Saldo Flussi di Cassa': 'cassa.flowBalance',
+  'Postazioni attive': 'stat.activeSpots',
+  'Con prenotazioni': 'stat.withBookings',
 };
 
 const FILTER_OPT_KEYS = ['filter.allStatus', 'filter.confirmed', 'filter.pending', 'filter.cancelled'];
@@ -223,12 +253,26 @@ function applyAutoLabels() {
   const nuovo = document.getElementById('btn-nuovo');
   if (nuovo) {
     const slug = getPageSlug();
-    const defaultKey = slug === 'booking' ? 'booking.newBtn' : slug === 'clienti' ? 'clienti.newBtn' : 'btn.new';
+    const defaultKey = slug === 'booking' ? 'booking.newBtn'
+      : slug === 'clienti' ? 'clienti.newBtn'
+      : (slug === 'cassa' || slug === 'flussi-cassa') ? 'cassa.newMovement'
+      : 'btn.new';
     const key = nuovo.dataset.i18n || defaultKey;
     nuovo.dataset.i18n = key;
     const val = t(key);
     if (val !== key) setTextWithIcon(nuovo, val);
   }
+
+  const modalTitle = document.getElementById('modal-title');
+  if (modalTitle?.dataset.i18n) applyKeyToEl(modalTitle, modalTitle.dataset.i18n);
+
+  document.querySelectorAll('.filters > label').forEach((lb) => {
+    const text = lb.childNodes[0]?.textContent?.trim();
+    const key = resolveKey(lb, text, { Data: 'label.dateFilter' });
+    if (!key) return;
+    const val = t(key);
+    if (val !== key && lb.childNodes[0]) lb.childNodes[0].textContent = `${val} `;
+  });
 
   document.querySelectorAll('.stat-box .lbl').forEach((el) => {
     const key = resolveKey(el, el.textContent, AUTO_STAT);
