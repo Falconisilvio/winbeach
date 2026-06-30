@@ -73,12 +73,14 @@
 
       <section class="panel db-panel">
         <h2>Base de datos <small>(githubDB)</small></h2>
-        <p class="db-hint">Lecturas instantáneas vía CDN. Guardar requiere token y tarda ~10–30 s.</p>
+        <p class="db-active-profile">Stabilimento: <strong id="db-profile-name">—</strong></p>
+        <p class="db-hint">Lecturas vía CDN. Guardar requiere token (~10–30 s). <a href="#" id="link-gestisci-bd">Gestisci stabilimenti</a></p>
         <div class="db-config">
           <label>Owner <input type="text" id="db-owner" placeholder="FiveTechSoft"></label>
           <label>Repo <input type="text" id="db-repo" placeholder="githubdb"></label>
           <label>Rama <input type="text" id="db-branch" placeholder="main"></label>
-          <label>Token <input type="password" id="db-token" placeholder="ghp_… (solo sesión)" autocomplete="off"></label>
+          <label>Archivo BD <input type="text" id="db-database" placeholder="winbeach"></label>
+          <label>Token <input type="password" id="db-token" placeholder="ghp_…" autocomplete="off"></label>
         </div>
         <div class="action-buttons">
           <button type="button" id="btn-db-save-config" class="btn-secondary">Guardar config</button>

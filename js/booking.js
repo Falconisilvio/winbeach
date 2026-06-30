@@ -1,9 +1,11 @@
 import {
   getDbStatus,
+  getActiveProfile,
   getToken,
   loadPrenotazioniFromDb,
   savePrenotazioneToDb,
   deletePrenotazioneFromDb,
+  onProfileChange,
 } from './winbeach-db.js';
 
 let prenotazioni = [];
@@ -25,8 +27,10 @@ function updateStatus() {
   const { state, message } = getDbStatus();
   const el = $('db-status');
   if (!el) return;
+  const profile = getActiveProfile();
+  const prefix = profile ? `${profile.name} · ` : '';
   el.className = `db-status ${state}`;
-  el.textContent = message || 'Listo';
+  el.textContent = message ? prefix + message : prefix + 'Listo';
 }
 
 function clienteLabel(c) {
@@ -276,5 +280,6 @@ function bindEvents() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   bindEvents();
+  onProfileChange(loadData);
   await loadData();
 });

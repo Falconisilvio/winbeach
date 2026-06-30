@@ -9,13 +9,72 @@
 </head>
 <body>
   <div class="header">
-    <h2><i class="fa-solid fa-right-left" style="color:#e17055"></i> Cambia Stabilimento</h2>
-    
-  </div><p class="subtitle">Seleziona lo stabilimento balneare attivo.</p>
-    <div class="grid-cards">
-      <div class="card-item"><i class="fa-solid fa-umbrella-beach" style="color:#0084ff"></i><h3>Lido Europa</h3><div class="value">Attivo</div></div>
-      <div class="card-item"><i class="fa-solid fa-umbrella-beach" style="color:#ccc"></i><h3>Lido Sud</h3><div class="value">—</div></div>
-      <div class="card-item"><i class="fa-solid fa-umbrella-beach" style="color:#ccc"></i><h3>Spiaggia Nord</h3><div class="value">—</div></div>
+    <h2><i class="fa-solid fa-right-left" style="color:#e17055"></i> Stabilimenti e Basi dati</h2>
+    <div class="toolbar">
+      <button type="button" class="btn btn-secondary" id="btn-test"><i class="fa-solid fa-plug"></i> Test connessione</button>
+      <button type="button" class="btn btn-success" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuovo</button>
     </div>
+  </div>
+
+  <p class="subtitle">
+    Ogni stabilimento ha la propria base dati githubDB (file <code>data/*.json</code>).
+    Puoi usare lo stesso repo con file diversi o fork separati per ogni cliente.
+  </p>
+
+  <div class="info-box">
+    <strong><i class="fa-solid fa-circle-info"></i> Multi-tenant</strong>
+    <ul>
+      <li><strong>Stesso repo:</strong> <code>winbeach-lido1.json</code>, <code>winbeach-lido2.json</code> nello stesso fork</li>
+      <li><strong>Repo separati:</strong> ogni cliente con il proprio fork githubDB</li>
+      <li><strong>Token:</strong> uno per stabilimento (salvato nel browser)</li>
+    </ul>
+  </div>
+
+  <div id="profiles-grid" class="profiles-grid"></div>
+
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Nuovo stabilimento</h3>
+        <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">&times;</button>
+      </div>
+      <form id="profile-form">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group" style="grid-column:1/-1">
+              <label for="f-name">Nome stabilimento *</label>
+              <input type="text" id="f-name" required placeholder="es. Lido Europa">
+            </div>
+            <div class="form-group">
+              <label for="f-owner">Owner GitHub *</label>
+              <input type="text" id="f-owner" required placeholder="FiveTechSoft">
+            </div>
+            <div class="form-group">
+              <label for="f-repo">Repo *</label>
+              <input type="text" id="f-repo" required placeholder="githubdb">
+            </div>
+            <div class="form-group">
+              <label for="f-branch">Rama</label>
+              <input type="text" id="f-branch" value="main">
+            </div>
+            <div class="form-group">
+              <label for="f-database">File BD (senza .json) *</label>
+              <input type="text" id="f-database" required placeholder="winbeach-lido-europa">
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label for="f-token">Token GitHub (scritture)</label>
+              <input type="password" id="f-token" placeholder="ghp_…" autocomplete="off">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button>
+          <button type="submit" class="btn btn-success">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/cambia.js"></script>
 </body>
 </html>

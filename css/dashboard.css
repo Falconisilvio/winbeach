@@ -63,6 +63,102 @@ TOP BAR (Barra Superiore Gialla)
     color: #888;
 }
 
+.profile-switcher {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    max-width: 200px;
+    min-height: 44px;
+}
+
+.profile-btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-chevron {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 240px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 200;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+}
+
+.profile-dropdown.open {
+    display: block;
+}
+
+.profile-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+}
+
+.profile-option small {
+    font-size: 11px;
+    color: #888;
+    font-weight: normal;
+}
+
+.profile-option:hover {
+    background: #f5f8fc;
+}
+
+.profile-option.active {
+    background: #e8f4ff;
+    color: #0084ff;
+}
+
+.profile-manage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-top: 1px solid #eee;
+    color: #555;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.profile-manage:hover {
+    background: #f8f9fa;
+}
+
 .topbar .btn-blue {
     background: #00A8FF;
     color: white;
@@ -524,8 +620,24 @@ RESPONSIVE — Tablet y móvil
         padding-top: calc(8px + env(safe-area-inset-top, 0px));
     }
 
+    .profile-switcher {
+        order: 2;
+        flex: 1 1 auto;
+    }
+
+    .profile-btn {
+        max-width: none;
+        width: 100%;
+    }
+
+    .profile-dropdown {
+        left: 0;
+        right: 0;
+        min-width: 0;
+    }
+
     .topbar .search {
-        order: 3;
+        order: 4;
         flex: 1 1 100%;
         max-width: none;
         margin-left: 0;

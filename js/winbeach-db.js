@@ -1,13 +1,16 @@
 /**
- * WinBeach — capa de persistencia con githubDB
- * Lecturas: CDN (sin token). Escrituras: repository_dispatch (requiere token).
+ * WinBeach — persistencia githubDB con soporte multi-perfil
+ * Cada perfil = un establecimiento con su propia BD (owner/repo/database).
  */
 import { GithubDB } from './githubdb/client.js';
 
-const CONFIG_KEY = 'winbeach_db_config';
-const TOKEN_KEY = 'winbeach_github_token';
+const LEGACY_CONFIG_KEY = 'winbeach_db_config';
+const PROFILES_KEY = 'winbeach_profiles';
+const ACTIVE_ID_KEY = 'winbeach_active_profile';
+const TOKENS_KEY = 'winbeach_profile_tokens';
+const LEGACY_TOKEN_KEY = 'winbeach_github_token';
 
-const DEFAULT_CONFIG = {
+const DEFAULT_CONNECTION = {
   owner: 'FiveTechSoft',
   repo: 'githubdb',
   branch: 'main',
@@ -16,37 +19,174 @@ const DEFAULT_CONFIG = {
 
 let lastStatus = { state: 'idle', message: '' };
 
-export function getDbConfig() {
+function newId() {
+  return crypto.randomUUID();
+}
+
+function loadTokens() {
   try {
-    const raw = localStorage.getItem(CONFIG_KEY);
-    return raw ? { ...DEFAULT_CONFIG, ...JSON.parse(raw) } : { ...DEFAULT_CONFIG };
+    const raw = localStorage.getItem(TOKENS_KEY);
+    return raw ? JSON.parse(raw) : {};
   } catch {
-    return { ...DEFAULT_CONFIG };
+    return {};
   }
 }
 
+function saveTokens(map) {
+  localStorage.setItem(TOKENS_KEY, JSON.stringify(map));
+}
+
+function migrateLegacyConfig() {
+  if (localStorage.getItem(PROFILES_KEY)) return;
+
+  let connection = { ...DEFAULT_CONNECTION };
+  try {
+    const raw = localStorage.getItem(LEGACY_CONFIG_KEY);
+    if (raw) connection = { ...DEFAULT_CONNECTION, ...JSON.parse(raw) };
+  } catch { /* ignore */ }
+
+  const profile = {
+    id: newId(),
+    name: 'Stabilimento principale',
+    ...connection,
+  };
+
+  localStorage.setItem(PROFILES_KEY, JSON.stringify([profile]));
+  localStorage.setItem(ACTIVE_ID_KEY, profile.id);
+
+  const legacyToken = sessionStorage.getItem(LEGACY_TOKEN_KEY);
+  if (legacyToken) {
+    const tokens = loadTokens();
+    tokens[profile.id] = legacyToken;
+    saveTokens(tokens);
+  }
+}
+
+migrateLegacyConfig();
+
+/** @returns {Array<{id:string,name:string,owner:string,repo:string,branch:string,database:string}>} */
+export function getProfiles() {
+  try {
+    const raw = localStorage.getItem(PROFILES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveProfiles(list) {
+  localStorage.setItem(PROFILES_KEY, JSON.stringify(list));
+}
+
+export function getActiveProfileId() {
+  return localStorage.getItem(ACTIVE_ID_KEY) || getProfiles()[0]?.id || null;
+}
+
+export function getActiveProfile() {
+  const id = getActiveProfileId();
+  return getProfiles().find((p) => p.id === id) || getProfiles()[0] || null;
+}
+
+export function setActiveProfile(id) {
+  const exists = getProfiles().some((p) => p.id === id);
+  if (!exists) return false;
+  localStorage.setItem(ACTIVE_ID_KEY, id);
+  window.dispatchEvent(new CustomEvent('winbeach-profile-change', { detail: { id } }));
+  try {
+    window.parent?.postMessage({ type: 'winbeach-profile-change', id }, '*');
+  } catch { /* cross-origin */ }
+  return true;
+}
+
+export function saveProfile(profile) {
+  const list = getProfiles();
+  const data = {
+    id: profile.id || newId(),
+    name: profile.name?.trim() || 'Nuovo stabilimento',
+    owner: profile.owner?.trim() || DEFAULT_CONNECTION.owner,
+    repo: profile.repo?.trim() || DEFAULT_CONNECTION.repo,
+    branch: profile.branch?.trim() || DEFAULT_CONNECTION.branch,
+    database: profile.database?.trim() || DEFAULT_CONNECTION.database,
+  };
+
+  const idx = list.findIndex((p) => p.id === data.id);
+  if (idx >= 0) list[idx] = data;
+  else list.push(data);
+
+  saveProfiles(list);
+
+  if (!getActiveProfileId() || list.length === 1) {
+    setActiveProfile(data.id);
+  }
+
+  return data;
+}
+
+export function deleteProfile(id) {
+  const list = getProfiles().filter((p) => p.id !== id);
+  if (!list.length) return false;
+
+  saveProfiles(list);
+
+  const tokens = loadTokens();
+  delete tokens[id];
+  saveTokens(tokens);
+
+  if (getActiveProfileId() === id) {
+    setActiveProfile(list[0].id);
+  }
+
+  return true;
+}
+
+/** Conexión del perfil activo (API retrocompatible) */
+export function getDbConfig() {
+  const p = getActiveProfile();
+  if (!p) return { ...DEFAULT_CONNECTION };
+  return {
+    owner: p.owner,
+    repo: p.repo,
+    branch: p.branch,
+    database: p.database,
+  };
+}
+
+/** Actualiza conexión del perfil activo */
 export function saveDbConfig(config) {
-  const merged = { ...DEFAULT_CONFIG, ...config };
-  localStorage.setItem(CONFIG_KEY, JSON.stringify({
-    owner: merged.owner,
-    repo: merged.repo,
-    branch: merged.branch,
-    database: merged.database,
-  }));
-  return merged;
+  const active = getActiveProfile();
+  if (!active) {
+    return saveProfile({ name: 'Stabilimento principale', ...config });
+  }
+  return saveProfile({ ...active, ...config });
 }
 
-export function getToken() {
-  return sessionStorage.getItem(TOKEN_KEY) || '';
+export function getToken(profileId = null) {
+  const id = profileId || getActiveProfileId();
+  const tokens = loadTokens();
+  if (id && tokens[id]) return tokens[id];
+  return sessionStorage.getItem(LEGACY_TOKEN_KEY) || '';
 }
 
-export function saveToken(token) {
-  if (token) sessionStorage.setItem(TOKEN_KEY, token);
-  else sessionStorage.removeItem(TOKEN_KEY);
+export function saveToken(token, profileId = null) {
+  const id = profileId || getActiveProfileId();
+  if (id) {
+    const tokens = loadTokens();
+    if (token) tokens[id] = token;
+    else delete tokens[id];
+    saveTokens(tokens);
+  }
+  if (token) sessionStorage.setItem(LEGACY_TOKEN_KEY, token);
+  else sessionStorage.removeItem(LEGACY_TOKEN_KEY);
 }
 
 export function getDbStatus() {
   return { ...lastStatus };
+}
+
+export function onProfileChange(callback) {
+  const handler = (e) => callback(e.detail);
+  window.addEventListener('winbeach-profile-change', handler);
+  return () => window.removeEventListener('winbeach-profile-change', handler);
 }
 
 function setStatus(state, message) {
@@ -70,13 +210,10 @@ function sqlEscape(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
 }
 
-/**
- * Carga estructura de playa desde githubDB (lectura rápida vía CDN).
- * @returns {Promise<{ok:boolean, data?:object, error?:string, empty?:boolean}>}
- */
 export async function loadStrutturaFromDb() {
   const cfg = getDbConfig();
-  setStatus('loading', `Cargando ${cfg.owner}/${cfg.repo}…`);
+  const profile = getActiveProfile();
+  setStatus('loading', `${profile?.name || 'BD'}: cargando…`);
 
   try {
     const db = createClient();
@@ -88,12 +225,12 @@ export async function loadStrutturaFromDb() {
     const celleRows = celleTable.objects();
 
     if (!configRows.length && !celleRows.length) {
-      setStatus('empty', 'Base de datos vacía — se usa diseño demo.');
+      setStatus('empty', `${profile?.name}: vacía — diseño demo.`);
       return { ok: true, empty: true };
     }
 
     const config = configRows[0] || {};
-    setStatus('ok', `Cargado: ${celleRows.length} celdas`);
+    setStatus('ok', `${profile?.name}: ${celleRows.length} celdas`);
     return {
       ok: true,
       data: {
@@ -119,10 +256,6 @@ export async function loadStrutturaFromDb() {
   }
 }
 
-/**
- * Guarda estructura en githubDB vía GitHub Actions (~10–30 s).
- * @param {{rows:number, cols:number, walkwayCol:number, prossimo:number, cells:object[]}} struttura
- */
 export async function saveStrutturaToDb(struttura) {
   const token = getToken();
   if (!token) {
@@ -132,7 +265,7 @@ export async function saveStrutturaToDb(struttura) {
   }
 
   const cfg = getDbConfig();
-  setStatus('saving', 'Guardando… (10–30 s vía GitHub Actions)');
+  setStatus('saving', 'Guardando… (10–30 s)');
 
   const now = new Date().toISOString();
   const cells = struttura.cells.filter((c) => c.elemento);
@@ -153,18 +286,14 @@ export async function saveStrutturaToDb(struttura) {
     );
   }
 
-  const sql = sqlParts.join('; ');
-
   try {
     const db = createClient();
-    const result = await db.query(cfg.database, sql);
-
+    const result = await db.query(cfg.database, sqlParts.join('; '));
     if (!result.ok) {
-      const msg = result.error || 'Error en la consulta SQL';
+      const msg = result.error || 'Error SQL';
       setStatus('error', msg);
       return { ok: false, error: msg };
     }
-
     await db.refresh(cfg.database);
     setStatus('ok', `Guardado: ${cells.length} celdas`);
     return { ok: true, cells: cells.length };
@@ -184,13 +313,13 @@ async function queryDb(sql, statusMsg) {
   }
 
   const cfg = getDbConfig();
-  setStatus('saving', statusMsg || 'Guardando… (10–30 s vía GitHub Actions)');
+  setStatus('saving', statusMsg || 'Guardando… (10–30 s)');
 
   try {
     const db = createClient();
     const result = await db.query(cfg.database, sql);
     if (!result.ok) {
-      const msg = result.error || 'Error en la consulta SQL';
+      const msg = result.error || 'Error SQL';
       setStatus('error', msg);
       return { ok: false, error: msg };
     }
@@ -208,18 +337,15 @@ function nextId(rows) {
   return Math.max(...rows.map((r) => Number(r.id) || 0)) + 1;
 }
 
-/**
- * Carga clienti desde githubDB.
- */
 export async function loadClientiFromDb() {
-  const cfg = getDbConfig();
-  setStatus('loading', 'Cargando clienti…');
+  const profile = getActiveProfile();
+  setStatus('loading', `${profile?.name}: clienti…`);
 
   try {
+    const cfg = getDbConfig();
     const db = createClient();
     await db.refresh(cfg.database);
-    const table = await db.table(cfg.database, 'clienti');
-    const rows = table.objects();
+    const rows = (await db.table(cfg.database, 'clienti')).objects();
     setStatus('ok', `${rows.length} clienti`);
     return { ok: true, data: rows };
   } catch (err) {
@@ -229,9 +355,6 @@ export async function loadClientiFromDb() {
   }
 }
 
-/**
- * Inserta o actualiza un cliente.
- */
 export async function saveClienteToDb(cliente, existingRows = []) {
   const id = cliente.id || nextId(existingRows);
   const sql = cliente.id
@@ -243,23 +366,18 @@ export async function saveClienteToDb(cliente, existingRows = []) {
   return res.ok ? { ok: true, id } : res;
 }
 
-/**
- * Elimina un cliente.
- */
 export async function deleteClienteFromDb(id) {
-  const res = await queryDb(`DELETE FROM clienti WHERE id = ${id}`, 'Eliminando cliente…');
+  const res = await queryDb(`DELETE FROM clienti WHERE id = ${id}`, 'Eliminando…');
   if (res.ok) setStatus('ok', 'Cliente eliminado');
   return res;
 }
 
-/**
- * Carga prenotazioni y clienti (join en cliente).
- */
 export async function loadPrenotazioniFromDb() {
-  const cfg = getDbConfig();
-  setStatus('loading', 'Cargando prenotazioni…');
+  const profile = getActiveProfile();
+  setStatus('loading', `${profile?.name}: prenotazioni…`);
 
   try {
+    const cfg = getDbConfig();
     const db = createClient();
     await db.refresh(cfg.database);
     const prenotazioni = (await db.table(cfg.database, 'prenotazioni')).objects();
@@ -282,9 +400,6 @@ export async function loadPrenotazioniFromDb() {
   }
 }
 
-/**
- * Inserta o actualiza una prenotazione.
- */
 export async function savePrenotazioneToDb(prenotazione, existingRows = []) {
   const id = prenotazione.id || nextId(existingRows);
   const sql = prenotazione.id
@@ -296,11 +411,26 @@ export async function savePrenotazioneToDb(prenotazione, existingRows = []) {
   return res.ok ? { ok: true, id } : res;
 }
 
-/**
- * Elimina una prenotazione.
- */
 export async function deletePrenotazioneFromDb(id) {
-  const res = await queryDb(`DELETE FROM prenotazioni WHERE id = ${id}`, 'Eliminando prenotazione…');
+  const res = await queryDb(`DELETE FROM prenotazioni WHERE id = ${id}`, 'Eliminando…');
   if (res.ok) setStatus('ok', 'Prenotazione eliminata');
   return res;
+}
+
+/** Comprueba conectividad de lectura del perfil activo */
+export async function testActiveProfile() {
+  const cfg = getDbConfig();
+  const profile = getActiveProfile();
+  setStatus('loading', `Probando ${profile?.name}…`);
+
+  try {
+    const db = createClient();
+    await db.refresh(cfg.database);
+    setStatus('ok', `Conectado: ${cfg.owner}/${cfg.repo} → ${cfg.database}`);
+    return { ok: true };
+  } catch (err) {
+    const msg = err.message || String(err);
+    setStatus('error', msg);
+    return { ok: false, error: msg };
+  }
 }

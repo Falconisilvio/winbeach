@@ -1,0 +1,151 @@
+import {
+  getProfiles,
+  getActiveProfileId,
+  getActiveProfile,
+  setActiveProfile,
+  saveProfile,
+  deleteProfile,
+  getToken,
+  saveToken,
+  testActiveProfile,
+  onProfileChange,
+} from './winbeach-db.js';
+
+let editingId = null;
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function connectionLabel(p) {
+  return `${p.owner}/${p.repo} · ${p.database}.json`;
+}
+
+function renderCards() {
+  const grid = $('profiles-grid');
+  const activeId = getActiveProfileId();
+  const profiles = getProfiles();
+
+  if (!profiles.length) {
+    grid.innerHTML = '<div class="empty-state"><p>Nessuno stabilimento configurato.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = profiles.map((p) => {
+    const active = p.id === activeId;
+    return `
+      <div class="profile-card ${active ? 'active' : ''}" data-id="${p.id}">
+        <div class="profile-card-head">
+          <i class="fa-solid fa-umbrella-beach" style="color:${active ? '#0084ff' : '#ccc'}"></i>
+          <h3>${escapeHtml(p.name)}</h3>
+          ${active ? '<span class="badge badge-green">Attivo</span>' : ''}
+        </div>
+        <p class="profile-conn">${escapeHtml(connectionLabel(p))}</p>
+        <div class="profile-card-actions">
+          ${active ? '' : `<button type="button" class="btn btn-primary btn-sm" data-activate="${p.id}">Attiva</button>`}
+          <button type="button" class="btn btn-secondary btn-sm" data-edit="${p.id}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="btn btn-danger btn-sm" data-delete="${p.id}" ${profiles.length < 2 ? 'disabled title="Minimo 1 stabilimento"' : ''}><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('[data-activate]').forEach((btn) => {
+    btn.addEventListener('click', () => activate(btn.dataset.activate));
+  });
+  grid.querySelectorAll('[data-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => openModal(btn.dataset.edit));
+  });
+  grid.querySelectorAll('[data-delete]').forEach((btn) => {
+    btn.addEventListener('click', () => removeProfile(btn.dataset.delete));
+  });
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function openModal(id = null) {
+  editingId = id;
+  const modal = $('profile-modal');
+
+  if (id) {
+    const p = getProfiles().find((x) => x.id === id);
+    $('modal-title').textContent = 'Modifica stabilimento';
+    $('f-name').value = p?.name || '';
+    $('f-owner').value = p?.owner || '';
+    $('f-repo').value = p?.repo || '';
+    $('f-branch').value = p?.branch || 'main';
+    $('f-database').value = p?.database || 'winbeach';
+    $('f-token').value = getToken(id) || '';
+  } else {
+    $('modal-title').textContent = 'Nuovo stabilimento';
+    $('profile-form').reset();
+    $('f-branch').value = 'main';
+    $('f-database').value = 'winbeach';
+    $('f-token').value = '';
+  }
+
+  modal.classList.add('open');
+}
+
+function closeModal() {
+  $('profile-modal').classList.remove('open');
+  editingId = null;
+}
+
+async function saveForm(e) {
+  e.preventDefault();
+
+  const profile = saveProfile({
+    id: editingId || undefined,
+    name: $('f-name').value,
+    owner: $('f-owner').value,
+    repo: $('f-repo').value,
+    branch: $('f-branch').value,
+    database: $('f-database').value,
+  });
+
+  saveToken($('f-token').value.trim(), profile.id);
+  closeModal();
+  renderCards();
+}
+
+function activate(id) {
+  setActiveProfile(id);
+  renderCards();
+}
+
+async function removeProfile(id) {
+  if (!confirm('Eliminare questo stabilimento dalla configurazione locale?')) return;
+  if (!deleteProfile(id)) {
+    alert('Debe quedar al menos un stabilimento.');
+    return;
+  }
+  renderCards();
+}
+
+function bindEvents() {
+  $('btn-nuovo').addEventListener('click', () => openModal());
+  $('profile-form').addEventListener('submit', saveForm);
+  $('modal-close').addEventListener('click', closeModal);
+  $('btn-cancel').addEventListener('click', closeModal);
+  $('btn-test').addEventListener('click', async () => {
+    $('btn-test').disabled = true;
+    await testActiveProfile();
+    $('btn-test').disabled = false;
+  });
+  $('profile-modal').addEventListener('click', (e) => {
+    if (e.target === $('profile-modal')) closeModal();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  bindEvents();
+  renderCards();
+  onProfileChange(renderCards);
+});
