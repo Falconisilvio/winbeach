@@ -400,13 +400,35 @@ export async function loadPrenotazioniFromDb() {
   }
 }
 
+const PRENOTAZIONE_FIELDS = [
+  'cliente_id', 'cella', 'data_inizio', 'data_fine', 'stato', 'note',
+  'importo', 'importo_pagato', 'canale', 'stato_pagamento', 'ora_arrivo', 'check_in', 'check_out',
+];
+
+function prenotazioneSql(p, id) {
+  const sets = PRENOTAZIONE_FIELDS.map((f) => {
+    const v = p[f];
+    if (f === 'cliente_id' || f === 'cella') return `${f} = ${Number(v) || 0}`;
+    if (f === 'importo' || f === 'importo_pagato') return `${f} = ${Number(v) || 0}`;
+    if (f === 'check_in' || f === 'check_out') return `${f} = ${v ? 'TRUE' : 'FALSE'}`;
+    return `${f} = ${sqlEscape(v ?? (f === 'stato' ? 'confermata' : f === 'canale' ? 'offline' : f === 'stato_pagamento' ? 'da_saldare' : ''))}`;
+  });
+  const cols = ['id', ...PRENOTAZIONE_FIELDS].join(', ');
+  const vals = [id, ...PRENOTAZIONE_FIELDS.map((f) => {
+    const v = p[f];
+    if (f === 'cliente_id' || f === 'cella') return Number(v) || 0;
+    if (f === 'importo' || f === 'importo_pagato') return Number(v) || 0;
+    if (f === 'check_in' || f === 'check_out') return v ? 'TRUE' : 'FALSE';
+    return sqlEscape(v ?? (f === 'stato' ? 'confermata' : f === 'canale' ? 'offline' : f === 'stato_pagamento' ? 'da_saldare' : ''));
+  })].join(', ');
+  return p.id
+    ? `UPDATE prenotazioni SET ${sets.join(', ')} WHERE id = ${id}`
+    : `INSERT INTO prenotazioni (${cols}) VALUES (${vals})`;
+}
+
 export async function savePrenotazioneToDb(prenotazione, existingRows = []) {
   const id = prenotazione.id || nextId(existingRows);
-  const sql = prenotazione.id
-    ? `UPDATE prenotazioni SET cliente_id = ${prenotazione.cliente_id}, cella = ${prenotazione.cella || 0}, data_inizio = ${sqlEscape(prenotazione.data_inizio)}, data_fine = ${sqlEscape(prenotazione.data_fine)}, stato = ${sqlEscape(prenotazione.stato)}, note = ${sqlEscape(prenotazione.note || '')} WHERE id = ${id}`
-    : `INSERT INTO prenotazioni (id, cliente_id, cella, data_inizio, data_fine, stato, note) VALUES (${id}, ${prenotazione.cliente_id}, ${prenotazione.cella || 0}, ${sqlEscape(prenotazione.data_inizio)}, ${sqlEscape(prenotazione.data_fine)}, ${sqlEscape(prenotazione.stato)}, ${sqlEscape(prenotazione.note || '')})`;
-
-  const res = await queryDb(sql, 'Guardando prenotazione…');
+  const res = await queryDb(prenotazioneSql(prenotazione, id), 'Guardando prenotazione…');
   if (res.ok) setStatus('ok', 'Prenotazione salvata');
   return res.ok ? { ok: true, id } : res;
 }
@@ -415,6 +437,134 @@ export async function deletePrenotazioneFromDb(id) {
   const res = await queryDb(`DELETE FROM prenotazioni WHERE id = ${id}`, 'Eliminando…');
   if (res.ok) setStatus('ok', 'Prenotazione eliminata');
   return res;
+}
+
+/** Carga genérica de tabla */
+export async function loadTable(tableName) {
+  const profile = getActiveProfile();
+  setStatus('loading', `${profile?.name}: ${tableName}…`);
+  try {
+    const cfg = getDbConfig();
+    const db = createClient();
+    await db.refresh(cfg.database);
+    const rows = (await db.table(cfg.database, tableName)).objects();
+    setStatus('ok', `${rows.length} righe`);
+    return { ok: true, data: rows };
+  } catch (err) {
+    const msg = err.message || String(err);
+    setStatus('error', msg);
+    return { ok: false, error: msg };
+  }
+}
+
+/** Guarda fila genérica (INSERT o UPDATE) */
+export async function saveTableRow(tableName, row, fields, existingRows = [], statusMsg = 'Salvando…') {
+  const id = row.id || nextId(existingRows);
+  const payload = { ...row, id };
+  const sets = fields.map((f) => {
+    const v = payload[f];
+    if (typeof v === 'boolean') return `${f} = ${v ? 'TRUE' : 'FALSE'}`;
+    if (typeof v === 'number') return `${f} = ${v}`;
+    return `${f} = ${sqlEscape(v ?? '')}`;
+  });
+  const cols = ['id', ...fields].join(', ');
+  const vals = [id, ...fields.map((f) => {
+    const v = payload[f];
+    if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
+    if (typeof v === 'number') return v;
+    return sqlEscape(v ?? '');
+  })].join(', ');
+  const sql = row.id
+    ? `UPDATE ${tableName} SET ${sets.join(', ')} WHERE id = ${id}`
+    : `INSERT INTO ${tableName} (${cols}) VALUES (${vals})`;
+  const res = await queryDb(sql, statusMsg);
+  return res.ok ? { ok: true, id } : res;
+}
+
+export async function deleteTableRow(tableName, id) {
+  return queryDb(`DELETE FROM ${tableName} WHERE id = ${id}`, 'Eliminando…');
+}
+
+/** Carga todo el dataset operativo */
+export async function loadOperationalData() {
+  const profile = getActiveProfile();
+  setStatus('loading', `${profile?.name}: dati…`);
+  try {
+    const cfg = getDbConfig();
+    const db = createClient();
+    await db.refresh(cfg.database);
+    const tables = [
+      'config', 'celle', 'clienti', 'prenotazioni', 'settori', 'tariffe',
+      'movimenti_cassa', 'elementi', 'listini', 'servizi', 'articoli',
+    ];
+    const data = {};
+    for (const t of tables) {
+      try {
+        data[t] = (await db.table(cfg.database, t)).objects();
+      } catch {
+        data[t] = [];
+      }
+    }
+    const clientiMap = Object.fromEntries(data.clienti.map((c) => [c.id, c]));
+    data.prenotazioniEnriched = data.prenotazioni.map((p) => ({
+      ...p,
+      cliente: clientiMap[p.cliente_id] || null,
+    }));
+    setStatus('ok', 'Dati caricati');
+    return { ok: true, data };
+  } catch (err) {
+    return { ok: false, error: err.message || String(err) };
+  }
+}
+
+export async function loadDashboardStats() {
+  const res = await loadOperationalData();
+  if (!res.ok) return res;
+  const { prenotazioni, prenotazioniEnriched, celle, movimenti_cassa, clienti } = res.data;
+  const today = new Date().toISOString().slice(0, 10);
+  const attive = prenotazioni.filter((p) => p.stato !== 'cancellata');
+  const arriviOggi = attive.filter((p) => p.data_inizio === today);
+  const partenzeOggi = attive.filter((p) => p.data_fine === today);
+  const occupateOggi = attive.filter((p) => p.data_inizio <= today && p.data_fine >= today);
+  const postazioni = celle.filter((c) => c.attivo && c.cella > 0).length;
+  const fatturato = attive.reduce((s, p) => s + (Number(p.importo) || 0), 0);
+  const incassato = movimenti_cassa.filter((m) => m.tipo === 'entrata').reduce((s, m) => s + (Number(m.importo) || 0), 0);
+  const pagamenti = {
+    saldato: attive.filter((p) => p.stato_pagamento === 'saldato').length,
+    parziale: attive.filter((p) => p.stato_pagamento === 'parziale').length,
+    da_saldare: attive.filter((p) => p.stato_pagamento === 'da_saldare').length,
+  };
+  const canali = {};
+  attive.forEach((p) => { canali[p.canale || 'offline'] = (canali[p.canale || 'offline'] || 0) + 1; });
+  return {
+    ok: true,
+    stats: {
+      arriviOggi: arriviOggi.length,
+      partenzeOggi: partenzeOggi.length,
+      cancellazioni: prenotazioni.filter((p) => p.stato === 'cancellata').length,
+      occupazione: postazioni ? Math.round((occupateOggi.length / postazioni) * 100) : 0,
+      fatturato,
+      incassato,
+      presenze: occupateOggi.length,
+      clienti: clienti.length,
+      pagamenti,
+      canali,
+      prenotazioni: prenotazioniEnriched,
+      postazioni,
+      occupateOggi: occupateOggi.length,
+    },
+  };
+}
+
+export function calcImportoFromTariffe(tariffe, tassa, dataInizio, dataFine) {
+  if (!tassa || !dataInizio || !dataFine) return 0;
+  const t = tariffe.find((x) => x.tassa === tassa);
+  if (!t) return 0;
+  const days = Math.max(1, Math.ceil((new Date(dataFine) - new Date(dataInizio)) / 86400000) + 1);
+  if (days >= 30) return t.mensile || t.giornaliero * days;
+  if (days >= 15) return t.quindicinale || t.giornaliero * days;
+  if (days >= 7) return t.settimanale || t.giornaliero * days;
+  return (t.giornaliero || 0) * days;
 }
 
 /** Comprueba conectividad de lectura del perfil activo */

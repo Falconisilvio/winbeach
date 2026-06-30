@@ -48,6 +48,8 @@
           <th>Dal</th>
           <th>Al</th>
           <th>Postazione</th>
+          <th>Importo</th>
+          <th>Pagamento</th>
           <th>Stato</th>
           <th>Azioni</th>
         </tr>
@@ -89,6 +91,26 @@
             <div class="form-group">
               <label for="f-stato">Stato</label>
               <select id="f-stato"></select>
+            </div>
+            <div class="form-group">
+              <label for="f-importo">Importo €</label>
+              <input type="number" id="f-importo" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="f-pagato">Pagato €</label>
+              <input type="number" id="f-pagato" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label for="f-canale">Canale</label>
+              <select id="f-canale"><option value="offline">Offline</option><option value="widget">Widget</option><option value="portale">Portale</option></select>
+            </div>
+            <div class="form-group">
+              <label for="f-pagamento">Stato pagamento</label>
+              <select id="f-pagamento"><option value="da_saldare">Da saldare</option><option value="parziale">Parziale</option><option value="saldato">Saldato</option></select>
+            </div>
+            <div class="form-group">
+              <label for="f-ora">Ora arrivo</label>
+              <input type="time" id="f-ora">
             </div>
             <div class="form-group" style="grid-column:1/-1">
               <label for="f-note">Note</label>

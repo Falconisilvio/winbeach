@@ -9,14 +9,18 @@
 </head>
 <body>
   <div class="header">
-    <h2><i class="fa-solid fa-umbrella-beach" style="color:#00a8ff"></i> Spiaggia</h2>
-    
+    <h2><i class="fa-solid fa-umbrella-beach" style="color:#00a8ff"></i> Spiaggia — Occupazione</h2>
+    <div class="toolbar"><button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button></div>
   </div>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> githubDB</span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="filters"><label>Data <input type="date" id="data-spiaggia"></label></div>
   <div class="stats-row">
-    <div class="stat-box"><div class="num">200</div><div class="lbl">Postazioni</div></div>
-    <div class="stat-box"><div class="num">100</div><div class="lbl">Occupate oggi</div></div>
-    <div class="stat-box"><div class="num">50%</div><div class="lbl">Occupazione</div></div>
+    <div class="stat-box"><div class="num" id="stat-postazioni">0</div><div class="lbl">Postazioni</div></div>
+    <div class="stat-box"><div class="num" id="stat-occupate">0</div><div class="lbl">Occupate</div></div>
+    <div class="stat-box"><div class="num" id="stat-libe">0</div><div class="lbl">Libere</div></div>
+    <div class="stat-box"><div class="num" id="stat-pct">0%</div><div class="lbl">Occupazione</div></div>
   </div>
-  <div class="chart-placeholder"><i class="fa-solid fa-chart-line"></i><p>Mappa occupazione in tempo reale</p></div>
+  <div id="spiaggia-grid" class="spiaggia-grid"></div>
+  <script type="module" src="../js/spiaggia.js"></script>
 </body>
 </html>

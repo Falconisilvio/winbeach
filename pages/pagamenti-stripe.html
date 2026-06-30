@@ -10,13 +10,26 @@
 <body>
   <div class="header">
     <h2><i class="fa-solid fa-credit-card" style="color:#6772e5"></i> Pagamenti Stripe</h2>
-    
+    <div class="toolbar">
+      <button type="button" class="btn btn-secondary" id="btn-reload"><i class="fa-solid fa-rotate"></i> Ricarica</button>
+      <button type="button" class="btn btn-primary" id="btn-nuovo"><i class="fa-solid fa-plus"></i> Nuovo</button>
+    </div>
   </div>
-  <div class="table-scroll">
-    <table>
-      <thead><tr><th>Data</th><th>Cliente</th><th>Importo</th><th>Metodo</th><th>Stato</th></tr></thead>
-      <tbody><tr><td>30/06 09:12</td><td>Laura Bianchi</td><td>175 €</td><td>Visa ****4242</td><td><span class="badge badge-green">Completato</span></td></tr><tr><td>29/06 16:45</td><td>Mario Rossi</td><td>420 €</td><td>Mastercard ****8888</td><td><span class="badge badge-green">Completato</span></td></tr></tbody>
-    </table>
+  <div class="db-bar"><span><i class="fa-solid fa-database"></i> githubDB</span><div id="db-status" class="db-status idle">…</div></div>
+  <div class="filters"><input type="search" id="search-input" placeholder="Cerca…"></div>
+  <div class="table-scroll"><table><thead><tr><th>Data</th><th>Importo</th><th>Metodo</th><th>Stato</th><th>Azioni</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
+  <div id="empty-state" class="empty-state" style="display:none"><p>Nessun record.</p></div>
+  <div class="modal-overlay" id="data-modal">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modal-title">Nuovo</h3><button type="button" class="modal-close" id="modal-close">&times;</button></div>
+      <form id="data-form"><div class="modal-body"><div class="form-grid"><div class="form-group"><label for="f-data">Data</label><input type="text" id="f-data"></div>
+            <div class="form-group"><label for="f-importo">Importo</label><input type="number" id="f-importo" step="0.01"></div>
+            <div class="form-group"><label for="f-metodo">Metodo</label><input type="text" id="f-metodo"></div>
+            <div class="form-group"><label for="f-stripe">Stripe ID</label><input type="text" id="f-stripe"></div>
+            <div class="form-group"><label for="f-stato">Stato</label><input type="text" id="f-stato"></div></div></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel">Annulla</button><button type="submit" class="btn btn-primary" id="btn-save">Salva</button></div>
+      </form>
+    </div>
   </div>
-</body>
-</html>
+  <script type="module" src="../js/pagamenti-stripe.js"></script>
+</body></html>
