@@ -1,5 +1,9 @@
-@import url('theme.css');
-@import url('dark-mode.css');
+/* Requiere page.css (theme + dark-mode) cargado antes */
+
+html {
+  background: var(--wb-bg);
+  color: var(--wb-text);
+}
 
 /* ── Mappa tavoli (tavoli.html) ── */
 body.tavoli-page {
@@ -8,6 +12,8 @@ body.tavoli-page {
   background: var(--wb-bg);
   color: var(--wb-text);
   margin: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .tavoli-page .header-sala {
