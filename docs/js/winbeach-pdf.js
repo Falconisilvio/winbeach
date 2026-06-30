@@ -1,4 +1,4 @@
-import { getActiveProfile } from './winbeach-db.js';
+import { getActiveProfile, profileDisplayName } from './winbeach-db.js';
 import { t } from './app-i18n.js';
 
 function esc(s) {
@@ -9,7 +9,8 @@ function esc(s) {
  * Apre finestra di stampa (Salva come PDF dal browser).
  */
 export function printTableReport({ title, columns, rows, subtitle = '' }) {
-  const facility = getActiveProfile()?.name || 'WinBeach';
+  const active = getActiveProfile();
+  const facility = active ? profileDisplayName(active) : 'WinBeach';
   const date = new Date().toLocaleString('it-IT');
   const head = columns.map((c) => `<th>${esc(c.label)}</th>`).join('');
   const body = rows.map((row) =>

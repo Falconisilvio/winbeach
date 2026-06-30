@@ -3,6 +3,7 @@ import {
   getActiveProfile,
   setActiveProfile,
   onProfileChange,
+  profileDisplayName,
 } from './winbeach-db.js';
 import { t, onLangChange } from './app-i18n.js';
 
@@ -12,7 +13,7 @@ function renderSwitcher() {
   const active = getActiveProfile();
 
   if (nameEl) {
-    nameEl.textContent = active?.name || t('profile.defaultName');
+    nameEl.textContent = active ? profileDisplayName(active) : t('profile.defaultName');
   }
 
   if (!dropdown) return;
@@ -22,7 +23,7 @@ function renderSwitcher() {
   dropdown.innerHTML = profiles.map((p) => `
     <button type="button" class="profile-option ${p.id === active?.id ? 'active' : ''}" data-id="${p.id}">
       <i class="fa-solid fa-umbrella-beach"></i>
-      <span>${p.name}</span>
+      <span>${profileDisplayName(p)}</span>
       <small>${p.database}.json</small>
     </button>
   `).join('') + `
