@@ -2,65 +2,92 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <script src="../js/theme-init.js"></script>
-  <script src="../js/lang-init.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Punto Vendita Ristorante</title>
+  <title>Cassa Ristorante (Point of Sale)</title>
   <link rel="stylesheet" href="../css/page.css">
-  <link rel="stylesheet" href="../css/ristorante.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <style>
+    .pos-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; background: #fff; border-bottom: 1px solid #e0e0e0; }
+    .tavolo-info-box { display: flex; align-items: center; gap: 10px; }
+    .badge-tavolo { background: #0288d1; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1rem; }
+    
+    /* PULSANTE CAMBIO TAVOLO RAPIDO RIDISEGNATO */
+    .btn-cambio-rapido { background: #e91e63; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+    .btn-cambio-rapido:hover { background: #c2185b; }
+
+    /* CONTENITORE CATEGORIE SCORREVOLI */
+    .wrapper-categorie { display: flex; align-items: center; background: #f5f5f5; padding: 8px; gap: 5px; }
+    .btn-freccia-cat { background: #fff; border: 1px solid #ccc; width: 36px; height: 36px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .scroll-categorie { display: flex; gap: 8px; overflow-x: hidden; scroll-behavior: smooth; flex-grow: 1; white-space: nowrap; }
+    .cat-btn { padding: 8px 16px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; }
+    .cat-btn.active { background: #0288d1; color: white; border-color: #0288d1; }
+    .cat-btn img { width: 24px; height: 24px; object-fit: cover; border-radius: 4px; }
+
+    /* LAYOUT PRINCIPALE CASSA */
+    .pos-main-container { display: flex; gap: 15px; padding: 15px; height: calc(100vh - 140px); }
+    .sezione-prodotti-scroll { flex: 1; display: flex; gap: 10px; align-items: stretch; }
+    
+    /* GRIGLIA PRODOTTI CORRETTA A 4 RIGHE FISSE */
+    .grid-prodotti-fissa { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-template-rows: repeat(4, 1fr); gap: 10px; overflow-y: hidden; scroll-behavior: smooth; }
+    
+    /* CONTROLLI VERTICALI PRODOTTI */
+    .controlli-verticali-prodotti { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+    .btn-freccia-prod { background: #fff; border: 1px solid #ccc; width: 50px; flex: 1; max-height: 120px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+    /* CARTE PRODOTTI CON IMMAGINE OPZIONALE */
+    .articolo-card { border: 1px solid #e0e0e0; background: #fff; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: transform 0.15s; height: 100%; box-sizing: border-box; }
+    .articolo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .articolo-card img { width: 100%; height: 70px; object-fit: cover; border-radius: 4px; margin-bottom: 6px; }
+    .articolo-card .no-img-placeholder { height: 70px; background: #eaeff2; border-radius: 4px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; color: #78909c; font-size: 1.2rem; }
+    .articolo-card .name { font-weight: bold; font-size: 0.9rem; margin-bottom: 4px; }
+    .articolo-card .price { color: #2e7d32; font-weight: bold; font-size: 0.95rem; }
+
+    /* SEZIONE RICEVUTA/COMANDA ATIVA */
+    .sezione-comanda { width: 360px; background: #fff; border: 1px solid #ccc; border-radius: 6px; display: flex; flex-direction: column; }
+    
+    dialog::backdrop { background: rgba(0,0,0,0.5); }
+  </style>
 </head>
-<body class="pointsale-page">
+<body>
 
-  <div class="cassa-header">
-    <h2><i class="fa-solid fa-cash-register" style="color: var(--wb-accent); margin-right: 8px;"></i> Cassa Ristorante (Point of Sale)</h2>
-    <div class="tavolo-badge" id="lbl-tavolo">Caricamento...</div>
-  </div>
-<button type="button" onclick="apriDialogCambioTavoloRapido()" style="margin-left: 10px; padding: 5px 10px; font-size: 0.85rem; cursor: pointer; background: #0288d1; color: white; border: none; border-radius: 4px;">
-  <i class="fa-solid fa-鋪fa-shuffle"></i> Cambia Tavolo Rapido
-</button>
-  <div class="main-container">
-    <div class="prodotti-section">
-      <div class="categorie-bar" id="barra-categorie-dinamica"></div>
-      <div class="tastiera-articoli" id="grid-prodotti"></div>
+  <div class="pos-header">
+    <div class="tavolo-info-box">
+      <span class="badge-tavolo" id="lbl-tavolo">Tavolo</span>
+      <button type="button" class="btn-cambio-rapido" onclick="apriDialogCambioTavoloRapido()">
+        <i class="fa-solid fa-shuffle"></i> Cambia Tavolo
+      </button>
     </div>
+    <div id="box-coperti-cassa"></div>
+  </div>
 
-    <div class="comanda-section">
-      <div class="comanda-title"><i class="fa-solid fa-list-check"></i> Righe Comanda Attiva</div>
-      <div class="xbrowse-container">
-        <table class="xbrowse">
-          <thead>
-            <tr>
-              <th>Articolo</th>
-              <th style="text-align: center; width: 50px;">Q.tà</th>
-              <th style="text-align: right; width: 80px;">Totale</th>
-              <th style="text-align: center; width: 40px;"></th>
-            </tr>
-          </thead>
-          <tbody id="xbrowse-body"></tbody>
-        </table>
-      </div>
-      <div class="comanda-totali">
-        <div class="tot-row">
-          <span>TOTALE CONTO:</span>
-          <span id="txt-totale">0.00 €</span>
-        </div>
-        <button type="button" class="btn-invia" onclick="inviaComanda()"><i class="fa-solid fa-print"></i> Stampa Comanda Cucina</button>
+  <div class="wrapper-categorie">
+    <button type="button" class="btn-freccia-cat" onclick="scorriCategorie(-150)"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="scroll-categorie" id="barra-categorie-dinamica"></div>
+    <button type="button" class="btn-freccia-cat" onclick="scorriCategorie(150)"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <div class="pos-main-container">
+    
+    <div class="sezione-prodotti-scroll">
+      <div class="grid-prodotti-fissa" id="grid-prodotti"></div>
+      
+      <div class="controlli-verticali-prodotti">
+        <button type="button" class="btn-freccia-prod" onclick="scorriProdotti(-120)"><i class="fa-solid fa-chevron-up"></i></button>
+        <button type="button" class="btn-freccia-prod" onclick="scorriProdotti(120)"><i class="fa-solid fa-chevron-down"></i></button>
       </div>
     </div>
-  </div>
-<dialog id="dialog-cambio-tavolo-rapido" style="border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: var(--wb-bg-card, #fff); color: var(--wb-text, #333); min-width: 320px;">
-  <h3 style="margin-top: 0;"><i class="fa-solid fa-utensils"></i> Seleziona Tavolo</h3>
-  <p style="font-size: 0.9rem; color: gray;">Seleziona un tavolo per caricare la sua comanda:</p>
-  
-  <select id="select-cambio-tavolo-rapido" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem; margin-top: 10px;">
-    </select>
 
-  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-    <button type="button" class="btn-annulla" onclick="document.getElementById('dialog-cambio-tavolo-rapido').close()" style="padding: 8px 15px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer;">Annulla</button>
-    <button type="button" class="btn-conferma" onclick="confermaCambioTavoloRapido()" style="padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 4px; cursor: pointer;">Carica Tavolo</button>
+    <div class="sezione-comanda">
+      </div>
   </div>
-</dialog>
-  <script src="../js/pointsale.js?v=1"></script>
+
+  <dialog id="dialog-cambio-tavolo-rapido" style="border:none; border-radius:8px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.3); min-width:320px;">
+    <h3 style="margin-top:0;"><i class="fa-solid fa-circle-user"></i> Seleziona Tavolo</h3>
+    <select id="select-cambio-tavolo-rapido" style="width:100%; padding:10px; font-size:1rem;"></select>
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+      <button type="button" onclick="document.getElementById('dialog-cambio-tavolo-rapido').close()" style="padding:8px 15px; background:#757575; color:white; border:none; border-radius:4px; cursor:pointer;">Annulla</button>
+      <button type="button" onclick="confermaCambioTavoloRapido()" style="padding:8px 15px; background:#2e7d32; color:white; border:none; border-radius:4px; cursor:pointer;">Carica</button>
+    </div>
+  </dialog>
+
 </body>
 </html>
