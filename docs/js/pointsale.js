@@ -251,4 +251,96 @@ function completaPagamentoESvotaTavolo() {
   }
 }
 
+
+// Funzione per aprire la dialog e popolare la select con i tavoli reali del DB
+function apriDialogCambioTavoloRapido() {
+  const select = document.getElementById('select-cambio-tavolo-rapido');
+  if (!select) return;
+  
+  select.innerHTML = ''; // Svuota la select precedente
+  
+  // Legge l'archivio reale configurato nel localStorage
+  const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+  if (!datiSalvati) {
+    alert("Nessun tavolo configurato nel sistema.");
+    return;
+  }
+  
+  const db = JSON.parse(datiSalvati);
+  if (!db.tavoli || db.tavoli.length === 0) {
+    select.innerHTML = '<option value="">Nessun tavolo trovato</option>';
+    return;
+  }
+
+  // Ordina i tavoli per numero per comodità dell'operatore
+  db.tavoli.sort((a, b) => Number(a.numero) - Number(b.numero));
+
+  // Raggruppa o elenca semplicemente i tavoli indicando lo stato (Libero/Occupato)
+  db.tavoli.forEach(t => {
+    const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
+    const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
+    const statoTesto = isOccupato ? `(Occupato - ${orarioApertura || 'In corso'})` : '(Libero)';
+    
+    const option = document.createElement('option');
+    option.value = t.id;
+    option.setAttribute('data-numero', t.numero);
+    option.innerText = `Tavolo ${t.numero} ${statoTesto}`;
+    
+    // Se è il tavolo attualmente aperto, lo seleziona di default nella lista
+    if (String(t.id) === String(localStorage.getItem('tavoloSelezionatoId'))) {
+      option.selected = true;
+    }
+    
+    select.appendChild(option);
+  });
+
+  // Mostra la finestra modale
+  document.getElementById('dialog-cambio-tavolo-rapido').showModal();
+}
+
+// Funzione che salva lo stato attuale del vecchio tavolo e carica all'istante il nuovo
+function confermaCambioTavoloRapido() {
+  const select = document.getElementById('select-cambio-tavolo-rapido');
+  const idSelezionato = select.value;
+  if (!idSelezionato) return;
+  
+  const optionSelezionata = select.options[select.selectedIndex];
+  const numeroTavolo = optionSelezionata.getAttribute('data-numero');
+
+  // 1. SALVA AUTOMATICAMENTE LA COMANDA ATTUALE DEL TAVOLO VECCHIO PRIMA DI ANDARSENE
+  const vecchioTavoloId = localStorage.getItem('tavoloSelezionatoId');
+  if (vecchioTavoloId) {
+    localStorage.setItem(`carrello_tavolo_${vecchioTavoloId}`, JSON.stringify(carrello));
+  }
+
+  // 2. SE IL NUOVO TAVOLO SELEZIONATO ERA LIBERO, LO APRE IN AUTOMATICO
+  const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+  if (datiSalvati) {
+    let db = JSON.parse(datiSalvati);
+    let tavoloTarget = db.tavoli.find(t => String(t.id) === String(idSelezionato));
+    
+    if (tavoloTarget && tavoloTarget.stato !== 'occupato') {
+      // Imposta l'orario di apertura automatico e lo marca come occupato
+      const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      localStorage.setItem(`ora_apertura_tavolo_${idSelezionato}`, oraAttuale);
+      localStorage.setItem(`coperti_tavolo_${idSelezionato}`, "1");
+      
+      tavoloTarget.stato = 'occupato';
+      localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+    }
+  }
+
+  // 3. IMPOSTA LE CHIAVI DI SESSIONE SUL NUOVO TAVOLO
+  localStorage.setItem('tavoloSelezionato', `Tavolo ${numeroTavolo}`);
+  localStorage.setItem('tavoloSelezionatoId', idSelezionato);
+  localStorage.setItem('pos_azione_richiesta', 'ordinazione'); // Ripristina su ordinazione standard
+
+  // 4. CHIUDE LA DIALOG
+  document.getElementById('dialog-cambio-tavolo-rapido').close();
+
+  // 5. SIMULA IL PAGESHOW PER FORZARE IL RILEGAMENTO DATI SENZA FARE IL REFRESH DELLA PAGINA
+  // Questo riprenderà l'array corretto, i coperti corretti ed eventuali tavoli uniti
+  window.dispatchEvent(new Event('pageshow'));
+}
+
 window.addEventListener('winbeach-lang-change', () => import('../js/page-i18n.js').then((m) => m.applyPageI18n()));
