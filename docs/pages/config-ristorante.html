@@ -10,17 +10,18 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
     .config-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
-    .config-card { background: var(--wb-bg-card, #fff); border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .config-card { background: var(--wb-bg-card, #fff); border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
     .config-card h2 { margin-top: 0; border-bottom: 2px solid var(--wb-accent, #0084FF); padding-bottom: 8px; font-size: 1.2rem; color: var(--wb-text); }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-    .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid var(--wb-border, #ccc); border-radius: 4px; background: var(--wb-bg-input, #fff); color: var(--wb-text); }
+    .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid var(--wb-border, #ccc); border-radius: 4px; background: var(--wb-bg-input, #fff); color: var(--wb-text); box-sizing: border-box; }
     .btn-save { background: var(--wb-accent, #0084FF); color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
     .btn-save:hover { opacity: 0.9; }
-    .data-list { margin-top: 15px; max-height: 150px; overflow-y: auto; border: 1px solid var(--wb-border, #eee); border-radius: 4px; padding: 0; list-style: none; }
-    .data-list li { padding: 8px 12px; border-bottom: 1px solid var(--wb-border, #eee); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-    .data-list li:last-child { border-bottom: none; }
-    .btn-del-item { background: transparent; border: none; color: #ff4d4d; cursor: pointer; }
+    .data-list { margin-top: 15px; max-height: 180px; overflow-y: auto; border: 1px solid var(--wb-border, #eee); border-radius: 4px; padding: 0; list-style: none; flex-grow: 1; }
+    .data-list li { padding: 8px 12px; border-bottom: 1px solid var(--wb-border, #eee); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; background: var(--wb-bg-item, #f9f9f9); margin-bottom: 4px; border-radius: 4px; }
+    .data-list li:last-child { border-bottom: none; margin-bottom: 0; }
+    .btn-del-item { background: transparent; border: none; color: #ff4d4d; cursor: pointer; padding: 4px 8px; font-size: 1rem; }
+    .btn-del-item:hover { color: #cc0000; }
     @media (max-width: 768px) { .config-container { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -34,62 +35,70 @@
   <div class="config-container">
     
     <div class="config-card">
-      <h2><i class="fa-solid fa-house-user"></i> 1. Gestione Sale / Zone</h2>
-      <form id="form-sala">
-        <div class="form-group">
-          <label for="nome-sala">Nome Nuova Sala:</label>
-          <input type="text" id="nome-sala" placeholder="Es: Terrazza Mare, Sala Interna..." required>
-        </div>
-        <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Sala</button>
-      </form>
+      <div>
+        <h2><i class="fa-solid fa-house-user"></i> 1. Gestione Sale / Zone</h2>
+        <form id="form-sala">
+          <div class="form-group">
+            <label for="nome-sala">Nome Nuova Sala:</label>
+            <input type="text" id="nome-sala" placeholder="Es: Terrazza Mare, Sala Interna..." required>
+          </div>
+          <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Sala</button>
+        </form>
+      </div>
       <ul class="data-list" id="lista-sale"></ul>
     </div>
 
     <div class="config-card">
-      <h2><i class="fa-solid fa-circle-dot"></i> 2. Inserimento Tavoli</h2>
-      <form id="form-tavolo">
-        <div class="form-group">
-          <label for="select-sala">Seleziona Sala:</label>
-          <select id="select-sala" required><option value="">Caricamento sale...</option></select>
-        </div>
-        <div class="form-group">
-          <label for="numero-tavolo">Numero o Nome Tavolo:</label>
-          <input type="text" id="numero-tavolo" placeholder="Es: 1, 14, Privè..." required>
-        </div>
-        <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Tavolo</button>
-      </form>
+      <div>
+        <h2><i class="fa-solid fa-circle-dot"></i> 2. Inserimento Tavoli</h2>
+        <form id="form-tavolo">
+          <div class="form-group">
+            <label for="select-sala">Seleziona Sala:</label>
+            <select id="select-sala" required><option value="">Caricamento sale...</option></select>
+          </div>
+          <div class="form-group">
+            <label for="numero-tavolo">Numero o Nome Tavolo:</label>
+            <input type="text" id="numero-tavolo" placeholder="Es: 1, 14, Privè..." required>
+          </div>
+          <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Tavolo</button>
+        </form>
+      </div>
       <ul class="data-list" id="lista-tavoli"></ul>
     </div>
 
     <div class="config-card">
-      <h2><i class="fa-solid fa-tags"></i> 3. Categorie Menu</h2>
-      <form id="form-categoria">
-        <div class="form-group">
-          <label for="nome-categoria">Nome Categoria:</label>
-          <input type="text" id="nome-categoria" placeholder="Es: Antipasti, Primi, Bevande, Bar..." required>
-        </div>
-        <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Categoria</button>
-      </form>
+      <div>
+        <h2><i class="fa-solid fa-tags"></i> 3. Categorie Menu</h2>
+        <form id="form-categoria">
+          <div class="form-group">
+            <label for="nome-categoria">Nome Categoria:</label>
+            <input type="text" id="nome-categoria" placeholder="Es: Antipasti, Primi, Bevande, Bar..." required>
+          </div>
+          <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Categoria</button>
+        </form>
+      </div>
       <ul class="data-list" id="lista-categorie"></ul>
     </div>
 
     <div class="config-card">
-      <h2><i class="fa-solid fa-utensils"></i> 4. Prodotti e Listino Piatti</h2>
-      <form id="form-prodotto">
-        <div class="form-group">
-          <label for="select-categoria">Categoria Prodotto:</label>
-          <select id="select-categoria" required><option value="">Caricamento categorie...</option></select>
-        </div>
-        <div class="form-group">
-          <label for="nome-prodotto">Nome Piatto / Articolo:</label>
-          <input type="text" id="nome-prodotto" placeholder="Es: Spaghetti alle Vongole..." required>
-        </div>
-        <div class="form-group">
-          <label for="prezzo-prodotto">Prezzo di Vendita (€):</label>
-          <input type="number" id="prezzo-prodotto" step="0.01" placeholder="Es: 14.50" required>
-        </div>
-        <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Prodotto al Listino</button>
-      </form>
+      <div>
+        <h2><i class="fa-solid fa-utensils"></i> 4. Prodotti e Listino Piatti</h2>
+        <form id="form-prodotto">
+          <div class="form-group">
+            <label for="select-categoria">Categoria Prodotto:</label>
+            <select id="select-categoria" required><option value="">Caricamento categorie...</option></select>
+          </div>
+          <div class="form-group">
+            <label for="nome-prodotto">Nome Piatto / Articolo:</label>
+            <input type="text" id="nome-prodotto" placeholder="Es: Spaghetti alle Vongole..." required>
+          </div>
+          <div class="form-group">
+            <label for="prezzo-prodotto">Prezzo di Vendita (€):</label>
+            <input type="number" id="prezzo-prodotto" step="0.01" placeholder="Es: 14.50" required>
+          </div>
+          <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Prodotto al Listino</button>
+        </form>
+      </div>
       <ul class="data-list" id="lista-prodotti"></ul>
     </div>
 
@@ -101,19 +110,20 @@
       saveRistoranteItemToDb, 
       deleteRistoranteItemFromDb 
     } from '../js/ristorante-db.js';
-    import { updateDbBar } from '../js/winbeach-module.js';
 
     let dbRistorante = null;
 
-    // Caricamento iniziale dei dati reali persistenti
+    // Caricamento iniziale asincrono dal Database
     async function initConfig() {
       dbRistorante = await loadRistoranteFromDb();
-      if (!dbRistorante) return;
-
+      if (!dbRistorante) {
+        alert("Impossibile connettersi all'archivio ristorante.");
+        return;
+      }
       aggiornaInterfaccia();
-      agganciaEventiElimina();
     }
 
+    // Funzione centrale per rigenerare elementi grafici e selettori
     function aggiornaInterfaccia() {
       renderSale();
       renderTavoli();
@@ -122,21 +132,64 @@
       agganciaEventiElimina();
     }
 
-    // Aggancia i listener di cancellazione sui cestini rossi dinamici
+    // --- 1. RENDERING DELLE SALE ---
+    function renderSale() {
+      const lista = document.getElementById('lista-sale');
+      const select = document.getElementById('select-sala');
+      lista.innerHTML = '';
+      select.innerHTML = '<option value="">-- Seleziona una Sala --</option>';
+
+      dbRistorante.sale.forEach(s => {
+        lista.innerHTML += `<li><span><i class="fa-solid fa-house-user"></i> ${s.nome}</span><button class="btn-del-item" data-tipo="sale" data-id="${s.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+      });
+    }
+
+    // --- 2. RENDERING DEI TAVOLI ---
+    function renderTavoli() {
+      const lista = document.getElementById('lista-tavoli');
+      lista.innerHTML = '';
+      dbRistorante.tavoli.forEach(t => {
+        const sala = dbRistorante.sale.find(s => s.id === t.salaId);
+        const nomeSala = sala ? sala.nome : 'Sconosciuta';
+        lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> <small>(${nomeSala})</small></span><button class="btn-del-item" data-tipo="tavoli" data-id="${t.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+      });
+    }
+
+    // --- 3. RENDERING DELLE CATEGORIE ---
+    function renderCategorie() {
+      const lista = document.getElementById('lista-categorie');
+      const select = document.getElementById('select-categoria');
+      lista.innerHTML = '';
+      select.innerHTML = '<option value="">-- Seleziona una Categoria --</option>';
+
+      dbRistorante.categorie.forEach(c => {
+        lista.innerHTML += `<li><span><i class="fa-solid fa-tag"></i> ${c.nome}</span><button class="btn-del-item" data-tipo="categorie" data-id="${c.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+      });
+    }
+
+    // --- 4. RENDERING DEI PRODOTTI ---
+    function renderProdotti() {
+      const lista = document.getElementById('lista-prodotti');
+      lista.innerHTML = '';
+      dbRistorante.prodotti.forEach(p => {
+        const cat = dbRistorante.categorie.find(c => c.id === p.categoriaId);
+        const nomeCat = cat ? cat.nome : 'Nessuna';
+        lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € <small>(${nomeCat})</small></span><button class="btn-del-item" data-tipo="prodotti" data-id="${p.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+      });
+    }
+
+    // --- ASSOCIAZIONE RIMONA EVENTI (CESTINI) ---
     function agganciaEventiElimina() {
       document.querySelectorAll('.btn-del-item').forEach(btn => {
-        // Rimuove vecchi listener per evitare doppie esecuzioni
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-
-        newBtn.addEventListener('click', async function() {
+        btn.addEventListener('click', async function() {
           const id = Number(this.getAttribute('data-id'));
           const tipo = this.getAttribute('data-tipo');
           
-          if (confirm(`Sei sicuro di voler eliminare questo elemento dall'archivio?`)) {
-            const eliminato = await deleteRistoranteItemFromDb(tipo, id);
-            if (eliminato) {
-              // Ricarica lo stato aggiornato dal modulo del database
+          if (confirm("Vuoi eliminare definitivamente questo elemento dall'archivio?")) {
+            const rimosso = await deleteRistoranteItemFromDb(tipo, id);
+            if (rimosso) {
               dbRistorante = await loadRistoranteFromDb();
               aggiornaInterfaccia();
             }
@@ -145,45 +198,18 @@
       });
     }
 
-    // --- 1. GESTIONE SALE ---
-    function renderSale() {
-      const lista = document.getElementById('lista-sale');
-      const select = document.getElementById('select-sala');
-      lista.innerHTML = '';
-      select.innerHTML = '<option value="">-- Seleziona una Sala --</option>';
-
-      dbRistorante.sale.forEach(s => {
-        lista.innerHTML += `<li><span>${s.nome}</span><button class="btn-del-item" data-tipo="sale" data-id="${s.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
-        select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
-      });
-    }
-
+    // --- GESTIONE INVIO DEI FORM CON SALVATAGGIO PERSISTENTE ---
     document.getElementById('form-sala').addEventListener('submit', async function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-sala').value.trim();
       const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
       
-      const nuovaSala = { id: nuovoId, nome: nome };
-      
-      // Chiamata di salvataggio persistente in archivio
-      const salvato = await saveRistoranteItemToDb('sale', nuovaSala);
-      if (salvato) {
+      if(await saveRistoranteItemToDb('sale', { id: nuovoId, nome: nome })) {
         document.getElementById('nome-sala').value = '';
         dbRistorante = await loadRistoranteFromDb();
         aggiornaInterfaccia();
       }
     });
-
-    // --- 2. GESTIONE TAVOLI ---
-    function renderTavoli() {
-      const lista = document.getElementById('lista-tavoli');
-      lista.innerHTML = '';
-      dbRistorante.tavoli.forEach(t => {
-        const sala = dbRistorante.sale.find(s => s.id === t.salaId);
-        const nomeSala = sala ? sala.nome : 'Sconosciuta';
-        lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> (${nomeSala})</span><button class="btn-del-item" data-tipo="tavoli" data-id="${t.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
-      });
-    }
 
     document.getElementById('form-tavolo').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -191,54 +217,24 @@
       const numero = document.getElementById('numero-tavolo').value.trim();
       const nuovoId = dbRistorante.tavoli.length > 0 ? Math.max(...dbRistorante.tavoli.map(t => t.id)) + 1 : 1;
 
-      const nuovoTavolo = { id: nuovoId, numero: numero, salaId: salaId, stato: 'libero', comanda: [] };
-
-      const salvato = await saveRistoranteItemToDb('tavoli', nuovoTavolo);
-      if (salvato) {
+      if(await saveRistoranteItemToDb('tavoli', { id: nuovoId, numero: numero, salaId: salaId, stato: 'libero', comanda: [] })) {
         document.getElementById('numero-tavolo').value = '';
         dbRistorante = await loadRistoranteFromDb();
         aggiornaInterfaccia();
       }
     });
 
-    // --- 3. GESTIONE CATEGORIE ---
-    function renderCategorie() {
-      const lista = document.getElementById('lista-categorie');
-      const select = document.getElementById('select-categoria');
-      lista.innerHTML = '';
-      select.innerHTML = '<option value="">-- Seleziona una Categoria --</option>';
-
-      dbRistorante.categorie.forEach(c => {
-        lista.innerHTML += `<li><span>${c.nome}</span><button class="btn-del-item" data-tipo="categorie" data-id="${c.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
-        select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
-      });
-    }
-
     document.getElementById('form-categoria').addEventListener('submit', async function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-categoria').value.trim();
       const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
 
-      const nuovaCat = { id: nuovoId, nome: nome };
-
-      const salvato = await saveRistoranteItemToDb('categorie', nuovaCat);
-      if (salvato) {
+      if(await saveRistoranteItemToDb('categorie', { id: nuovoId, nome: nome })) {
         document.getElementById('nome-categoria').value = '';
         dbRistorante = await loadRistoranteFromDb();
         aggiornaInterfaccia();
       }
     });
-
-    // --- 4. GESTIONE PRODOTTI ---
-    function renderProdotti() {
-      const lista = document.getElementById('lista-prodotti');
-      lista.innerHTML = '';
-      dbRistorante.prodotti.forEach(p => {
-        const cat = dbRistorante.categorie.find(c => c.id === p.categoriaId);
-        const nomeCat = cat ? cat.nome : 'Nessuna';
-        lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € (${nomeCat})</span><button class="btn-del-item" data-tipo="prodotti" data-id="${p.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
-      });
-    }
 
     document.getElementById('form-prodotto').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -247,10 +243,7 @@
       const prezzo = Number(document.getElementById('prezzo-prodotto').value);
       const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
 
-      const nuovoProdotto = { id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId };
-
-      const salvato = await saveRistoranteItemToDb('prodotti', nuovoProdotto);
-      if (salvato) {
+      if(await saveRistoranteItemToDb('prodotti', { id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId })) {
         document.getElementById('nome-prodotto').value = '';
         document.getElementById('prezzo-prodotto').value = '';
         dbRistorante = await loadRistoranteFromDb();
@@ -258,7 +251,8 @@
       }
     });
 
-    window.addEventListener('load', initConfig);
+    // Avvio immediato al caricamento
+    window.addEventListener('DOMContentLoaded', initConfig);
   </script>
 </body>
 </html>
