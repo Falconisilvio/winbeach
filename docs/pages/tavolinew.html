@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <script src="../js/theme-init.js"></script>
+  <script src="../js/lang-init.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sala e Tavoli</title>
+  <link rel="stylesheet" href="../css/page.css">
+  <link rel="stylesheet" href="../css/ristorante.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <style>
+    .messaggio-vuoto {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+      background: var(--wb-bg-card, #fff);
+      border-radius: 8px;
+      color: var(--wb-text);
+      font-weight: bold;
+      border: 1px dashed var(--wb-border, #ccc);
+    }
+    .zona-container { margin-bottom: 30px; }
+  </style>
+</head>
+<body class="tavoli-page">
+
+  <div class="header-sala">
+    <h1>Mappa della Sala Ristorante</h1>
+    <p>Seleziona uno dei tavoli disponibili configurati per aprire la comanda touch nel Punto Vendita.</p>
+  </div>
+
+  <div id="mappa-dinamica-sale"></div>
+
+  <script>
+    function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
+
+    function generaMappaTavoli() {
+      const contenitorePrincipale = document.getElementById('mappa-dinamica-sale');
+      if (!contenitorePrincipale) return;
+      
+      contenitorePrincipale.innerHTML = '';
+
+      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+      
+      if (!datiSalvati) {
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto">Nessun dato configurato. Vai nel pannello di configurazione per aggiungere sale e tavoli.</div>`;
+        return;
+      }
+
+      const dbRistorante = JSON.parse(datiSalvati);
+
+      if (!dbRistorante.sale || dbRistorante.sale.length === 0) {
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-house-laptop"></i> Nessuna sala creata. Aggiungi almeno una sala dalla configurazione.</div>`;
+        return;
+      }
+
+      // Genera SOLO le sale salvate nel LocalStorage
+      dbRistorante.sale.forEach(sala => {
+        const zonaDiv = document.createElement('div');
+        zonaDiv.className = 'zona-container';
+        
+        zonaDiv.innerHTML = `
+          <div class="zona-titolo"><i class="fa-solid fa-house-user"></i> ${sala.nome}</div>
+          <div class="sala-grid" id="grid-sala-${sala.id}"></div>
+        `;
+        contenitorePrincipale.appendChild(zonaDiv);
+
+        const grigliaTavoli = document.getElementById(`grid-sala-${sala.id}`);
+        const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => Number(t.salaId) === Number(sala.id)) : [];
+
+        if (tavoliDellaSala.length === 0) {
+          grigliaTavoli.innerHTML = `<p style="padding: 10px; color: gray; font-style: italic;">Nessun tavolo inserito in questa sala.</p>`;
+        } else {
+          tavoliDellaSala.forEach(t => {
+            const isOccupato = t.stato === 'occupato';
+            const statoClasse = isOccupato ? 'occupato' : '';
+            const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
+            const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+            const nomeVisualizzato = `${wbT('tavoli.table')} ${t.numero}`;
+
+            grigliaTavoli.innerHTML += `
+              <div class="tavolo-card ${statoClasse}" onclick="selezionaTavolo('${t.id}', '${nomeVisualizzato.replace(/'/g, "\\'")}')">
+                <i class="fa-solid ${icona}"></i>
+                <h3>Tavolo ${t.numero}</h3>
+                <small>${statoTesto}</small>
+              </div>`;
+          });
+        }
+      });
+    }
+
+    function selezionaTavolo(idTavolo, nomeTavolo) {
+      localStorage.setItem('tavoloSelezionatoId', idTavolo);
+      localStorage.setItem('tavoloSelezionato', nomeTavolo);
+      window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+    }
+
+    window.addEventListener('pageshow', generaMappaTavoli);
+    window.addEventListener('winbeach-lang-change', () => { generaMappaTavoli(); });
+    window.onload = generaMappaTavoli;
+  </script>
+</body>
+</html>
