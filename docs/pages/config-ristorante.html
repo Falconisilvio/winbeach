@@ -72,7 +72,7 @@
         <form id="form-categoria">
           <div class="form-group">
             <label for="nome-categoria">Nome Categoria:</label>
-            <input type="text" id="nome-categoria" placeholder="Es: Antipasti, Primi, Bevande, Bar..." required>
+            <input type="text" id="nome-categoria" placeholder="Es: Antipasti, Pizze, Primi, Bevande..." required>
           </div>
           <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Categoria</button>
         </form>
@@ -90,11 +90,11 @@
           </div>
           <div class="form-group">
             <label for="nome-prodotto">Nome Piatto / Articolo:</label>
-            <input type="text" id="nome-prodotto" placeholder="Es: Spaghetti alle Vongole..." required>
+            <input type="text" id="nome-prodotto" placeholder="Es: Margherita, Spaghetti..." required>
           </div>
           <div class="form-group">
             <label for="prezzo-prodotto">Prezzo di Vendita (€):</label>
-            <input type="number" id="prezzo-prodotto" step="0.01" placeholder="Es: 14.50" required>
+            <input type="number" id="prezzo-prodotto" step="0.01" placeholder="Es: 6.50" required>
           </div>
           <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Prodotto al Listino</button>
         </form>
@@ -110,16 +110,14 @@
 
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
-      
-      // MODIFICA: Se la chiave esiste (anche se contiene liste vuote), usa quella e NON sovrascrivere!
       if (datiSalvati !== null) {
         dbRistorante = JSON.parse(datiSalvati);
+        if(!dbRistorante.sale) dbRistorante.sale = [];
+        if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
+        if(!dbRistorante.categorie) dbRistorante.categorie = [];
+        if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
       } else {
-        // Questa configurazione iniziale avviene UNA VOLTA SOLA in assoluto se il localStorage è immacolato
-        dbRistorante.sale = [{ id: 1, nome: "Sala Interna" }];
-        dbRistorante.tavoli = [];
-        dbRistorante.categorie = [];
-        dbRistorante.prodotti = [];
+        dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
         salvaNelStorage();
       }
       aggiornaInterfaccia();
@@ -141,25 +139,20 @@
       const select = document.getElementById('select-sala');
       lista.innerHTML = '';
       select.innerHTML = '<option value="">-- Seleziona una Sala --</option>';
-
-      if(dbRistorante.sale) {
-        dbRistorante.sale.forEach(s => {
-          lista.innerHTML += `<li><span><i class="fa-solid fa-house-user"></i> ${s.nome}</span><button class="btn-del-item" onclick="eliminaVoce('sale', ${s.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-          select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
-        });
-      }
+      dbRistorante.sale.forEach(s => {
+        lista.innerHTML += `<li><span><i class="fa-solid fa-house-user"></i> ${s.nome}</span><button class="btn-del-item" onclick="eliminaVoce('sale', ${s.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+      });
     }
 
     function renderTavoli() {
       const lista = document.getElementById('lista-tavoli');
       lista.innerHTML = '';
-      if(dbRistorante.tavoli) {
-        dbRistorante.tavoli.forEach(t => {
-          const sala = dbRistorante.sale.find(s => s.id === t.salaId);
-          const nomeSala = sala ? sala.nome : 'Sconosciuta';
-          lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> <small>(${nomeSala})</small></span><button class="btn-del-item" onclick="eliminaVoce('tavoli', ${t.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-        });
-      }
+      dbRistorante.tavoli.forEach(t => {
+        const sala = dbRistorante.sale.find(s => s.id === t.salaId);
+        const nomeSala = sala ? sala.nome : 'Sconosciuta';
+        lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> <small>(${nomeSala})</small></span><button class="btn-del-item" onclick="eliminaVoce('tavoli', ${t.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+      });
     }
 
     function renderCategorie() {
@@ -167,32 +160,24 @@
       const select = document.getElementById('select-categoria');
       lista.innerHTML = '';
       select.innerHTML = '<option value="">-- Seleziona una Categoria --</option>';
-
-      if(dbRistorante.categorie) {
-        dbRistorante.categorie.forEach(c => {
-          lista.innerHTML += `<li><span><i class="fa-solid fa-tag"></i> ${c.nome}</span><button class="btn-del-item" onclick="eliminaVoce('categorie', ${c.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-          select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
-        });
-      }
+      dbRistorante.categorie.forEach(c => {
+        lista.innerHTML += `<li><span><i class="fa-solid fa-tag"></i> ${c.nome}</span><button class="btn-del-item" onclick="eliminaVoce('categorie', ${c.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        // CORREZIONE: Usiamo il nome o ID testuale per fare match con la cassa
+        select.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+      });
     }
 
     function renderProdotti() {
       const lista = document.getElementById('lista-prodotti');
       lista.innerHTML = '';
-      if(dbRistorante.prodotti) {
-        dbRistorante.prodotti.forEach(p => {
-          const cat = dbRistorante.categorie.find(c => c.id === p.categoriaId);
-          const nomeCat = cat ? cat.nome : 'Nessuna';
-          lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € <small>(${nomeCat})</small></span><button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-        });
-      }
+      dbRistorante.prodotti.forEach(p => {
+        lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${Number(p.prezzo).toFixed(2)} € <small>(${p.categoriaId})</small></span><button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+      });
     }
 
     function eliminaVoce(tipo, id) {
       if (confirm("Vuoi eliminare definitivamente questo elemento?")) {
         dbRistorante[tipo] = dbRistorante[tipo].filter(x => x.id !== id);
-        if (tipo === 'sale') dbRistorante.tavoli = dbRistorante.tavoli.filter(t => t.salaId !== id);
-        if (tipo === 'categorie') dbRistorante.prodotti = dbRistorante.prodotti.filter(p => p.categoriaId !== id);
         salvaNelStorage();
         aggiornaInterfaccia();
       }
@@ -201,9 +186,7 @@
     document.getElementById('form-sala').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-sala').value.trim();
-      if(!dbRistorante.sale) dbRistorante.sale = [];
       const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
-      
       dbRistorante.sale.push({ id: nuovoId, nome: nome });
       document.getElementById('nome-sala').value = '';
       salvaNelStorage();
@@ -214,10 +197,8 @@
       e.preventDefault();
       const salaId = Number(document.getElementById('select-sala').value);
       const numero = document.getElementById('numero-tavolo').value.trim();
-      if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
       const nuovoId = dbRistorante.tavoli.length > 0 ? Math.max(...dbRistorante.tavoli.map(t => t.id)) + 1 : 1;
-
-      dbRistorante.tavoli.push({ id: nuovoId, numero: numero, salaId: salaId, stato: 'libero', comanda: [] });
+      dbRistorante.tavoli.push({ id: nuovoId, numero: numero, salaId: salaId, stato: 'libero' });
       document.getElementById('numero-tavolo').value = '';
       salvaNelStorage();
       aggiornaInterfaccia();
@@ -226,9 +207,7 @@
     document.getElementById('form-categoria').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-categoria').value.trim();
-      if(!dbRistorante.categorie) dbRistorante.categorie = [];
       const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
-
       dbRistorante.categorie.push({ id: nuovoId, nome: nome });
       document.getElementById('nome-categoria').value = '';
       salvaNelStorage();
@@ -237,13 +216,12 @@
 
     document.getElementById('form-prodotto').addEventListener('submit', function(e) {
       e.preventDefault();
-      const categoriaId = Number(document.getElementById('select-categoria').value);
+      const categoriaNome = document.getElementById('select-categoria').value; 
       const nome = document.getElementById('nome-prodotto').value.trim();
       const prezzo = Number(document.getElementById('prezzo-prodotto').value);
-      if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
       const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
 
-      dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId });
+      dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome });
       document.getElementById('nome-prodotto').value = '';
       document.getElementById('prezzo-prodotto').value = '';
       salvaNelStorage();
