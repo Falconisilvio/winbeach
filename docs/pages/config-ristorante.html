@@ -105,33 +105,21 @@
   </div>
 
   <script>
-    // Database locale centralizzato integrato nello script standard
     let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     const LOCAL_STORAGE_KEY = 'winbeach_archivio_ristorante';
 
-    // 1. Caricamento dati iniziale sicuro
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (datiSalvati) {
+      
+      // MODIFICA: Se la chiave esiste (anche se contiene liste vuote), usa quella e NON sovrascrivere!
+      if (datiSalvati !== null) {
         dbRistorante = JSON.parse(datiSalvati);
       } else {
-        // Valori di esempio iniziali
-        dbRistorante.sale = [
-          { id: 1, nome: "Sala Interna" },
-          { id: 2, nome: "Terrazza Mare" }
-        ];
-        dbRistorante.tavoli = [
-          { id: 101, numero: "1", salaId: 1, stato: "libero", comanda: [] },
-          { id: 102, numero: "2", salaId: 1, stato: "libero", comanda: [] }
-        ];
-        dbRistorante.categorie = [
-          { id: 10, nome: "Ristorante" },
-          { id: 11, nome: "Bevande" }
-        ];
-        dbRistorante.prodotti = [
-          { id: 50, nome: "Acqua Minerale 1L", prezzo: 2.50, categoriaId: 11 },
-          { id: 51, nome: "Spaghetti allo Scoglio", prezzo: 15.00, categoriaId: 10 }
-        ];
+        // Questa configurazione iniziale avviene UNA VOLTA SOLA in assoluto se il localStorage è immacolato
+        dbRistorante.sale = [{ id: 1, nome: "Sala Interna" }];
+        dbRistorante.tavoli = [];
+        dbRistorante.categorie = [];
+        dbRistorante.prodotti = [];
         salvaNelStorage();
       }
       aggiornaInterfaccia();
@@ -141,7 +129,6 @@
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbRistorante));
     }
 
-    // 2. Funzioni di Rendering Grafico
     function aggiornaInterfaccia() {
       renderSale();
       renderTavoli();
@@ -155,20 +142,24 @@
       lista.innerHTML = '';
       select.innerHTML = '<option value="">-- Seleziona una Sala --</option>';
 
-      dbRistorante.sale.forEach(s => {
-        lista.innerHTML += `<li><span><i class="fa-solid fa-house-user"></i> ${s.nome}</span><button class="btn-del-item" onclick="eliminaVoce('sale', ${s.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-        select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
-      });
+      if(dbRistorante.sale) {
+        dbRistorante.sale.forEach(s => {
+          lista.innerHTML += `<li><span><i class="fa-solid fa-house-user"></i> ${s.nome}</span><button class="btn-del-item" onclick="eliminaVoce('sale', ${s.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+          select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+        });
+      }
     }
 
     function renderTavoli() {
       const lista = document.getElementById('lista-tavoli');
       lista.innerHTML = '';
-      dbRistorante.tavoli.forEach(t => {
-        const sala = dbRistorante.sale.find(s => s.id === t.salaId);
-        const nomeSala = sala ? sala.nome : 'Sconosciuta';
-        lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> <small>(${nomeSala})</small></span><button class="btn-del-item" onclick="eliminaVoce('tavoli', ${t.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-      });
+      if(dbRistorante.tavoli) {
+        dbRistorante.tavoli.forEach(t => {
+          const sala = dbRistorante.sale.find(s => s.id === t.salaId);
+          const nomeSala = sala ? sala.nome : 'Sconosciuta';
+          lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> <small>(${nomeSala})</small></span><button class="btn-del-item" onclick="eliminaVoce('tavoli', ${t.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        });
+      }
     }
 
     function renderCategorie() {
@@ -177,39 +168,40 @@
       lista.innerHTML = '';
       select.innerHTML = '<option value="">-- Seleziona una Categoria --</option>';
 
-      dbRistorante.categorie.forEach(c => {
-        lista.innerHTML += `<li><span><i class="fa-solid fa-tag"></i> ${c.nome}</span><button class="btn-del-item" onclick="eliminaVoce('categorie', ${c.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-        select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
-      });
+      if(dbRistorante.categorie) {
+        dbRistorante.categorie.forEach(c => {
+          lista.innerHTML += `<li><span><i class="fa-solid fa-tag"></i> ${c.nome}</span><button class="btn-del-item" onclick="eliminaVoce('categorie', ${c.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+          select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+        });
+      }
     }
 
     function renderProdotti() {
       const lista = document.getElementById('lista-prodotti');
       lista.innerHTML = '';
-      dbRistorante.prodotti.forEach(p => {
-        const cat = dbRistorante.categorie.find(c => c.id === p.categoriaId);
-        const nomeCat = cat ? cat.nome : 'Nessuna';
-        lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € <small>(${nomeCat})</small></span><button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
-      });
+      if(dbRistorante.prodotti) {
+        dbRistorante.prodotti.forEach(p => {
+          const cat = dbRistorante.categorie.find(c => c.id === p.categoriaId);
+          const nomeCat = cat ? cat.nome : 'Nessuna';
+          lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € <small>(${nomeCat})</small></span><button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        });
+      }
     }
 
-    // 3. Gestione Eliminazione
     function eliminaVoce(tipo, id) {
-      if (confirm("Vuoi eliminare definitivamente questo elemento dall'archivio?")) {
+      if (confirm("Vuoi eliminare definitivamente questo elemento?")) {
         dbRistorante[tipo] = dbRistorante[tipo].filter(x => x.id !== id);
-        
         if (tipo === 'sale') dbRistorante.tavoli = dbRistorante.tavoli.filter(t => t.salaId !== id);
         if (tipo === 'categorie') dbRistorante.prodotti = dbRistorante.prodotti.filter(p => p.categoriaId !== id);
-        
         salvaNelStorage();
         aggiornaInterfaccia();
       }
     }
 
-    // 4. Inserimenti dai Moduli Form
     document.getElementById('form-sala').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-sala').value.trim();
+      if(!dbRistorante.sale) dbRistorante.sale = [];
       const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
       
       dbRistorante.sale.push({ id: nuovoId, nome: nome });
@@ -222,6 +214,7 @@
       e.preventDefault();
       const salaId = Number(document.getElementById('select-sala').value);
       const numero = document.getElementById('numero-tavolo').value.trim();
+      if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
       const nuovoId = dbRistorante.tavoli.length > 0 ? Math.max(...dbRistorante.tavoli.map(t => t.id)) + 1 : 1;
 
       dbRistorante.tavoli.push({ id: nuovoId, numero: numero, salaId: salaId, stato: 'libero', comanda: [] });
@@ -233,6 +226,7 @@
     document.getElementById('form-categoria').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-categoria').value.trim();
+      if(!dbRistorante.categorie) dbRistorante.categorie = [];
       const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
 
       dbRistorante.categorie.push({ id: nuovoId, nome: nome });
@@ -246,16 +240,16 @@
       const categoriaId = Number(document.getElementById('select-categoria').value);
       const nome = document.getElementById('nome-prodotto').value.trim();
       const prezzo = Number(document.getElementById('prezzo-prodotto').value);
+      if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
       const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
 
-      dbRistorante.prodotti.push({ id: nuevoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId });
+      dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId });
       document.getElementById('nome-prodotto').value = '';
       document.getElementById('prezzo-prodotto').value = '';
       salvaNelStorage();
       aggiornaInterfaccia();
     });
 
-    // Avvio immediato e sicuro senza moduli esterni
     window.addEventListener('DOMContentLoaded', inizializzaDatabaseLocale);
   </script>
 </body>
