@@ -372,3 +372,37 @@ window.addEventListener('message', function (event) {
         if (voceMenu) voceMenu.classList.add('active-item');
     }
 });
+
+
+<script type="module">
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnRistorante = document.getElementById('btn-sidebar-ristorante');
+        
+        if (btnRistorante) {
+            btnRistorante.addEventListener('click', function() {
+                // 1. Rimuove lo stato attivo dalle altre icone della sidebar e lo dà a questa
+                document.querySelectorAll('.sidebar .icon').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+
+                // 2. Se il leftmenu usa una classe per aprirsi/mostrarsi (es. sui dispositivi mobili)
+                // assicurati di aprirlo. Spesso basta attivare la visualizzazione o togliere classi "hidden".
+                const leftMenu = document.querySelector('.leftmenu');
+                if (leftMenu) {
+                    leftMenu.classList.add('open'); // O la classe che usate nel CSS per mostrare il menu
+                }
+
+                // 3. Trova la voce "Ristorante & Bar" nel leftmenu e falla scorrere in vista (se c'è lo scroll)
+                const voceRistoranteMenu = document.querySelector('.leftmenu li.group[data-page="tavoli"]');
+                if (voceRistoranteMenu) {
+                    voceRistoranteMenu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    // Opzionale: aggiungi un breve effetto visivo (es. un lampeggio) per far capire all'utente dove guardare
+                    voceRistoranteMenu.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    setTimeout(() => {
+                        voceRistoranteMenu.style.backgroundColor = '';
+                    }, 1000);
+                }
+            });
+        }
+    });
+</script>
