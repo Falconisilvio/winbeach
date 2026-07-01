@@ -30,6 +30,7 @@
     <p>Seleziona uno dei tavoli disponibili configurati per aprire la comanda touch nel Punto Vendita.</p>
   </div>
 
+  <!-- Questo è l'unico contenitore: qui dentro verranno create SOLO le tue sale reali -->
   <div id="mappa-dinamica-sale"></div>
 
   <script>
@@ -56,10 +57,12 @@
         return;
       }
 
-      // Cicla ed esegue il rendering delle sole sale salvate dall'utente
+      // Disegna ESCLUSIVAMENTE le sale inserite da te nel pannello di configurazione
       dbRistorante.sale.forEach(sala => {
         const zonaDiv = document.createElement('div');
         zonaDiv.className = 'zona-container';
+        
+        // Qui prende il nome reale (es. Sala Primo Piano)
         zonaDiv.innerHTML = `
           <div class="zona-titolo"><i class="fa-solid fa-house-user"></i> ${sala.nome}</div>
           <div class="sala-grid" id="grid-sala-${sala.id}"></div>
@@ -67,7 +70,7 @@
         contenitorePrincipale.appendChild(zonaDiv);
 
         const grigliaTavoli = document.getElementById(`grid-sala-${sala.id}`);
-        const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => t.salaId === sala.id) : [];
+        const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => Number(t.salaId) === Number(sala.id)) : [];
 
         if (tavoliDellaSala.length === 0) {
           grigliaTavoli.innerHTML = `<p style="padding: 10px; color: gray; font-style: italic;">Nessun tavolo inserito in questa sala.</p>`;
@@ -96,8 +99,7 @@
       window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
     }
 
-    // --- CORREZIONE CRUCIALE PER ABBATTERE LA CACHE DEL NAVIGATORE ---
-    // Questo evento scatta SEMPRE quando la pagina viene mostrata (anche tornando indietro o cambiando scheda)
+    // Forza il ricaricamento dei dati puliti ad ogni accesso visivo alla pagina
     window.addEventListener('pageshow', function(event) {
       generaMappaTavoli();
     });
