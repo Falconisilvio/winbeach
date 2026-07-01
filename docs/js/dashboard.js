@@ -22,7 +22,32 @@ function setupAppNavigation() {
 
     // 1. Gestione Clic sulle Icone della Sidebar (Sinistra Esterna)
     sidebarIcons.forEach(function(icon) {
-        icon.addEventListener("click", function() {
+        icon.addEventListener("click", function(e) {
+            
+            // CONTROLLO PULSANTE RISTORANTE (Evita il 404 e muove solo il menu interno)
+            if (this.id === 'btn-sidebar-ristorante') {
+                e.preventDefault();
+                e.stopPropagation();
+
+                sidebarIcons.forEach(i => i.classList.remove("active"));
+                this.classList.add("active");
+
+                const leftMenu = document.querySelector('.leftmenu');
+                if (leftMenu) leftMenu.classList.add('open');
+
+                const voceRistoranteMenu = document.querySelector('.leftmenu li.group[data-page="tavoli"]');
+                if (voceRistoranteMenu) {
+                    voceRistoranteMenu.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    voceRistoranteMenu.style.transition = 'background-color 0.3s';
+                    voceRistoranteMenu.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                    setTimeout(() => {
+                        voceRistoranteMenu.style.backgroundColor = '';
+                    }, 1000);
+                }
+                return; // Ferma il codice qui per l'icona ristorante
+            }
+
+            // Comportamento standard per le altre icone della sidebar
             sidebarIcons.forEach(i => i.classList.remove("active"));
             this.classList.add("active");
 
@@ -40,7 +65,7 @@ function setupAppNavigation() {
             } else if (page === "dashboard") {
                 submenuImpostazioni.classList.remove("show");
                 caricaProceduraEsterna("dashboard");
-            } else {
+            } else if (page) {
                 submenuImpostazioni.classList.remove("show");
                 caricaProceduraEsterna(page);
             }
@@ -50,7 +75,6 @@ function setupAppNavigation() {
     // 2. Gestione Clic su tutte le voci del Menu Testuale (Sinistra Interna)
     clickableMenuItems.forEach(function(item) {
         item.addEventListener("click", function() {
-            // Rimuove la selezione grafica da tutte le altre scritte
             document.querySelectorAll(".leftmenu ul li").forEach(li => li.classList.remove("active-item"));
             this.classList.add("active-item");
 
@@ -87,7 +111,8 @@ function setupAppNavigation() {
         btnNuova.addEventListener("click", function() {
             caricaProceduraEsterna("booking");
             sidebarIcons.forEach(i => i.classList.remove("active"));
-            document.querySelector('.sidebar .icon[data-page="booking"]').classList.add("active");
+            const bookingIcon = document.querySelector('.sidebar .icon[data-page="booking"]');
+            if (bookingIcon) bookingIcon.classList.add("active");
         });
     }
 }
@@ -174,7 +199,7 @@ window.caricaProceduraEsterna = function caricaProceduraEsterna(nomePagina, opts
         if (iconPage) {
             sidebarIcons.forEach((i) => i.classList.remove("active"));
             const icon = document.querySelector(`.sidebar .icon[data-page="${iconPage}"]`);
-            if (icon) icon.classList.add("active");
+            if (icon) icon.add("active");
             if (submenuImpostazioni) submenuImpostazioni.classList.remove("show");
         }
     }
@@ -220,6 +245,7 @@ function mergeChartOptions(extra = {}) {
     };
 }
 
+// Interfaccia i18n etichette
 function chartLabels() {
     const T = window.__wbT || ((k) => k);
     return {
@@ -361,7 +387,6 @@ function animateNumbers() {
     });
 }
 
-
 // Cambio pagina da moduli figli (es. tavoli → cassa ristorante)
 window.addEventListener('message', function (event) {
     if (event.data && event.data.comando === 'cambiaPagina') {
@@ -372,37 +397,3 @@ window.addEventListener('message', function (event) {
         if (voceMenu) voceMenu.classList.add('active-item');
     }
 });
-
-
-<script type="module">
-    document.addEventListener('DOMContentLoaded', () => {
-        const btnRistorante = document.getElementById('btn-sidebar-ristorante');
-        
-        if (btnRistorante) {
-            btnRistorante.addEventListener('click', function() {
-                // 1. Rimuove lo stato attivo dalle altre icone della sidebar e lo dà a questa
-                document.querySelectorAll('.sidebar .icon').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-
-                // 2. Se il leftmenu usa una classe per aprirsi/mostrarsi (es. sui dispositivi mobili)
-                // assicurati di aprirlo. Spesso basta attivare la visualizzazione o togliere classi "hidden".
-                const leftMenu = document.querySelector('.leftmenu');
-                if (leftMenu) {
-                    leftMenu.classList.add('open'); // O la classe che usate nel CSS per mostrare il menu
-                }
-
-                // 3. Trova la voce "Ristorante & Bar" nel leftmenu e falla scorrere in vista (se c'è lo scroll)
-                const voceRistoranteMenu = document.querySelector('.leftmenu li.group[data-page="tavoli"]');
-                if (voceRistoranteMenu) {
-                    voceRistoranteMenu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    
-                    // Opzionale: aggiungi un breve effetto visivo (es. un lampeggio) per far capire all'utente dove guardare
-                    voceRistoranteMenu.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    setTimeout(() => {
-                        voceRistoranteMenu.style.backgroundColor = '';
-                    }, 1000);
-                }
-            });
-        }
-    });
-</script>
