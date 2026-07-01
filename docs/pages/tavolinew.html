@@ -42,7 +42,6 @@
 
   <div id="mappa-dinamica-sale"></div>
 
-  <!-- MENU POPUP DINAMICO -->
   <div id="custom-popup-menu" class="popup-menu-tavolo">
     <button id="btn-popup-apri" onclick="azioneMenu('apri')"><i class="fa-solid fa-folder-open" style="color: #2e7d32;"></i> Apri tavolo</button>
     <button id="btn-popup-comanda" onclick="azioneMenu('comanda')"><i class="fa-solid fa-utensils" style="color: #0288d1;"></i> Comanda</button>
@@ -51,7 +50,6 @@
     <button id="btn-popup-chiudi" onclick="azioneMenu('chiudi')" class="opzione-chiudi"><i class="fa-solid fa-cash-register"></i> Chiudi Tavolo</button>
   </div>
 
-  <!-- DIALOG SPOSTA TAVOLO -->
   <dialog id="dialog-sposta">
     <h3>Sposta Comanda</h3>
     <p>Seleziona il tavolo di destinazione libero:</p>
@@ -62,7 +60,6 @@
     </div>
   </dialog>
 
-  <!-- DIALOG UNISCI TAVOLI -->
   <dialog id="dialog-unisci">
     <h3>Unisci Tavoli</h3>
     <p>Seleziona i tavoli da unire a questo conto:</p>
@@ -86,7 +83,7 @@
 
       const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
       if (!datiSalvati) {
-        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-triangle-exclamation"></i> Nessuna configurazione trovata. Salva le sale dal pannello.</div>`;
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-triangle-exclamation"></i> Nessuna configurazione trouvata. Salva le sale dal pannello.</div>`;
         return;
       }
 
@@ -146,7 +143,6 @@
     function mostraPopup(e, isOccupato) {
       const menu = document.getElementById('custom-popup-menu');
       
-      // MOSTRA / NASCONDE LE VOCI IN BASE ALLO STATO DEL TAVOLO
       document.getElementById('btn-popup-apri').style.display = isOccupato ? 'none' : 'flex';
       document.getElementById('btn-popup-comanda').style.display = isOccupato ? 'flex' : 'none';
       document.getElementById('btn-popup-sposta').style.display = isOccupato ? 'flex' : 'none';
@@ -176,11 +172,15 @@
         generaMappaTavoli();
       } else if (tipo === 'comanda' || tipo === 'chiudi') {
         localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
+        
+        // 1. Invia il messaggio al parent per caricare il POS
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
-        } else {
-          window.location.href = 'pointsale.html';
         }
+        
+        // 2. Forza il caricamento se l'app gira in modalità standalone diretta (stessa cartella)
+        window.location.href = "pointsale.html";
+        
       } else if (tipo === 'sposta') {
         apriSpostaTavolo();
       } else if (tipo === 'unisci') {
@@ -203,19 +203,16 @@
       if (!destId) return;
       const sorgId = tavoloSelezionatoCorrente.id;
 
-      // Sposta dati localStorage
       localStorage.setItem(`ora_apertura_tavolo_${destId}`, localStorage.getItem(`ora_apertura_tavolo_${sorgId}`));
       localStorage.setItem(`carrello_tavolo_${destId}`, localStorage.getItem(`carrello_tavolo_${sorgId}`));
       localStorage.setItem(`coperti_tavolo_${destId}`, localStorage.getItem(`coperti_tavolo_${sorgId}`) || "1");
       localStorage.setItem(`tavoli_uniti_a_${destId}`, localStorage.getItem(`tavoli_uniti_a_${sorgId}`) || "[]");
 
-      // Rimuove vecchi
       localStorage.removeItem(`ora_apertura_tavolo_${sorgId}`);
       localStorage.removeItem(`carrello_tavolo_${sorgId}`);
       localStorage.removeItem(`coperti_tavolo_${sorgId}`);
       localStorage.removeItem(`tavoli_uniti_a_${sorgId}`);
 
-      // Aggiorna stati DB
       dbRistorante.tavoli = dbRistorante.tavoli.map(t => {
         if (t.id === sorgId) return { ...t, stato: 'libero' };
         if (String(t.id) === String(destId)) return { ...t, stato: 'occupato' };
