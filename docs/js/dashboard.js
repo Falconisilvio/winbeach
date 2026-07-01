@@ -23,6 +23,43 @@ function setupAppNavigation() {
     // 1. Gestione Clic sulle Icone della Sidebar (Sinistra Esterna)
     sidebarIcons.forEach(function(icon) {
         icon.addEventListener("click", function(e) {
+            const page = this.getAttribute("data-page");
+
+            // --- INTERCETTAZIONE ICONA RISTORANTE (Previene il 404 e muove solo il menu interno) ---
+            if (page === "tavoli" || this.id === "btn-sidebar-ristorante" || this.classList.contains("ristorante")) {
+                e.preventDefault();
+                e.stopPropagation(); // Blocca l'evento per evitare che scatti altra logica
+
+                // Cambia lo stato attivo solo sulle icone della sidebar
+                sidebarIcons.forEach(i => i.classList.remove("active"));
+                this.classList.add("active");
+
+                if (submenuImpostazioni) submenuImpostazioni.classList.remove("show");
+
+                // Cerca l'elemento del menu interno in 3 modi diversi per essere sicuri al 100% di trovarlo
+                let voceRistoranteMenu = document.querySelector('.leftmenu [data-page="tavoli"]') 
+                                      || document.getElementById('menu-item-ristorante')
+                                      || Array.from(document.querySelectorAll('.leftmenu .group, .leftmenu li')).find(el => el.textContent.includes('Ristorante'));
+
+                if (voceRistoranteMenu) {
+                    // Fa scorrere il leftmenu fino a far vedere la voce del ristorante al centro
+                    voceRistoranteMenu.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Effetto feedback visivo temporaneo (lampeggio) per l'utente
+                    voceRistoranteMenu.style.transition = 'background-color 0.3s, transform 0.3s';
+                    voceRistoranteMenu.style.backgroundColor = 'rgba(255, 255, 255, 0.25)';
+                    voceRistoranteMenu.style.transform = 'scale(1.02)';
+                    
+                    setTimeout(() => {
+                        voceRistoranteMenu.style.backgroundColor = '';
+                        voceRistoranteMenu.style.transform = '';
+                    }, 1000);
+                }
+                return; // INTERROMPE IL COLO: non tocca l'area di destra, non apre iframe, evita il 404
+            }
+            // --- FINE INTERCETTAZIONE RISTORANTE ---
+
+            // Comportamento standard per tutte le altre icone della sidebar
             sidebarIcons.forEach(i => i.classList.remove("active"));
             this.classList.add("active");
 
@@ -32,39 +69,13 @@ function setupAppNavigation() {
             if (overlay) overlay.classList.remove("show");
             document.body.classList.remove("menu-lock");
 
-            const page = this.getAttribute("data-page");
-
-            // --- NUOVO CONTROLLO INTERCETTAZIONE RISTORANTE & BAR ---
-            if (page === "tavoli") {
-                e.preventDefault();
-                
-                // Chiude il sottomenu impostazioni se era aperto
-                if (submenuImpostazioni) submenuImpostazioni.classList.remove("show");
-
-                // Trova il sottomenu "Ristorante & Bar" nel leftmenu (la voce evidenziata in giallo)
-                const voceRistoranteMenu = document.querySelector('.leftmenu li.group[data-page="tavoli"]');
-                if (voceRistoranteMenu) {
-                    // Fa scorrere fluidamente la colonna fino alla sezione corretta
-                    voceRistoranteMenu.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // Applica un leggero lampeggio per catturare lo sguardo dell'utente
-                    voceRistoranteMenu.style.transition = 'background-color 0.3s';
-                    voceRistoranteMenu.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
-                    setTimeout(() => {
-                        voceRistoranteMenu.style.backgroundColor = '';
-                    }, 1000);
-                }
-                return; // IMPORTANTE: Interrompe l'esecuzione qui per evitare il caricamento della pagina e il 404
-            }
-            // --- FINE NUOVO CONTROLLO ---
-
             if (page === "impostazioni") {
                 submenuImpostazioni.classList.add("show");
                 submenuImpostazioni.scrollIntoView({ behavior: 'smooth', block: 'end' });
             } else if (page === "dashboard") {
                 submenuImpostazioni.classList.remove("show");
                 caricaProceduraEsterna("dashboard");
-            } else {
+            } else if (page) {
                 submenuImpostazioni.classList.remove("show");
                 caricaProceduraEsterna(page);
             }
@@ -74,7 +85,6 @@ function setupAppNavigation() {
     // 2. Gestione Clic su tutte le voci del Menu Testuale (Sinistra Interna)
     clickableMenuItems.forEach(function(item) {
         item.addEventListener("click", function() {
-            // Rimuove la selezione grafica da tutte le altre scritte
             document.querySelectorAll(".leftmenu ul li").forEach(li => li.classList.remove("active-item"));
             this.classList.add("active-item");
 
