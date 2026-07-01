@@ -14,70 +14,87 @@
 
   <div class="header-sala">
     <h1>Mappa della Sala Ristorante</h1>
-    <p>Seleziona uno dei 50 tavoli disponibili per aprire la comanda touch nel Punto Vendita.</p>
+    <p>Seleziona un tavolo dall'archivio per aprire la comanda touch nel Punto Vendita.</p>
   </div>
 
-  <div class="zona-titolo"><i class="fa-solid fa-house-user"></i> Sala Interna</div>
-  <div class="sala-grid" id="zona-interna"></div>
+  <div id="sale-container">
+    <div class="loading-db" style="text-align: center; padding: 20px; color: var(--wb-text-muted);">
+      <i class="fa-solid fa-spinner fa-spin"></i> Caricamento tavoli dall'archivio...
+    </div>
+  </div>
 
-  <div class="zona-titolo"><i class="fa-solid fa-cloud-sun"></i> Terrazza Vista Mare</div>
-  <div class="sala-grid" id="zona-terrazza"></div>
+  <script type="module">
+    import { getToken } from '../js/winbeach-db.js';
+    import { applyReadOnlyMode, onAuthChange } from '../js/winbeach-auth.js';
+    import { $ } from '../js/winbeach-module.js';
+    import { loadRistoranteFromDb, getTavoliDivisiPerSale } from '../js/ristorante-db.js';
 
-  <div class="zona-titolo"><i class="fa-solid fa-tree"></i> Giardino</div>
-  <div class="sala-grid" id="zona-giardino"></div>
-
-  <div class="zona-titolo"><i class="fa-solid fa-umbrella-beach"></i> Gazebo Beach</div>
-  <div class="sala-grid" id="zona-gazebo"></div>
-
-  <script>
     function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
-    function generaMappaTavoli() {
-      const interna = document.getElementById('zona-interna');
-      const terrazza = document.getElementById('zona-terrazza');
-      const giardino = document.getElementById('zona-giardino');
-      const gazebo = document.getElementById('zona-gazebo');
-      [interna, terrazza, giardino, gazebo].forEach((z) => { if (z) z.innerHTML = ''; });
-
-      for (let i = 1; i <= 50; i++) {
-        const isOccupato = Math.random() < 0.35;
-        const statoClasse = isOccupato ? 'occupato' : '';
-        const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
-        const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
-        const nome = `${wbT('tavoli.table')} ${i}`;
-
-        const tavoloHTML = `
-          <div class="tavolo-card ${statoClasse}" onclick="selezionaTavolo('${nome.replace(/'/g, "\\'")}')">
-            <i class="fa-solid ${icona}"></i>
-            <h3>${nome}</h3>
-            <small>${statoTesto}</small>
-          </div>`;
-
-        if (i <= 20) interna.innerHTML += tavoloHTML;
-        else if (i <= 35) terrazza.innerHTML += tavoloHTML;
-        else if (i <= 45) giardino.innerHTML += tavoloHTML;
-        else gazebo.innerHTML += tavoloHTML;
+    async function inizializzaMappa() {
+      // Carica i dati reali centralizzati dal DB
+      const dati = await loadRistoranteFromDb();
+      if (!dati) {
+        document.getElementById('sale-container').innerHTML = '<p style="color:red; text-align:center;">Errore nel caricamento dell\'archivio tavoli.</p>';
+        return;
       }
+
+      renderizzaSaleETavoli();
     }
 
-    function selezionaTavolo(nomeTavolo) {
-      localStorage.setItem('tavoloSelezionato', nomeTavolo);
-      window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+    function renderizzaSaleETavoli() {
+      const container = document.getElementById('sale-container');
+      container.innerHTML = '';
+
+      const saleConTavoli = getTavoliDivisiPerSale();
+
+      saleConTavoli.forEach(sala => {
+        // Icone dinamiche in base al nome della sala
+        let iconaConversione = 'fa-house-user';
+        if (sala.nome.toLowerCase().includes('terrazza')) iconaConversione = 'fa-cloud-sun';
+        if (sala.nome.toLowerCase().includes('giardino')) iconaConversione = 'fa-tree';
+        if (sala.nome.toLowerCase().includes('gazebo') || sala.nome.toLowerCase().includes('spiaggia')) iconaConversione = 'fa-umbrella-beach';
+
+        let salaHTML = `
+          <div class="zona-titolo"><i class="fa-solid ${iconaConversione}"></i> ${sala.nome}</div>
+          <div class="sala-grid">`;
+
+        sala.tavoli.forEach(tavolo => {
+          const isOccupato = tavolo.stato === 'occupato';
+          const statoClasse = isOccupato ? 'occupato' : '';
+          const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
+          const iconaTavolo = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+
+          salaHTML += `
+            <div class="tavolo-card ${statoClasse}" data-id="${tavolo.id}">
+              <i class="fa-solid ${iconaTavolo}"></i>
+              <h3>Tavolo ${tavolo.numero}</h3>
+              <small>${statoTesto}</small>
+            </div>`;
+        });
+
+        salaHTML += `</div>`;
+        container.innerHTML += salaHTML;
+      });
+
+      // Aggancia l'evento click reale su ogni tavolo generato
+      document.querySelectorAll('.tavolo-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const idTavolo = this.getAttribute('data-id');
+          // Salva l'ID del tavolo selezionato anziché solo il nome testo
+          localStorage.setItem('tavoloSelezionatoId', idTavolo);
+          
+          // Reindirizza alla cassa ristorante (pointsale) senza causare errori 404
+          window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+        });
+      });
     }
 
-    window.addEventListener('winbeach-lang-change', () => { generaMappaTavoli(); import('../js/page-i18n.js').then((m) => m.applyPageI18n()); });
-    window.addEventListener('message', (e) => {
-      if (e.data?.type === 'winbeach-lang-change') {
-        generaMappaTavoli();
-        import('../js/page-i18n.js').then((m) => m.applyPageI18n());
-      }
+    window.addEventListener('winbeach-lang-change', () => {
+      renderizzaSaleETavoli();
     });
-    window.onload = generaMappaTavoli;
-  </script>
-  <script type="module" src="../js/app-i18n.js"></script>
-  <script type="module">
-    import { initPageI18n } from '../js/page-i18n.js';
-    initPageI18n();
+
+    window.addEventListener('load', inizializzaMappa);
   </script>
 </body>
 </html>
