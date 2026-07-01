@@ -96,17 +96,22 @@
   </div>
 
   <script type="module">
-    import { loadRistoranteFromDb } from '../js/ristorante-db.js';
+    import { 
+      loadRistoranteFromDb, 
+      saveRistoranteItemToDb, 
+      deleteRistoranteItemFromDb 
+    } from '../js/ristorante-db.js';
     import { updateDbBar } from '../js/winbeach-module.js';
 
     let dbRistorante = null;
 
-    // Caricamento iniziale e rendering delle liste correnti
+    // Caricamento iniziale dei dati reali persistenti
     async function initConfig() {
       dbRistorante = await loadRistoranteFromDb();
       if (!dbRistorante) return;
 
       aggiornaInterfaccia();
+      agganciaEventiElimina();
     }
 
     function aggiornaInterfaccia() {
@@ -114,9 +119,33 @@
       renderTavoli();
       renderCategorie();
       renderProdotti();
+      agganciaEventiElimina();
     }
 
-    // --- RENDER & AGGIUNTA SALE ---
+    // Aggancia i listener di cancellazione sui cestini rossi dinamici
+    function agganciaEventiElimina() {
+      document.querySelectorAll('.btn-del-item').forEach(btn => {
+        // Rimuove vecchi listener per evitare doppie esecuzioni
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', async function() {
+          const id = Number(this.getAttribute('data-id'));
+          const tipo = this.getAttribute('data-tipo');
+          
+          if (confirm(`Sei sicuro di voler eliminare questo elemento dall'archivio?`)) {
+            const eliminato = await deleteRistoranteItemFromDb(tipo, id);
+            if (eliminato) {
+              // Ricarica lo stato aggiornato dal modulo del database
+              dbRistorante = await loadRistoranteFromDb();
+              aggiornaInterfaccia();
+            }
+          }
+        });
+      });
+    }
+
+    // --- 1. GESTIONE SALE ---
     function renderSale() {
       const lista = document.getElementById('lista-sale');
       const select = document.getElementById('select-sala');
@@ -124,46 +153,55 @@
       select.innerHTML = '<option value="">-- Seleziona una Sala --</option>';
 
       dbRistorante.sale.forEach(s => {
-        lista.innerHTML += `<li><span>${s.nome}</span><button class="btn-del-item" data-id="${s.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        lista.innerHTML += `<li><span>${s.nome}</span><button class="btn-del-item" data-tipo="sale" data-id="${s.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
         select.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
       });
     }
 
-    document.getElementById('form-sala').addEventListener('submit', function(e) {
+    document.getElementById('form-sala').addEventListener('submit', async function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-sala').value.trim();
       const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
       
-      dbRistorante.sale.push({ id: nuevoId, nome: nome });
-      document.getElementById('nome-sala').value = '';
-      aggiornaInterfaccia();
-      // Qui andrà la funzione reale: saveSalaToDb(...)
+      const nuovaSala = { id: nuovoId, nome: nome };
+      
+      // Chiamata di salvataggio persistente in archivio
+      const salvato = await saveRistoranteItemToDb('sale', nuovaSala);
+      if (salvato) {
+        document.getElementById('nome-sala').value = '';
+        dbRistorante = await loadRistoranteFromDb();
+        aggiornaInterfaccia();
+      }
     });
 
-    // --- RENDER & AGGIUNTA TAVOLI ---
+    // --- 2. GESTIONE TAVOLI ---
     function renderTavoli() {
       const lista = document.getElementById('lista-tavoli');
       lista.innerHTML = '';
       dbRistorante.tavoli.forEach(t => {
         const sala = dbRistorante.sale.find(s => s.id === t.salaId);
         const nomeSala = sala ? sala.nome : 'Sconosciuta';
-        lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> (${nomeSala})</span><button class="btn-del-item" data-id="${t.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        lista.innerHTML += `<li><span><strong>Tavolo ${t.numero}</strong> (${nomeSala})</span><button class="btn-del-item" data-tipo="tavoli" data-id="${t.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
       });
     }
 
-    document.getElementById('form-tavolo').addEventListener('submit', function(e) {
+    document.getElementById('form-tavolo').addEventListener('submit', async function(e) {
       e.preventDefault();
       const salaId = Number(document.getElementById('select-sala').value);
       const numero = document.getElementById('numero-tavolo').value.trim();
       const nuovoId = dbRistorante.tavoli.length > 0 ? Math.max(...dbRistorante.tavoli.map(t => t.id)) + 1 : 1;
 
-      dbRistorante.tavoli.push({ id: nuovoId, numero: numero, salaId: salaId, stato: 'libero', comanda: [] });
-      document.getElementById('numero-tavolo').value = '';
-      aggiornaInterfaccia();
-      // Qui andrà la funzione reale: saveTavoloToDb(...)
+      const nuovoTavolo = { id: nuovoId, numero: numero, salaId: salaId, stato: 'libero', comanda: [] };
+
+      const salvato = await saveRistoranteItemToDb('tavoli', nuovoTavolo);
+      if (salvato) {
+        document.getElementById('numero-tavolo').value = '';
+        dbRistorante = await loadRistoranteFromDb();
+        aggiornaInterfaccia();
+      }
     });
 
-    // --- RENDER & AGGIUNTA CATEGORIE ---
+    // --- 3. GESTIONE CATEGORIE ---
     function renderCategorie() {
       const lista = document.getElementById('lista-categorie');
       const select = document.getElementById('select-categoria');
@@ -171,43 +209,53 @@
       select.innerHTML = '<option value="">-- Seleziona una Categoria --</option>';
 
       dbRistorante.categorie.forEach(c => {
-        lista.innerHTML += `<li><span>${c.nome}</span><button class="btn-del-item" data-id="${c.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        lista.innerHTML += `<li><span>${c.nome}</span><button class="btn-del-item" data-tipo="categorie" data-id="${c.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
         select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
       });
     }
 
-    document.getElementById('form-categoria').addEventListener('submit', function(e) {
+    document.getElementById('form-categoria').addEventListener('submit', async function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-categoria').value.trim();
       const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
 
-      dbRistorante.categorie.push({ id: nuovoId, nome: nome });
-      document.getElementById('nome-categoria').value = '';
-      aggiornaInterfaccia();
+      const nuovaCat = { id: nuovoId, nome: nome };
+
+      const salvato = await saveRistoranteItemToDb('categorie', nuovaCat);
+      if (salvato) {
+        document.getElementById('nome-categoria').value = '';
+        dbRistorante = await loadRistoranteFromDb();
+        aggiornaInterfaccia();
+      }
     });
 
-    // --- RENDER & AGGIUNTA PRODOTTI ---
+    // --- 4. GESTIONE PRODOTTI ---
     function renderProdotti() {
       const lista = document.getElementById('lista-prodotti');
       lista.innerHTML = '';
       dbRistorante.prodotti.forEach(p => {
         const cat = dbRistorante.categorie.find(c => c.id === p.categoriaId);
         const nomeCat = cat ? cat.nome : 'Nessuna';
-        lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € (${nomeCat})</span><button class="btn-del-item" data-id="${p.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
+        lista.innerHTML += `<li><span><strong>${p.nome}</strong> - ${p.prezzo.toFixed(2)} € (${nomeCat})</span><button class="btn-del-item" data-tipo="prodotti" data-id="${p.id}"><i class="fa-regular fa-trash-can"></i></button></li>`;
       });
     }
 
-    document.getElementById('form-prodotto').addEventListener('submit', function(e) {
+    document.getElementById('form-prodotto').addEventListener('submit', async function(e) {
       e.preventDefault();
       const categoriaId = Number(document.getElementById('select-categoria').value);
       const nome = document.getElementById('nome-prodotto').value.trim();
       const prezzo = Number(document.getElementById('prezzo-prodotto').value);
       const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
 
-      dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId });
-      document.getElementById('nome-prodotto').value = '';
-      document.getElementById('prezzo-prodotto').value = '';
-      aggiornaInterfaccia();
+      const nuovoProdotto = { id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaId };
+
+      const salvato = await saveRistoranteItemToDb('prodotti', nuovoProdotto);
+      if (salvato) {
+        document.getElementById('nome-prodotto').value = '';
+        document.getElementById('prezzo-prodotto').value = '';
+        dbRistorante = await loadRistoranteFromDb();
+        aggiornaInterfaccia();
+      }
     });
 
     window.addEventListener('load', initConfig);
