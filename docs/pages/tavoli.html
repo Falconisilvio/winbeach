@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="../css/ristorante.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
-    /* Stile di sicurezza se l'archivio è vuoto */
     .messaggio-vuoto {
       grid-column: 1 / -1;
       text-align: center;
@@ -38,9 +37,11 @@
 
     function generaMappaTavoli() {
       const contenitorePrincipale = document.getElementById('mappa-dinamica-sale');
+      if (!contenitorePrincipale) return;
+      
       contenitorePrincipale.innerHTML = '';
 
-      // Recupera i dati reali salvati nel localStorage
+      // Recupera i dati aggiornati dal localStorage
       const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
       
       if (!datiSalvati) {
@@ -55,29 +56,23 @@
         return;
       }
 
-      // Cicla su ogni sala inserita dall'utente nella configurazione
+      // Cicla ed esegue il rendering delle sole sale salvate dall'utente
       dbRistorante.sale.forEach(sala => {
-        // Crea il blocco della Zona/Sala
         const zonaDiv = document.createElement('div');
         zonaDiv.className = 'zona-container';
-
-        // Titolo della sala dinamico
         zonaDiv.innerHTML = `
           <div class="zona-titolo"><i class="fa-solid fa-house-user"></i> ${sala.nome}</div>
           <div class="sala-grid" id="grid-sala-${sala.id}"></div>
         `;
         contenitorePrincipale.appendChild(zonaDiv);
 
-        // Prende i tavoli associati a questa specifica sala
         const grigliaTavoli = document.getElementById(`grid-sala-${sala.id}`);
         const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => t.salaId === sala.id) : [];
 
         if (tavoliDellaSala.length === 0) {
           grigliaTavoli.innerHTML = `<p style="padding: 10px; color: gray; font-style: italic;">Nessun tavolo inserito in questa sala.</p>`;
         } else {
-          // Genera i singoli tavoli reali della sala
           tavoliDellaSala.forEach(t => {
-            // Per dare un senso simuliamo lo stato (puoi legarlo a t.stato reale se memorizzato)
             const isOccupato = t.stato === 'occupato' || (t.comanda && t.comanda.length > 0);
             const statoClasse = isOccupato ? 'occupato' : '';
             const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
@@ -101,7 +96,12 @@
       window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
     }
 
-    // Listener per i cambi di lingua o messaggi di aggiornamento
+    // --- CORREZIONE CRUCIALE PER ABBATTERE LA CACHE DEL NAVIGATORE ---
+    // Questo evento scatta SEMPRE quando la pagina viene mostrata (anche tornando indietro o cambiando scheda)
+    window.addEventListener('pageshow', function(event) {
+      generaMappaTavoli();
+    });
+
     window.addEventListener('winbeach-lang-change', () => { generaMappaTavoli(); import('../js/page-i18n.js').then((m) => m.applyPageI18n()); });
     window.addEventListener('message', (e) => {
       if (e.data?.type === 'winbeach-lang-change' || e.data?.comando === 'refreshMappa') {
