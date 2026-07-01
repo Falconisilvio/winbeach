@@ -162,6 +162,10 @@ function setupMobileNav() {
 
 function risolviPercorso(nomePagina) {
     if (nomePagina === "struttura") return "struttura.html";
+    
+    // --- NUOVE PAGINE PER LA CONFIGURAZIONE RISTORANTE ---
+    if (nomePagina === "config-ristorante") return "pages/config-ristorante.html";
+    
     return `pages/${nomePagina}.html`;
 }
 
