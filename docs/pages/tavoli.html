@@ -9,92 +9,112 @@
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="../css/ristorante.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <style>
+    /* Stile di sicurezza se l'archivio è vuoto */
+    .messaggio-vuoto {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+      background: var(--wb-bg-card, #fff);
+      border-radius: 8px;
+      color: var(--wb-text);
+      font-weight: bold;
+      border: 1px dashed var(--wb-border, #ccc);
+    }
+    .zona-container { margin-bottom: 30px; }
+  </style>
 </head>
 <body class="tavoli-page">
 
   <div class="header-sala">
     <h1>Mappa della Sala Ristorante</h1>
-    <p>Seleziona un tavolo dall'archivio per aprire la comanda touch nel Punto Vendita.</p>
+    <p>Seleziona uno dei tavoli disponibili configurati per aprire la comanda touch nel Punto Vendita.</p>
   </div>
 
-  <div id="sale-container">
-    <div class="loading-db" style="text-align: center; padding: 20px; color: var(--wb-text-muted);">
-      <i class="fa-solid fa-spinner fa-spin"></i> Caricamento tavoli dall'archivio...
-    </div>
-  </div>
+  <div id="mappa-dinamica-sale"></div>
 
-  <script type="module">
-    import { getToken } from '../js/winbeach-db.js';
-    import { applyReadOnlyMode, onAuthChange } from '../js/winbeach-auth.js';
-    import { $ } from '../js/winbeach-module.js';
-    import { loadRistoranteFromDb, getTavoliDivisiPerSale } from '../js/ristorante-db.js';
-
+  <script>
     function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
-    async function inizializzaMappa() {
-      // Carica i dati reali centralizzati dal DB
-      const dati = await loadRistoranteFromDb();
-      if (!dati) {
-        document.getElementById('sale-container').innerHTML = '<p style="color:red; text-align:center;">Errore nel caricamento dell\'archivio tavoli.</p>';
+    function generaMappaTavoli() {
+      const contenitorePrincipale = document.getElementById('mappa-dinamica-sale');
+      contenitorePrincipale.innerHTML = '';
+
+      // Recupera i dati reali salvati nel localStorage
+      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+      
+      if (!datiSalvati) {
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-triangle-exclamation"></i> Nessun dato configurato. Vai nel pannello di configurazione per aggiungere sale e tavoli.</div>`;
         return;
       }
 
-      renderizzaSaleETavoli();
-    }
+      const dbRistorante = JSON.parse(datiSalvati);
 
-    function renderizzaSaleETavoli() {
-      const container = document.getElementById('sale-container');
-      container.innerHTML = '';
+      if (!dbRistorante.sale || dbRistorante.sale.length === 0) {
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-house-laptop"></i> Nessuna sala creata. Aggiungi almeno una sala dalla configurazione.</div>`;
+        return;
+      }
 
-      const saleConTavoli = getTavoliDivisiPerSale();
+      // Cicla su ogni sala inserita dall'utente nella configurazione
+      dbRistorante.sale.forEach(sala => {
+        // Crea il blocco della Zona/Sala
+        const zonaDiv = document.createElement('div');
+        zonaDiv.className = 'zona-container';
 
-      saleConTavoli.forEach(sala => {
-        // Icone dinamiche in base al nome della sala
-        let iconaConversione = 'fa-house-user';
-        if (sala.nome.toLowerCase().includes('terrazza')) iconaConversione = 'fa-cloud-sun';
-        if (sala.nome.toLowerCase().includes('giardino')) iconaConversione = 'fa-tree';
-        if (sala.nome.toLowerCase().includes('gazebo') || sala.nome.toLowerCase().includes('spiaggia')) iconaConversione = 'fa-umbrella-beach';
+        // Titolo della sala dinamico
+        zonaDiv.innerHTML = `
+          <div class="zona-titolo"><i class="fa-solid fa-house-user"></i> ${sala.nome}</div>
+          <div class="sala-grid" id="grid-sala-${sala.id}"></div>
+        `;
+        contenitorePrincipale.appendChild(zonaDiv);
 
-        let salaHTML = `
-          <div class="zona-titolo"><i class="fa-solid ${iconaConversione}"></i> ${sala.nome}</div>
-          <div class="sala-grid">`;
+        // Prende i tavoli associati a questa specifica sala
+        const grigliaTavoli = document.getElementById(`grid-sala-${sala.id}`);
+        const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => t.salaId === sala.id) : [];
 
-        sala.tavoli.forEach(tavolo => {
-          const isOccupato = tavolo.stato === 'occupato';
-          const statoClasse = isOccupato ? 'occupato' : '';
-          const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
-          const iconaTavolo = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+        if (tavoliDellaSala.length === 0) {
+          grigliaTavoli.innerHTML = `<p style="padding: 10px; color: gray; font-style: italic;">Nessun tavolo inserito in questa sala.</p>`;
+        } else {
+          // Genera i singoli tavoli reali della sala
+          tavoliDellaSala.forEach(t => {
+            // Per dare un senso simuliamo lo stato (puoi legarlo a t.stato reale se memorizzato)
+            const isOccupato = t.stato === 'occupato' || (t.comanda && t.comanda.length > 0);
+            const statoClasse = isOccupato ? 'occupato' : '';
+            const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
+            const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+            const nomeVisualizzato = `${wbT('tavoli.table')} ${t.numero}`;
 
-          salaHTML += `
-            <div class="tavolo-card ${statoClasse}" data-id="${tavolo.id}">
-              <i class="fa-solid ${iconaTavolo}"></i>
-              <h3>Tavolo ${tavolo.numero}</h3>
-              <small>${statoTesto}</small>
-            </div>`;
-        });
-
-        salaHTML += `</div>`;
-        container.innerHTML += salaHTML;
-      });
-
-      // Aggancia l'evento click reale su ogni tavolo generato
-      document.querySelectorAll('.tavolo-card').forEach(card => {
-        card.addEventListener('click', function() {
-          const idTavolo = this.getAttribute('data-id');
-          // Salva l'ID del tavolo selezionato anziché solo il nome testo
-          localStorage.setItem('tavoloSelezionatoId', idTavolo);
-          
-          // Reindirizza alla cassa ristorante (pointsale) senza causare errori 404
-          window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
-        });
+            grigliaTavoli.innerHTML += `
+              <div class="tavolo-card ${statoClasse}" onclick="selezionaTavolo('${t.id}', '${nomeVisualizzato.replace(/'/g, "\\'")}')">
+                <i class="fa-solid ${icona}"></i>
+                <h3>Tavolo ${t.numero}</h3>
+                <small>${statoTesto}</small>
+              </div>`;
+          });
+        }
       });
     }
 
-    window.addEventListener('winbeach-lang-change', () => {
-      renderizzaSaleETavoli();
+    function selezionaTavolo(idTavolo, nomeTavolo) {
+      localStorage.setItem('tavoloSelezionatoId', idTavolo);
+      localStorage.setItem('tavoloSelezionato', nomeTavolo);
+      window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+    }
+
+    // Listener per i cambi di lingua o messaggi di aggiornamento
+    window.addEventListener('winbeach-lang-change', () => { generaMappaTavoli(); import('../js/page-i18n.js').then((m) => m.applyPageI18n()); });
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === 'winbeach-lang-change' || e.data?.comando === 'refreshMappa') {
+        generaMappaTavoli();
+      }
     });
-
-    window.addEventListener('load', inizializzaMappa);
+    
+    window.onload = generaMappaTavoli;
+  </script>
+  <script type="module" src="../js/app-i18n.js"></script>
+  <script type="module">
+    import { initPageI18n } from '../js/page-i18n.js';
+    initPageI18n();
   </script>
 </body>
 </html>
