@@ -76,8 +76,10 @@
     <p>Seleziona uno dei tavoli disponibili configurati per aprire la comanda touch nel Punto Vendita.</p>
   </div>
 
+  <!-- Contenitore delle sale reali -->
   <div id="mappa-dinamica-sale"></div>
 
+  <!-- STRUTTURA DEL POPUP MENU -->
   <div id="custom-popup-menu" class="popup-menu-tavolo">
     <button onclick="azioneMenu('apri')"><i class="fa-solid fa-folder-open" style="color: #2e7d32;"></i> Apri tavolo</button>
     <button onclick="azioneMenu('comanda')"><i class="fa-solid fa-utensils" style="color: #0288d1;"></i> Comanda</button>
@@ -131,7 +133,6 @@
             
             const statoClasse = isOccupato ? 'occupato' : '';
             
-            // Fix stringhe di traduzione grezze
             let statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
             if (statoTesto === 'tavoli.busy') statoTesto = 'Occupato';
             if (statoTesto === 'tavoli.free') statoTesto = 'Libero';
@@ -151,7 +152,7 @@
             }
             card.innerHTML = htmlInterno;
 
-            // Click per aprire il menu a tendina
+            // Click sicuro per aprire il menu a tendina
             card.addEventListener('click', function(e) {
               e.stopPropagation();
               tavoloSelezionatoCorrente = { tavolo: t, nomeTavolo: `Tavolo ${t.numero}` };
@@ -167,42 +168,46 @@
       });
     }
 
-   function azioneMenu(tipo) {
-  if (!tavoloSelezionatoCorrente) return;
-  const { tavolo, nomeTavolo } = tavoloSelezionatoCorrente;
-  
-  localStorage.setItem('tavoloSelezionato', nomeTavolo);
-  localStorage.setItem('tavoloSelezionatoId', tavolo.id);
+    function azioneMenu(tipo) {
+      if (!tavoloSelezionatoCorrente) return;
+      const { tavolo, nomeTavolo } = tavoloSelezionatoCorrente;
+      
+      localStorage.setItem('tavoloSelezionato', nomeTavolo);
+      localStorage.setItem('tavoloSelezionatoId', tavolo.id);
 
-  let db = JSON.parse(localStorage.getItem('winbeach_archivio_ristorante'));
+      let db = JSON.parse(localStorage.getItem('winbeach_archivio_ristorante'));
 
-  if (tipo === 'apri') {
-    // Gestione apertura tavolo (funziona già correttamente)
-    const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    localStorage.setItem(`ora_apertura_tavolo_${tavolo.id}`, oraAttuale);
-    db.tavoli = db.tavoli.map(t => t.id === tavolo.id ? { ...t, stato: 'occupato' } : t);
-    localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
-    generaMappaTavoli();
-  } else {
-    // Imposta l'azione richiesta per il Point of Sale
-    localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
-    
-    // 1. TENTATIVO DI REINDIRIZZAMENTO TRAMITE L'IFRAME PRINCIPALE
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+      if (tipo === 'apri') {
+        const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem(`ora_apertura_tavolo_${tavolo.id}`, oraAttuale);
+        
+        db.tavoli = db.tavoli.map(t => t.id === tavolo.id ? { ...t, stato: 'occupato' } : t);
+        localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+        generaMappaTavoli();
+      } else {
+        localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
+        
+        // 1. Prova a cambiare la schermata principale tramite la dashboard
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+        }
+        
+        // 2. Sicurezza: Se la dashboard non riceve il messaggio, apre direttamente pointsale.html qui
+        setTimeout(() => {
+          window.location.href = 'pointsale.html';
+        }, 300);
+      }
+      document.getElementById('custom-popup-menu').style.display = 'none';
     }
-    
-    // 2. SISTEMA DI SICUREZZA: Se dopo mezzo secondo l'iframe non è cambiato, 
-    // forziamo l'apertura diretta della pagina per evitare blocchi
-    setTimeout(() => {
-      window.location.href = 'pointsale.html';
-    }, 300);
-  }
-  
-  // Chiude il menu popup
-  const menu = document.getElementById('custom-popup-menu');
-  if (menu) menu.style.display = 'none';
-}
+
+    // Chiude il menu se si clicca in un punto qualsiasi fuori dal popup
+    document.addEventListener('click', () => {
+      const menu = document.getElementById('custom-popup-menu');
+      if (menu) menu.style.display = 'none';
+    });
+
+    window.addEventListener('pageshow', generaMappaTavoli);
+    window.onload = generaMappaTavoli;
   </script>
-  </body>
+</body>
 </html>
