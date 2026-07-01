@@ -19,8 +19,7 @@
 
   <div class="main-container">
     <div class="prodotti-section">
-      <div class="categorie-bar" id="bar-categorie">
-        </div>
+      <div class="categorie-bar" id="barra-categorie-dinamica"></div>
       <div class="tastiera-articoli" id="grid-prodotti"></div>
     </div>
 
@@ -44,100 +43,100 @@
           <span>TOTALE CONTO:</span>
           <span id="txt-totale">0.00 €</span>
         </div>
-        <button type="button" class="btn-invia" id="btn-salva-comanda"><i class="fa-solid fa-floppy-disk"></i> Salva e Stampa Comanda</button>
+        <button type="button" class="btn-invia" onclick="inviaComanda()"><i class="fa-solid fa-print"></i> Stampa Comanda Cucina</button>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    import { loadRistoranteFromDb, selezionaTavolo, saveTavoloToDb } from '../js/ristorante-db.js';
-
-    let tavoloCorrente = null;
-    let prodottiGlobali = [];
+  <script>
+    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     let carrello = [];
+    let categoriaAttiva = "";
 
     function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
-    window.addEventListener('load', async function () {
-      // 1. Inizializza i dati dal database centralizzato
-      const dbData = await loadRistoranteFromDb();
-      if (!dbData) return;
-
-      prodottiGlobali = dbData.prodotti;
-
-      // 2. Recupera il tavolo selezionato
-      const idTavolo = localStorage.getItem('tavoloSelezionatoId');
-      tavoloCorrente = selezionaTavolo(idTavolo);
-
-      if (tavoloCorrente) {
-        document.getElementById('lbl-tavolo').innerText = `Tavolo ${tavoloCorrente.numero}`;
-        
-        // 3. Se il tavolo ha già una comanda salvata, la carica nel carrello grafico
-        carrello = tavoloCorrente.comanda.map(item => {
-          const prodInfo = prodottiGlobali.find(p => p.id === item.prodId);
-          return {
-            id: item.prodId,
-            nome: prodInfo ? prodInfo.nome : 'Prodotto Sconosciuto',
-            prezzo: prodInfo ? prodInfo.prezzo : 0,
-            qta: item.qta
-          };
-        });
-        aggiornaXBrowse();
-      } else {
-        document.getElementById('lbl-tavolo').innerText = "Nessun Tavolo";
+    window.addEventListener('pageshow', function () {
+      const tbl = localStorage.getItem('tavoloSelezionato') || wbT('pos.counter');
+      document.getElementById('lbl-tavolo').innerText = tbl;
+      
+      // Legge i dati reali della configurazione
+      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+      if (datiSalvati) {
+        dbRistorante = JSON.parse(datiSalvati);
       }
-
-      // 4. Renderizza la barra delle categorie reali provenienti dall'archivio
-      renderizzaCategorie(dbData.categorie);
+      
+      costruisciMenuCassa();
     });
 
-    function renderizzaCategorie(categorie) {
-      const catBar = document.getElementById('bar-categorie');
-      catBar.innerHTML = '';
-      
-      categorie.forEach((cat, idx) => {
-        const activeClass = idx === 0 ? 'active' : '';
+    function costruisciMenuCassa() {
+      const barraCat = document.getElementById('barra-categorie-dinamica');
+      barraCat.innerHTML = '';
+
+      if (!dbRistorante.categorie || dbRistorante.categorie.length === 0) {
+        barraCat.innerHTML = '<span style="color:gray; padding:10px; font-style:italic;">Nessuna categoria creata</span>';
+        document.getElementById('grid-prodotti').innerHTML = '';
+        return;
+      }
+
+      // Genera i pulsanti delle categorie create da te
+      dbRistorante.categorie.forEach((c, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `cat-btn ${activeClass}`;
-        btn.innerText = cat.nome;
-        btn.addEventListener('click', function() {
+        btn.className = 'cat-btn';
+        btn.innerText = c.nome;
+        
+        if (index === 0 && !categoriaAttiva) {
+          categoriaAttiva = c.nome;
+        }
+        
+        if (categoriaAttiva === c.nome) {
+          btn.classList.add('active');
+        }
+
+        btn.onclick = function() {
           document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          caricaArticoliPerCategoria(cat.id);
-        });
-        catBar.appendChild(btn);
+          btn.classList.add('active');
+          categoriaAttiva = c.nome;
+          caricaArticoliDellaCategoria(c.nome);
+        };
+
+        barraCat.appendChild(btn);
       });
 
-      if (categorie.length > 0) {
-        caricaArticoliPerCategoria(categorie[0].id);
+      if (categoriaAttiva) {
+        caricaArticoliDellaCategoria(categoriaAttiva);
       }
     }
 
-    function caricaArticoliPerCategoria(categoriaId) {
+    function caricaArticoliDellaCategoria(catNome) {
       const grid = document.getElementById('grid-prodotti');
       grid.innerHTML = '';
-      
-      const filtrati = prodottiGlobali.filter(p => p.categoriaId === categoriaId);
-      
-      filtrati.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'articolo-card';
-        card.innerHTML = `
-          <div class="name">${p.nome}</div>
-          <div class="price">${p.prezzo.toFixed(2)} €</div>`;
-        card.addEventListener('click', () => aggiungiProdotto(p));
-        grid.appendChild(card);
+
+      const prodottiFiltrati = dbRistorante.prodotti ? dbRistorante.prodotti.filter(p => p.categoriaId === catNome) : [];
+
+      if (prodottiFiltrati.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; padding: 20px; color: gray; font-style: italic;">Nessun prodotto inserito in questa categoria.</p>';
+        return;
+      }
+
+      prodottiFiltrati.forEach(p => {
+        grid.innerHTML += `
+          <div class="articolo-card" onclick="aggiungiProdotto('${p.nome.replace(/'/g, "\\'")}', ${p.prezzo})">
+            <div class="name">${p.nome}</div>
+            <div class="price">${Number(p.prezzo).toFixed(2)} €</div>
+          </div>`;
       });
     }
 
-    function aggiungiProdotto(prodotto) {
-      const item = carrello.find(i => i.id === prodotto.id);
-      if (item) {
-        item.qta++;
-      } else {
-        carrello.push({ id: prodotto.id, nome: prodotto.nome, qta: 1, prezzo: prodotto.prezzo });
-      }
+    function aggiungiProdotto(nome, prezzo) {
+      const item = carrello.find((i) => i.nome === nome);
+      if (item) item.qta++;
+      else carrello.push({ nome, qta: 1, prezzo });
+      aggiornaXBrowse();
+    }
+
+    function rimuoviProdotto(idx) {
+      carrello.splice(idx, 1);
       aggiornaXBrowse();
     }
 
@@ -149,51 +148,25 @@
       carrello.forEach((item, idx) => {
         const rigaTot = item.qta * item.prezzo;
         totaleConto += rigaTot;
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${item.nome}</strong></td>
-          <td style="text-align:center;">${item.qta}</td>
-          <td style="text-align:right;">${rigaTot.toFixed(2)} €</td>
-          <td style="text-align:center;"></td>`;
-          
-        const btnDel = document.createElement('button');
-        btnDel.type = 'button';
-        btnDel.className = 'btn-del';
-        btnDel.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-        btnDel.addEventListener('click', () => {
-          carrello.splice(idx, 1);
-          aggiornaXBrowse();
-        });
-        
-        tr.children[3].appendChild(btnDel);
-        tbody.appendChild(tr);
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${item.nome}</strong></td>
+            <td style="text-align:center;">${item.qta}</td>
+            <td style="text-align:right;">${rigaTot.toFixed(2)} €</td>
+            <td style="text-align:center;"><button type="button" class="btn-del" onclick="rimuoviProdotto(${idx})"><i class="fa-regular fa-trash-can"></i></button></td>
+          </tr>`;
       });
       document.getElementById('txt-totale').innerText = totaleConto.toFixed(2) + ' €';
     }
 
-    // Salvataggio sul modulo ristorante-db
-    document.getElementById('btn-salva-comanda').addEventListener('click', async function() {
-      if (!tavoloCorrente) return alert("Nessun tavolo selezionato.");
-      
-      // Converte il carrello grafico nel formato compatto del database (.comanda)
-      tavoloCorrente.comanda = carrello.map(item => ({
-        prodId: item.id,
-        qta: item.qta
-      }));
-      
-      if (carrello.length === 0) {
-        tavoloCorrente.stato = 'libero';
-      }
+    function inviaComanda() {
+      if (carrello.length === 0) return alert(wbT('pos.empty'));
+      alert(wbT('pos.sent'));
+      carrello = [];
+      aggiornaXBrowse();
+    }
 
-      const salvato = await saveTavoloToDb(tavoloCorrente);
-      if (salvato) {
-        alert(wbT('pos.sent') || "Comanda inviata alla cucina e salvata con successo!");
-        // Ritorna alla visualizzazione della mappa dei tavoli
-        window.parent.postMessage({ comando: 'cambiaPagina', target: 'tavoli' }, '*');
-      }
-    });
+    window.addEventListener('winbeach-lang-change', () => import('../js/page-i18n.js').then((m) => m.applyPageI18n()));
   </script>
 </body>
-</html>
 </html>
