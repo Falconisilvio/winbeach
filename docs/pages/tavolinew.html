@@ -167,40 +167,42 @@
       });
     }
 
-    function azioneMenu(tipo) {
-      if (!tavoloSelezionatoCorrente) return;
-      const { tavolo, nomeTavolo } = tavoloSelezionatoCorrente;
-      
-      localStorage.setItem('tavoloSelezionato', nomeTavolo);
-      localStorage.setItem('tavoloSelezionatoId', tavolo.id);
+   function azioneMenu(tipo) {
+  if (!tavoloSelezionatoCorrente) return;
+  const { tavolo, nomeTavolo } = tavoloSelezionatoCorrente;
+  
+  localStorage.setItem('tavoloSelezionato', nomeTavolo);
+  localStorage.setItem('tavoloSelezionatoId', tavolo.id);
 
-      let db = JSON.parse(localStorage.getItem('winbeach_archivio_ristorante'));
+  let db = JSON.parse(localStorage.getItem('winbeach_archivio_ristorante'));
 
-      if (tipo === 'apri') {
-        const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-        localStorage.setItem(`ora_apertura_tavolo_${tavolo.id}`, oraAttuale);
-        db.tavoli = db.tavoli.map(t => t.id === tavolo.id ? { ...t, stato: 'occupato' } : t);
-        localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
-        generaMappaTavoli();
-      } else {
-        localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
-        } else {
-          window.location.href = 'pointsale.html';
-        }
-      }
-      document.getElementById('custom-popup-menu').style.display = 'none';
+  if (tipo === 'apri') {
+    // Gestione apertura tavolo (funziona già correttamente)
+    const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    localStorage.setItem(`ora_apertura_tavolo_${tavolo.id}`, oraAttuale);
+    db.tavoli = db.tavoli.map(t => t.id === tavolo.id ? { ...t, stato: 'occupato' } : t);
+    localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+    generaMappaTavoli();
+  } else {
+    // Imposta l'azione richiesta per il Point of Sale
+    localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
+    
+    // 1. TENTATIVO DI REINDIRIZZAMENTO TRAMITE L'IFRAME PRINCIPALE
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
     }
-
-    // Chiude il menu se si clicca in un punto qualsiasi fuori dal popup
-    document.addEventListener('click', () => {
-      const menu = document.getElementById('custom-popup-menu');
-      if (menu) menu.style.display = 'none';
-    });
-
-    window.addEventListener('pageshow', generaMappaTavoli);
-    window.onload = generaMappaTavoli;
+    
+    // 2. SISTEMA DI SICUREZZA: Se dopo mezzo secondo l'iframe non è cambiato, 
+    // forziamo l'apertura diretta della pagina per evitare blocchi
+    setTimeout(() => {
+      window.location.href = 'pointsale.html';
+    }, 300);
+  }
+  
+  // Chiude il menu popup
+  const menu = document.getElementById('custom-popup-menu');
+  if (menu) menu.style.display = 'none';
+}
   </script>
-</body>
+  </body>
 </html>
