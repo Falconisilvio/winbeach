@@ -10,63 +10,27 @@
   <link rel="stylesheet" href="../css/ristorante.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
-    .messaggio-vuoto {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 30px;
-      background: var(--wb-bg-card, #fff);
-      border-radius: 8px;
-      color: var(--wb-text);
-      font-weight: bold;
-      border: 1px dashed var(--wb-border, #ccc);
-    }
+    .messaggio-vuoto { grid-column: 1 / -1; text-align: center; padding: 30px; background: var(--wb-bg-card, #fff); border-radius: 8px; color: var(--wb-text); font-weight: bold; border: 1px dashed var(--wb-border, #ccc); }
     .zona-container { margin-bottom: 30px; }
     .tavolo-card { cursor: pointer; position: relative; }
-    
-    /* Stile orario di apertura sul tavolo */
-    .ora-apertura {
-      display: block;
-      font-size: 0.75rem;
-      background: rgba(0, 0, 0, 0.15);
-      padding: 2px 5px;
-      border-radius: 4px;
-      margin-top: 4px;
-      font-weight: bold;
-    }
+    .ora-apertura { display: block; font-size: 0.75rem; background: rgba(0, 0, 0, 0.15); padding: 2px 5px; border-radius: 4px; margin-top: 4px; font-weight: bold; }
+    .info-unito { display: block; font-size: 0.7rem; color: #ffeb3b; font-style: italic; margin-top: 2px; }
 
     /* POPUP INTERATTIVO */
-    .popup-menu-tavolo {
-      display: none;
-      position: absolute;
-      background: var(--wb-bg-card, #fff);
-      border: 1px solid var(--wb-border, #ccc);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border-radius: 8px;
-      z-index: 9999;
-      min-width: 160px;
-      overflow: hidden;
-    }
-    .popup-menu-tavolo button {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      padding: 12px 15px;
-      border: none;
-      background: none;
-      text-align: left;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: var(--wb-text, #333);
-      transition: background 0.2s;
-    }
-    .popup-menu-tavolo button:hover {
-      background: var(--wb-bg-hover, #f5f5f5);
-    }
-    .popup-menu-tavolo button.opzione-chiudi {
-      color: #d32f2f;
-      border-top: 1px solid var(--wb-border, #eee);
-    }
+    .popup-menu-tavolo { display: none; position: absolute; background: var(--wb-bg-card, #fff); border: 1px solid var(--wb-border, #ccc); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; z-index: 9999; min-width: 180px; overflow: hidden; }
+    .popup-menu-tavolo button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 15px; border: none; background: none; text-align: left; font-size: 0.9rem; cursor: pointer; color: var(--wb-text, #333); transition: background 0.2s; }
+    .popup-menu-tavolo button:hover { background: var(--wb-bg-hover, #f5f5f5); }
+    .popup-menu-tavolo button.opzione-chiudi { color: #d32f2f; border-top: 1px solid var(--wb-border, #eee); }
+
+    /* DIALOG MODALI NATIVE */
+    dialog { border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: var(--wb-bg-card, #fff); color: var(--wb-text, #333); min-width: 300px; }
+    dialog::backdrop { background: rgba(0,0,0,0.5); }
+    .dialog-azioni { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .dialog-azioni button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-conferma { background: #2e7d32; color: #fff; }
+    .btn-annulla { background: #757575; color: #fff; }
+    .lista-checkbox { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; margin-top: 10px; }
+    .lista-checkbox label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
   </style>
 </head>
 <body class="tavoli-page">
@@ -76,42 +40,62 @@
     <p>Seleziona uno dei tavoli disponibili configurati per aprire la comanda touch nel Punto Vendita.</p>
   </div>
 
-  <!-- Contenitore delle sale reali -->
   <div id="mappa-dinamica-sale"></div>
 
-  <!-- STRUTTURA DEL POPUP MENU -->
+  <!-- MENU POPUP DINAMICO -->
   <div id="custom-popup-menu" class="popup-menu-tavolo">
-    <button onclick="azioneMenu('apri')"><i class="fa-solid fa-folder-open" style="color: #2e7d32;"></i> Apri tavolo</button>
-    <button onclick="azioneMenu('comanda')"><i class="fa-solid fa-utensils" style="color: #0288d1;"></i> Comanda</button>
-    <button onclick="azioneMenu('chiudi')" class="opzione-chiudi"><i class="fa-solid fa-cash-register"></i> Chiudi Tavolo</button>
+    <button id="btn-popup-apri" onclick="azioneMenu('apri')"><i class="fa-solid fa-folder-open" style="color: #2e7d32;"></i> Apri tavolo</button>
+    <button id="btn-popup-comanda" onclick="azioneMenu('comanda')"><i class="fa-solid fa-utensils" style="color: #0288d1;"></i> Comanda</button>
+    <button id="btn-popup-sposta" onclick="azioneMenu('sposta')"><i class="fa-solid fa-arrows-up-down-left-right" style="color: #ed6c02;"></i> Sposta tavolo</button>
+    <button id="btn-popup-unisci" onclick="azioneMenu('unisci')"><i class="fa-solid fa-link" style="color: #9c27b0;"></i> Unisci tavoli</button>
+    <button id="btn-popup-chiudi" onclick="azioneMenu('chiudi')" class="opzione-chiudi"><i class="fa-solid fa-cash-register"></i> Chiudi Tavolo</button>
   </div>
+
+  <!-- DIALOG SPOSTA TAVOLO -->
+  <dialog id="dialog-sposta">
+    <h3>Sposta Comanda</h3>
+    <p>Seleziona il tavolo di destinazione libero:</p>
+    <select id="select-tavolo-destinazione" style="width:100%; padding:8px; margin-top:10px;"></select>
+    <div class="dialog-azioni">
+      <button class="btn-annulla" onclick="document.getElementById('dialog-sposta').close()">Annulla</button>
+      <button class="btn-conferma" onclick="confermaSposta()">Sposta</button>
+    </div>
+  </dialog>
+
+  <!-- DIALOG UNISCI TAVOLI -->
+  <dialog id="dialog-unisci">
+    <h3>Unisci Tavoli</h3>
+    <p>Seleziona i tavoli da unire a questo conto:</p>
+    <div id="lista-tavoli-unibili" class="lista-checkbox"></div>
+    <div class="dialog-azioni">
+      <button class="btn-annulla" onclick="document.getElementById('dialog-unisci').close()">Annulla</button>
+      <button class="btn-conferma" onclick="confermaUnione()">Unisci</button>
+    </div>
+  </dialog>
 
   <script>
     let tavoloSelezionatoCorrente = null;
+    let dbRistorante = { sale: [], tavoli: [] };
+
     function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
     function generaMappaTavoli() {
       const contenitorePrincipale = document.getElementById('mappa-dinamica-sale');
       if (!contenitorePrincipale) return;
-      
       contenitorePrincipale.innerHTML = '';
 
-      // Legge l'archivio reale dal LocalStorage
       const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-      
       if (!datiSalvati) {
         contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-triangle-exclamation"></i> Nessuna configurazione trovata. Salva le sale dal pannello.</div>`;
         return;
       }
 
-      const dbRistorante = JSON.parse(datiSalvati);
-
+      dbRistorante = JSON.parse(datiSalvati);
       if (!dbRistorante.sale || dbRistorante.sale.length === 0) {
         contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-house-laptop"></i> Nessuna sala creata nel tuo archivio.</div>`;
         return;
       }
 
-      // Ciclo sulle sale reali impostate dall'utente
       dbRistorante.sale.forEach(sala => {
         const zonaDiv = document.createElement('div');
         zonaDiv.className = 'zona-container';
@@ -124,83 +108,150 @@
         const grigliaTavoli = document.getElementById(`grid-sala-${sala.id}`);
         const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => String(t.salaId) === String(sala.id)) : [];
 
-        if (tavoliDellaSala.length === 0) {
-          grigliaTavoli.innerHTML = `<p style="padding: 10px; color: gray; font-style: italic;">Nessun tavolo inserito in questa sala.</p>`;
-        } else {
-          tavoliDellaSala.forEach(t => {
-            const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
-            const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
-            
-            const statoClasse = isOccupato ? 'occupato' : '';
-            
-            let statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
-            if (statoTesto === 'tavoli.busy') statoTesto = 'Occupato';
-            if (statoTesto === 'tavoli.free') statoTesto = 'Libero';
+        tavoliDellaSala.forEach(t => {
+          const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
+          const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
+          const uniti = JSON.parse(localStorage.getItem(`tavoli_uniti_a_${t.id}`) || "[]");
+          
+          const statoClasse = isOccupato ? 'occupato' : '';
+          let statoTesto = isOccupato ? 'Occupato' : 'Libero';
 
-            const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+          const card = document.createElement('div');
+          card.className = `tavolo-card ${statoClasse}`;
+          
+          let htmlInterno = `
+            <i class="fa-solid ${isOccupato ? 'fa-utensils' : 'fa-circle-dot'}"></i>
+            <h3>Tavolo ${t.numero}</h3>
+            <small>${statoTesto}</small>
+          `;
+          if (orarioApertura) {
+            htmlInterno += `<span class="ora-apertura"><i class="fa-regular fa-clock"></i> ${orarioApertura}</span>`;
+          }
+          if (uniti.length > 0) {
+            htmlInterno += `<span class="info-unito"><i class="fa-solid fa-link"></i> + T. ${uniti.join(', ')}</span>`;
+          }
+          card.innerHTML = htmlInterno;
 
-            const card = document.createElement('div');
-            card.className = `tavolo-card ${statoClasse}`;
-            
-            let htmlInterno = `
-              <i class="fa-solid ${icona}"></i>
-              <h3>Tavolo ${t.numero}</h3>
-              <small>${statoTesto}</small>
-            `;
-            if (orarioApertura) {
-              htmlInterno += `<span class="ora-apertura"><i class="fa-regular fa-clock"></i> ${orarioApertura}</span>`;
-            }
-            card.innerHTML = htmlInterno;
-
-            // Click sicuro per aprire il menu a tendina
-            card.addEventListener('click', function(e) {
-              e.stopPropagation();
-              tavoloSelezionatoCorrente = { tavolo: t, nomeTavolo: `Tavolo ${t.numero}` };
-              const menu = document.getElementById('custom-popup-menu');
-              menu.style.display = 'block';
-              menu.style.left = e.pageX + 'px';
-              menu.style.top = e.pageY + 'px';
-            });
-
-            grigliaTavoli.appendChild(card);
+          card.addEventListener('click', function(e) {
+            e.stopPropagation();
+            tavoloSelezionatoCorrente = t;
+            mostraPopup(e, isOccupato);
           });
-        }
+
+          grigliaTavoli.appendChild(card);
+        });
       });
+    }
+
+    function mostraPopup(e, isOccupato) {
+      const menu = document.getElementById('custom-popup-menu');
+      
+      // MOSTRA / NASCONDE LE VOCI IN BASE ALLO STATO DEL TAVOLO
+      document.getElementById('btn-popup-apri').style.display = isOccupato ? 'none' : 'flex';
+      document.getElementById('btn-popup-comanda').style.display = isOccupato ? 'flex' : 'none';
+      document.getElementById('btn-popup-sposta').style.display = isOccupato ? 'flex' : 'none';
+      document.getElementById('btn-popup-unisci').style.display = isOccupato ? 'flex' : 'none';
+      document.getElementById('btn-popup-chiudi').style.display = isOccupato ? 'flex' : 'none';
+
+      menu.style.display = 'block';
+      menu.style.left = e.pageX + 'px';
+      menu.style.top = e.pageY + 'px';
     }
 
     function azioneMenu(tipo) {
       if (!tavoloSelezionatoCorrente) return;
-      const { tavolo, nomeTavolo } = tavoloSelezionatoCorrente;
+      const t = tavoloSelezionatoCorrente;
       
-      localStorage.setItem('tavoloSelezionato', nomeTavolo);
-      localStorage.setItem('tavoloSelezionatoId', tavolo.id);
-
-      let db = JSON.parse(localStorage.getItem('winbeach_archivio_ristorante'));
+      localStorage.setItem('tavoloSelezionato', `Tavolo ${t.numero}`);
+      localStorage.setItem('tavoloSelezionatoId', t.id);
 
       if (tipo === 'apri') {
         const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-        localStorage.setItem(`ora_apertura_tavolo_${tavolo.id}`, oraAttuale);
+        localStorage.setItem(`ora_apertura_tavolo_${t.id}`, oraAttuale);
+        localStorage.setItem(`carrello_tavolo_${t.id}`, JSON.stringify([]));
+        localStorage.setItem(`coperti_tavolo_${t.id}`, "1");
         
-        db.tavoli = db.tavoli.map(t => t.id === tavolo.id ? { ...t, stato: 'occupato' } : t);
-        localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+        dbRistorante.tavoli = dbRistorante.tavoli.map(item => item.id === t.id ? { ...item, stato: 'occupato' } : item);
+        localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(dbRistorante));
         generaMappaTavoli();
-      } else {
+      } else if (tipo === 'comanda' || tipo === 'chiudi') {
         localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
-        
-        // 1. Prova a cambiare la schermata principale tramite la dashboard
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
-        }
-        
-        // 2. Sicurezza: Se la dashboard non riceve il messaggio, apre direttamente pointsale.html qui
-        setTimeout(() => {
+        } else {
           window.location.href = 'pointsale.html';
-        }, 300);
+        }
+      } else if (tipo === 'sposta') {
+        apriSpostaTavolo();
+      } else if (tipo === 'unisci') {
+        apriUnisciTavoli();
       }
       document.getElementById('custom-popup-menu').style.display = 'none';
     }
 
-    // Chiude il menu se si clicca in un punto qualsiasi fuori dal popup
+    function apriSpostaTavolo() {
+      const select = document.getElementById('select-tavolo-destinazione');
+      select.innerHTML = '';
+      dbRistorante.tavoli.filter(t => t.stato !== 'occupato' && t.id !== tavoloSelezionatoCorrente.id).forEach(t => {
+        select.innerHTML += `<option value="${t.id}">Tavolo ${t.numero}</option>`;
+      });
+      document.getElementById('dialog-sposta').showModal();
+    }
+
+    function confermaSposta() {
+      const destId = document.getElementById('select-tavolo-destinazione').value;
+      if (!destId) return;
+      const sorgId = tavoloSelezionatoCorrente.id;
+
+      // Sposta dati localStorage
+      localStorage.setItem(`ora_apertura_tavolo_${destId}`, localStorage.getItem(`ora_apertura_tavolo_${sorgId}`));
+      localStorage.setItem(`carrello_tavolo_${destId}`, localStorage.getItem(`carrello_tavolo_${sorgId}`));
+      localStorage.setItem(`coperti_tavolo_${destId}`, localStorage.getItem(`coperti_tavolo_${sorgId}`) || "1");
+      localStorage.setItem(`tavoli_uniti_a_${destId}`, localStorage.getItem(`tavoli_uniti_a_${sorgId}`) || "[]");
+
+      // Rimuove vecchi
+      localStorage.removeItem(`ora_apertura_tavolo_${sorgId}`);
+      localStorage.removeItem(`carrello_tavolo_${sorgId}`);
+      localStorage.removeItem(`coperti_tavolo_${sorgId}`);
+      localStorage.removeItem(`tavoli_uniti_a_${sorgId}`);
+
+      // Aggiorna stati DB
+      dbRistorante.tavoli = dbRistorante.tavoli.map(t => {
+        if (t.id === sorgId) return { ...t, stato: 'libero' };
+        if (String(t.id) === String(destId)) return { ...t, stato: 'occupato' };
+        return t;
+      });
+      localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(dbRistorante));
+      document.getElementById('dialog-sposta').close();
+      generaMappaTavoli();
+    }
+
+    function apriUnisciTavoli() {
+      const container = document.getElementById('lista-tavoli-unibili');
+      container.innerHTML = '';
+      dbRistorante.tavoli.filter(t => t.stato !== 'occupato' && t.id !== tavoloSelezionatoCorrente.id).forEach(t => {
+        container.innerHTML += `<label><input type="checkbox" value="${t.numero}" data-id="${t.id}"> Tavolo ${t.numero}</label>`;
+      });
+      document.getElementById('dialog-unisci').showModal();
+    }
+
+    function confermaUnione() {
+      const checkboxes = document.querySelectorAll('#lista-tavoli-unibili input:checked');
+      const numeriUniti = [];
+      
+      checkboxes.forEach(cb => {
+        numeriUniti.push(cb.value);
+        const unitoId = cb.getAttribute('data-id');
+        dbRistorante.tavoli = dbRistorante.tavoli.map(t => String(t.id) === String(unitoId) ? { ...t, stato: 'occupato' } : t);
+        localStorage.setItem(`ora_apertura_tavolo_${unitoId}`, new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
+      });
+
+      localStorage.setItem(`tavoli_uniti_a_${tavoloSelezionatoCorrente.id}`, JSON.stringify(numeriUniti));
+      localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(dbRistorante));
+      document.getElementById('dialog-unisci').close();
+      generaMappaTavoli();
+    }
+
     document.addEventListener('click', () => {
       const menu = document.getElementById('custom-popup-menu');
       if (menu) menu.style.display = 'none';
