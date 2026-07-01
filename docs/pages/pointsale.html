@@ -16,7 +16,9 @@
     <h2><i class="fa-solid fa-cash-register" style="color: var(--wb-accent); margin-right: 8px;"></i> Cassa Ristorante (Point of Sale)</h2>
     <div class="tavolo-badge" id="lbl-tavolo">Caricamento...</div>
   </div>
-
+<button type="button" onclick="apriDialogCambioTavoloRapido()" style="margin-left: 10px; padding: 5px 10px; font-size: 0.85rem; cursor: pointer; background: #0288d1; color: white; border: none; border-radius: 4px;">
+  <i class="fa-solid fa-鋪fa-shuffle"></i> Cambia Tavolo Rapido
+</button>
   <div class="main-container">
     <div class="prodotti-section">
       <div class="categorie-bar" id="barra-categorie-dinamica"></div>
@@ -47,7 +49,18 @@
       </div>
     </div>
   </div>
+<dialog id="dialog-cambio-tavolo-rapido" style="border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: var(--wb-bg-card, #fff); color: var(--wb-text, #333); min-width: 320px;">
+  <h3 style="margin-top: 0;"><i class="fa-solid fa-utensils"></i> Seleziona Tavolo</h3>
+  <p style="font-size: 0.9rem; color: gray;">Seleziona un tavolo per caricare la sua comanda:</p>
+  
+  <select id="select-cambio-tavolo-rapido" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem; margin-top: 10px;">
+    </select>
 
+  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+    <button type="button" class="btn-annulla" onclick="document.getElementById('dialog-cambio-tavolo-rapido').close()" style="padding: 8px 15px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer;">Annulla</button>
+    <button type="button" class="btn-conferma" onclick="confermaCambioTavoloRapido()" style="padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 4px; cursor: pointer;">Carica Tavolo</button>
+  </div>
+</dialog>
   <script src="../js/pointsale.js?v=1"></script>
 </body>
 </html>
