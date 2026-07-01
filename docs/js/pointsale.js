@@ -5,32 +5,24 @@ let copertiCorrenti = 1;
 
 function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
-// Inizializzazione della cassa ad ogni visualizzazione della pagina
 window.addEventListener('pageshow', function () {
   let tbl = localStorage.getItem('tavoloSelezionato') || wbT('pos.counter');
   const tavoloId = localStorage.getItem('tavoloSelezionatoId');
   
-  // SE I TAVOLI SONO UNITI, LI VISUALIZZA ACCANTO AL NOME PRINCIPALE
   if (tavoloId) {
     const uniti = JSON.parse(localStorage.getItem(`tavoli_uniti_a_${tavoloId}`) || "[]");
     if (uniti.length > 0) {
       tbl += ` (+ T. ${uniti.join(', ')})`;
     }
-    
-    // Recupera la comanda separata salvata per questo specifico tavolo
     const carrelloSalvato = localStorage.getItem(`carrello_tavolo_${tavoloId}`);
     carrello = carrelloSalvato ? JSON.parse(carrelloSalvato) : [];
-    
-    // Recupera i coperti salvati per questo tavolo
     copertiCorrenti = parseInt(localStorage.getItem(`coperti_tavolo_${tavoloId}`) || "1", 10);
   } else {
     carrello = [];
     copertiCorrenti = 1;
   }
 
-  // Costruisce la barra dei coperti sopra o sotto il titolo del tavolo se l'elemento esiste
   mostraInterfacciaCoperti();
-
   document.getElementById('lbl-tavolo').innerText = tbl;
   
   const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
@@ -40,59 +32,28 @@ window.addEventListener('pageshow', function () {
   
   costruisciMenuCassa();
   aggiornaXBrowse();
-
-  const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
-  if (azioneRichiesta === 'pagamento') {
-    console.log("Modalità pagamento diretto attivata.");
-    alert("Pronto per il saldo del " + tbl + ". Scegli il metodo di pagamento ed esegui la chiusura.");
-  }
 });
 
-function mostraInterfacciaCoperti() {
-  let box = document.getElementById('box-coperti-cassa');
-  if (!box) {
-    // Se non esiste l'elemento nel tuo HTML, lo inseriamo dinamicamente sotto il titolo del tavolo
-    const header = document.getElementById('lbl-tavolo').parentElement;
-    box = document.createElement('div');
-    box.id = 'box-coperti-cassa';
-    box.style = 'margin: 5px 0; display: flex; align-items: center; gap: 10px; font-size: 0.95rem;';
-    header.appendChild(box);
-  }
-  
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-  if (!tavoloId) {
-    box.innerHTML = ''; // Nessun coperto per la vendita al banco diretta
-    return;
-  }
-
-  box.innerHTML = `
-    <strong>Coperti:</strong>
-    <button type="button" onclick="cambiaCoperti(-1)" style="padding: 2px 8px; font-weight: bold; cursor:pointer;">-</button>
-    <span id="txt-coperti-valore" style="font-weight: bold; color: #0288d1;">${copertiCorrenti}</span>
-    <button type="button" onclick="cambiaCoperti(1)" style="padding: 2px 8px; font-weight: bold; cursor:pointer;">+</button>
-  `;
+/* SCORRIMENTO ORIZZONTALE CATEGORIE */
+function scorriCategorie(valore) {
+  const container = document.getElementById('barra-categorie-dinamica');
+  if (container) container.scrollLeft += valore;
 }
 
-function cambiaCoperti(val) {
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-  if (!tavoloId) return;
-
-  copertiCorrenti += val;
-  if (copertiCorrenti < 1) copertiCorrenti = 1;
-  
-  document.getElementById('txt-coperti-valore').innerText = copertiCorrenti;
-  localStorage.setItem(`coperti_tavolo_${tavoloId}`, copertiCorrenti.toString());
-  aggiornaXBrowse(); // Ricalcola se hai una riga costo coperti automatica, o semplicemente aggiorna
+/* SCORRIMENTO VERTICALE PRODOTTI (A RIGHE) */
+function scorriProdotti(valore) {
+  const container = document.getElementById('grid-prodotti');
+  if (container) container.scrollTop += valore;
 }
 
+/* COSTRUZIONE BOTTONI CATEGORIE */
 function costruisciMenuCassa() {
   const barraCat = document.getElementById('barra-categorie-dinamica');
   if (!barraCat) return;
   barraCat.innerHTML = '';
 
   if (!dbRistorante.categorie || dbRistorante.categorie.length === 0) {
-    barraCat.innerHTML = '<span style="color:gray; padding:10px; font-style:italic;">Nessuna categoria creata</span>';
-    document.getElementById('grid-prodotti').innerHTML = '';
+    barraCat.innerHTML = '<span style="color:gray; padding:10px; font-style:italic;">Nessuna categoria</span>';
     return;
   }
 
@@ -100,15 +61,16 @@ function costruisciMenuCassa() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'cat-btn';
-    btn.innerText = c.nome;
     
-    if (index === 0 && !categoriaAttiva) {
-      categoriaAttiva = c.nome;
+    // Gestione Immagine Categoria (Se presente nel database)
+    if (c.immagine && c.immagine.trim() !== "") {
+      btn.innerHTML = `<img src="${c.immagine}" alt=""> <span>${c.nome}</span>`;
+    } else {
+      btn.innerHTML = `<i class="fa-solid fa-folder"></i> <span>${c.nome}</span>`;
     }
     
-    if (categoriaAttiva === c.nome) {
-      btn.classList.add('active');
-    }
+    if (index === 0 && !categoriaAttiva) categoriaAttiva = c.nome;
+    if (categoriaAttiva === c.nome) btn.classList.add('active');
 
     btn.onclick = function() {
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -116,15 +78,13 @@ function costruisciMenuCassa() {
       categoriaAttiva = c.nome;
       caricaArticoliDellaCategoria(c.nome);
     };
-
     barraCat.appendChild(btn);
   });
 
-  if (categoriaAttiva) {
-    caricaArticoliDellaCategoria(categoriaAttiva);
-  }
+  if (categoriaAttiva) caricaArticoliDellaCategoria(categoriaAttiva);
 }
 
+/* CARICAMENTO ARTICOLI IN GRIGLIA A 4 RIGHE */
 function caricaArticoliDellaCategoria(catNome) {
   const grid = document.getElementById('grid-prodotti');
   if (!grid) return;
@@ -133,214 +93,133 @@ function caricaArticoliDellaCategoria(catNome) {
   const prodottiFiltrati = dbRistorante.prodotti ? dbRistorante.prodotti.filter(p => p.categoriaId === catNome) : [];
 
   if (prodottiFiltrati.length === 0) {
-    grid.innerHTML = '<p style="grid-column: 1/-1; padding: 20px; color: gray; font-style: italic;">Nessun prodotto in questa categoria.</p>';
+    grid.innerHTML = '<p style="padding:20px; color:gray;">Nessun prodotto.</p>';
     return;
   }
 
   prodottiFiltrati.forEach(p => {
     const card = document.createElement('div');
     card.className = 'articolo-card';
+    
+    // CONTROLLO IMMAGINE PRODOTTO: Se c'è la mostra, altrimenti inserisce l'icona posate di fallback
+    let bloccoImmagine = `<div class="no-img-placeholder"><i class="fa-solid fa-utensils"></i></div>`;
+    if (p.immagine && p.immagine.trim() !== "") {
+      bloccoImmagine = `<img src="${p.immagine}" onerror="this.onerror=null; this.parentElement.querySelector('.no-img-placeholder').style.display='flex'; this.style.display='none';">`;
+    }
+
     card.innerHTML = `
+      ${bloccoImmagine}
       <div class="name">${p.nome}</div>
       <div class="price">${Number(p.prezzo).toFixed(2)} €</div>
     `;
-    card.onclick = function() {
-      aggiungiProdotto(p.nome, p.prezzo);
-    };
+    
+    card.onclick = function() { aggiungiProdotto(p.nome, p.prezzo); };
     grid.appendChild(card);
   });
 }
 
-function aggiungiProdotto(nome, prezzo) {
-  const item = carrello.find((i) => i.nome === nome);
-  if (item) item.qta++;
-  else carrello.push({ nome, qta: 1, prezzo });
-  
-  // SALVATAGGIO IN TEMPO REALE DELLA VERA COMANDA DEL TAVOLO
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-  if (tavoloId) {
-    localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello));
-  }
-  
-  aggiornaXBrowse();
-}
-
-function rimuoviProdotto(idx) {
-  carrello.splice(idx, 1);
-  
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-  if (tavoloId) {
-    localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello));
-  }
-  
-  aggiornaXBrowse();
-}
-
-function aggiornaXBrowse() {
-  const tbody = document.getElementById('xbrowse-body');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  let totaleConto = 0;
-
-  carrello.forEach((item, idx) => {
-    const rigaTot = item.qta * item.prezzo;
-    totaleConto += rigaTot;
-    tbody.innerHTML += `
-      <tr>
-        <td><strong>${item.nome}</strong></td>
-        <td style="text-align:center;">${item.qta}</td>
-        <td style="text-align:right;">${rigaTot.toFixed(2)} €</td>
-        <td style="text-align:center;"><button type="button" class="btn-del" onclick="rimuoviProdotto(${idx})"><i class="fa-regular fa-trash-can"></i></button></td>
-      </tr>`;
-  });
-  document.getElementById('txt-totale').innerText = totaleConto.toFixed(2) + ' €';
-}
-
-function inviaComanda() {
-  if (carrello.length === 0) return alert(wbT('pos.empty'));
-  
-  const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
-  if (azioneRichiesta === 'pagamento') {
-    completaPagamentoESvotaTavolo();
-  } else {
-    alert(wbT('pos.sent'));
-    // Resta sul tavolo aperto senza ripulire la schermata globale, l'ordine è andato
-  }
-}
-
-function completaPagamentoESvotaTavolo() {
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-  
-  if (tavoloId) {
-    // Elenco di tutti i tavoli coinvolti (quello principale + eventuali uniti)
-    const uniti = JSON.parse(localStorage.getItem(`tavoli_uniti_a_${tavoloId}`) || "[]");
-    
-    // Ripulisce il tavolo principale
-    localStorage.removeItem(`ora_apertura_tavolo_${tavoloId}`);
-    localStorage.removeItem(`carrello_tavolo_${tavoloId}`);
-    localStorage.removeItem(`coperti_tavolo_${tavoloId}`);
-    localStorage.removeItem(`tavoli_uniti_a_${tavoloId}`);
-
-    dbRistorante.tavoli = dbRistorante.tavoli.map(t => String(t.id) === String(tavoloId) ? { ...t, stato: 'libero' } : t);
-
-    // Ripulisce e sblocca tutti i tavoli che erano stati uniti a questo
-    uniti.forEach(numTavolo => {
-      const tUnito = dbRistorante.tavoli.find(t => String(t.numero) === String(numTavolo));
-      if (tUnito) {
-        localStorage.removeItem(`ora_apertura_tavolo_${tUnito.id}`);
-        localStorage.removeItem(`carrello_tavolo_${tUnito.id}`);
-        localStorage.removeItem(`coperti_tavolo_${tUnito.id}`);
-        tUnito.stato = 'libero';
-      }
-    });
-
-    localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(dbRistorante));
-  }
-  
-  alert("Pagamento registrato con successo! I tavoli selezionati sono stati liberati.");
-  
-  carrello = [];
-  localStorage.removeItem('tavoloSelezionato');
-  localStorage.removeItem('tavoloSelezionatoId');
-  localStorage.removeItem('pos_azione_richiesta');
-  
-  if (window.parent && window.parent !== window) {
-    window.parent.postMessage({ comando: 'cambiaPagina', target: 'ristorante' }, '*');
-  } else {
-    window.location.href = 'tavolinew.html';
-  }
-}
-
-
-// Funzione per aprire la dialog e popolare la select con i tavoli reali del DB
+/* CAMBIO TAVOLO RAPIDO DIALOG */
 function apriDialogCambioTavoloRapido() {
   const select = document.getElementById('select-cambio-tavolo-rapido');
   if (!select) return;
+  select.innerHTML = '';
   
-  select.innerHTML = ''; // Svuota la select precedente
-  
-  // Legge l'archivio reale configurato nel localStorage
   const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-  if (!datiSalvati) {
-    alert("Nessun tavolo configurato nel sistema.");
-    return;
-  }
+  if (!datiSalvati) return alert("Nessun tavolo caricato.");
   
   const db = JSON.parse(datiSalvati);
-  if (!db.tavoli || db.tavoli.length === 0) {
-    select.innerHTML = '<option value="">Nessun tavolo trovato</option>';
-    return;
-  }
-
-  // Ordina i tavoli per numero per comodità dell'operatore
   db.tavoli.sort((a, b) => Number(a.numero) - Number(b.numero));
 
-  // Raggruppa o elenca semplicemente i tavoli indicando lo stato (Libero/Occupato)
   db.tavoli.forEach(t => {
     const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
     const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
-    const statoTesto = isOccupato ? `(Occupato - ${orarioApertura || 'In corso'})` : '(Libero)';
+    const stato = isOccupato ? `(Occupato - ${orarioApertura})` : '(Libero)';
     
-    const option = document.createElement('option');
-    option.value = t.id;
-    option.setAttribute('data-numero', t.numero);
-    option.innerText = `Tavolo ${t.numero} ${statoTesto}`;
-    
-    // Se è il tavolo attualmente aperto, lo seleziona di default nella lista
-    if (String(t.id) === String(localStorage.getItem('tavoloSelezionatoId'))) {
-      option.selected = true;
-    }
-    
-    select.appendChild(option);
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.setAttribute('data-numero', t.numero);
+    opt.innerText = `Tavolo ${t.numero} ${stato}`;
+    if (String(t.id) === String(localStorage.getItem('tavoloSelezionatoId'))) opt.selected = true;
+    select.appendChild(opt);
   });
-
-  // Mostra la finestra modale
   document.getElementById('dialog-cambio-tavolo-rapido').showModal();
 }
 
-// Funzione che salva lo stato attuale del vecchio tavolo e carica all'istante il nuovo
 function confermaCambioTavoloRapido() {
   const select = document.getElementById('select-cambio-tavolo-rapido');
   const idSelezionato = select.value;
   if (!idSelezionato) return;
   
-  const optionSelezionata = select.options[select.selectedIndex];
-  const numeroTavolo = optionSelezionata.getAttribute('data-numero');
+  const opt = select.options[select.selectedIndex];
+  const numeroTavolo = opt.getAttribute('data-numero');
 
-  // 1. SALVA AUTOMATICAMENTE LA COMANDA ATTUALE DEL TAVOLO VECCHIO PRIMA DI ANDARSENE
   const vecchioTavoloId = localStorage.getItem('tavoloSelezionatoId');
   if (vecchioTavoloId) {
     localStorage.setItem(`carrello_tavolo_${vecchioTavoloId}`, JSON.stringify(carrello));
   }
 
-  // 2. SE IL NUOVO TAVOLO SELEZIONATO ERA LIBERO, LO APRE IN AUTOMATICO
   const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
   if (datiSalvati) {
     let db = JSON.parse(datiSalvati);
-    let tavoloTarget = db.tavoli.find(t => String(t.id) === String(idSelezionato));
-    
-    if (tavoloTarget && tavoloTarget.stato !== 'occupato') {
-      // Imposta l'orario di apertura automatico e lo marca come occupato
-      const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-      localStorage.setItem(`ora_apertura_tavolo_${idSelezionato}`, oraAttuale);
+    let target = db.tavoli.find(t => String(t.id) === String(idSelezionato));
+    if (target && target.stato !== 'occupato') {
+      localStorage.setItem(`ora_apertura_tavolo_${idSelezionato}`, new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
       localStorage.setItem(`coperti_tavolo_${idSelezionato}`, "1");
-      
-      tavoloTarget.stato = 'occupato';
+      target.stato = 'occupato';
       localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
     }
   }
 
-  // 3. IMPOSTA LE CHIAVI DI SESSIONE SUL NUOVO TAVOLO
   localStorage.setItem('tavoloSelezionato', `Tavolo ${numeroTavolo}`);
   localStorage.setItem('tavoloSelezionatoId', idSelezionato);
-  localStorage.setItem('pos_azione_richiesta', 'ordinazione'); // Ripristina su ordinazione standard
+  localStorage.setItem('pos_azione_richiesta', 'ordinazione');
 
-  // 4. CHIUDE LA DIALOG
   document.getElementById('dialog-cambio-tavolo-rapido').close();
-
-  // 5. SIMULA IL PAGESHOW PER FORZARE IL RILEGAMENTO DATI SENZA FARE IL REFRESH DELLA PAGINA
-  // Questo riprenderà l'array corretto, i coperti corretti ed eventuali tavoli uniti
   window.dispatchEvent(new Event('pageshow'));
 }
 
-window.addEventListener('winbeach-lang-change', () => import('../js/page-i18n.js').then((m) => m.applyPageI18n()));
+/* FUNZIONI DI SERVIZIO STANDARD */
+function mostraInterfacciaCoperti() {
+  let box = document.getElementById('box-coperti-cassa');
+  if (!box) return;
+  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  if (!tavoloId) { box.innerHTML = ''; return; }
+  box.innerHTML = `
+    <strong>Coperti:</strong>
+    <button type="button" onclick="cambiaCoperti(-1)">-</button>
+    <span id="txt-coperti-valore" style="font-weight:bold;margin:0 5px;">${copertiCorrenti}</span>
+    <button type="button" onclick="cambiaCoperti(1)">+</button>
+  `;
+}
+function cambiaCoperti(val) {
+  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  if (!tavoloId) return;
+  copertiCorrenti += val;
+  if (copertiCorrenti < 1) copertiCorrenti = 1;
+  document.getElementById('txt-coperti-valore').innerText = copertiCorrenti;
+  localStorage.setItem(`coperti_tavolo_${tavoloId}`, copertiCorrenti.toString());
+  aggiornaXBrowse();
+}
+function aggiungiProdotto(nome, prezzo) {
+  const item = carrello.find((i) => i.nome === nome);
+  if (item) item.qta++; else carrello.push({ nome, qta: 1, prezzo });
+  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  if (tavoloId) localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello));
+  aggiornaXBrowse();
+}
+function rimuoviProdotto(idx) {
+  carrello.splice(idx, 1);
+  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  if (tavoloId) localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello));
+  aggiornaXBrowse();
+}
+function aggiornaXBrowse() {
+  const tbody = document.getElementById('xbrowse-body');
+  if (!tbody) return; tbody.innerHTML = ''; let tot = 0;
+  carrello.forEach((item, idx) => {
+    const rigaTot = item.qta * item.prezzo; tot += rigaTot;
+    tbody.innerHTML += `<tr><td><strong>${item.nome}</strong></td><td style="text-align:center;">${item.qta}</td><td style="text-align:right;">${rigaTot.toFixed(2)} €</td><td style="text-align:center;"><button type="button" class="btn-del" onclick="rimuoviProdotto(${idx})"><i class="fa-regular fa-trash-can"></i></button></td></tr>`;
+  });
+  const lblTot = document.getElementById('txt-totale');
+  if (lblTot) lblTot.innerText = tot.toFixed(2) + ' €';
+}
