@@ -23,18 +23,18 @@
     .zona-container { margin-bottom: 30px; }
     .tavolo-card { cursor: pointer; position: relative; }
     
-    /* Stile per l'ora di apertura sul tavolo */
+    /* Stile orario di apertura sul tavolo */
     .ora-apertura {
       display: block;
       font-size: 0.75rem;
-      background: rgba(0,0,0,0.1);
+      background: rgba(0, 0, 0, 0.15);
       padding: 2px 5px;
       border-radius: 4px;
       margin-top: 4px;
       font-weight: bold;
     }
 
-    /* STILE POPUP MENU */
+    /* POPUP INTERATTIVO */
     .popup-menu-tavolo {
       display: none;
       position: absolute;
@@ -43,7 +43,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       border-radius: 8px;
       z-index: 9999;
-      min-width: 150px;
+      min-width: 160px;
       overflow: hidden;
     }
     .popup-menu-tavolo button {
@@ -65,6 +65,7 @@
     }
     .popup-menu-tavolo button.opzione-chiudi {
       color: #d32f2f;
+      border-top: 1px solid var(--wb-border, #eee);
     }
   </style>
 </head>
@@ -85,20 +86,30 @@
 
   <script>
     let tavoloSelezionatoCorrente = null;
-
     function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
     function generaMappaTavoli() {
       const contenitorePrincipale = document.getElementById('mappa-dinamica-sale');
       if (!contenitorePrincipale) return;
+      
       contenitorePrincipale.innerHTML = '';
 
+      // Legge l'archivio reale dal LocalStorage
       const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-      if (!datiSalvati) return;
+      
+      if (!datiSalvati) {
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-triangle-exclamation"></i> Nessuna configurazione trovata. Salva le sale dal pannello.</div>`;
+        return;
+      }
 
       const dbRistorante = JSON.parse(datiSalvati);
-      if (!dbRistorante.sale || dbRistorante.sale.length === 0) return;
 
+      if (!dbRistorante.sale || dbRistorante.sale.length === 0) {
+        contenitorePrincipale.innerHTML = `<div class="messaggio-vuoto"><i class="fa-solid fa-house-laptop"></i> Nessuna sala creata nel tuo archivio.</div>`;
+        return;
+      }
+
+      // Ciclo sulle sale reali impostate dall'utente
       dbRistorante.sale.forEach(sala => {
         const zonaDiv = document.createElement('div');
         zonaDiv.className = 'zona-container';
@@ -109,49 +120,51 @@
         contenitorePrincipale.appendChild(zonaDiv);
 
         const grigliaTavoli = document.getElementById(`grid-sala-${sala.id}`);
-        const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => Number(t.salaId) === Number(sala.id)) : [];
+        const tavoliDellaSala = dbRistorante.tavoli ? dbRistorante.tavoli.filter(t => String(t.salaId) === String(sala.id)) : [];
 
-        tavoliDellaSala.forEach(t => {
-          // Recuperiamo lo stato e l'orario in tempo reale dal database o dal localStorage temporaneo
-          const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
-          const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
-          
-          const statoClasse = isOccupato ? 'occupato' : '';
-          const statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
-          const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
+        if (tavoliDellaSala.length === 0) {
+          grigliaTavoli.innerHTML = `<p style="padding: 10px; color: gray; font-style: italic;">Nessun tavolo inserito in questa sala.</p>`;
+        } else {
+          tavoliDellaSala.forEach(t => {
+            const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
+            const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
+            
+            const statoClasse = isOccupato ? 'occupato' : '';
+            
+            // Fix stringhe di traduzione grezze
+            let statoTesto = isOccupato ? wbT('tavoli.busy') : wbT('tavoli.free');
+            if (statoTesto === 'tavoli.busy') statoTesto = 'Occupato';
+            if (statoTesto === 'tavoli.free') statoTesto = 'Libero';
 
-          const card = document.createElement('div');
-          card.className = `tavolo-card ${statoClasse}`;
-          
-          let htmlInterno = `
-            <i class="fa-solid ${icona}"></i>
-            <h3>Tavolo ${t.numero}</h3>
-            <small>${statoTesto}</small>
-          `;
-          
-          if (orarioApertura) {
-            htmlInterno += `<span class="ora-apertura"><i class="fa-regular fa-clock"></i> ${orarioApertura}</span>`;
-          }
+            const icona = isOccupato ? 'fa-utensils' : 'fa-circle-dot';
 
-          card.innerHTML = htmlInterno;
+            const card = document.createElement('div');
+            card.className = `tavolo-card ${statoClasse}`;
+            
+            let htmlInterno = `
+              <i class="fa-solid ${icona}"></i>
+              <h3>Tavolo ${t.numero}</h3>
+              <small>${statoTesto}</small>
+            `;
+            if (orarioApertura) {
+              htmlInterno += `<span class="ora-apertura"><i class="fa-regular fa-clock"></i> ${orarioApertura}</span>`;
+            }
+            card.innerHTML = htmlInterno;
 
-          card.addEventListener('click', function(e) {
-            e.stopPropagation();
-            mostraPopupMenu(e, t, `Tavolo ${t.numero}`);
+            // Click per aprire il menu a tendina
+            card.addEventListener('click', function(e) {
+              e.stopPropagation();
+              tavoloSelezionatoCorrente = { tavolo: t, nomeTavolo: `Tavolo ${t.numero}` };
+              const menu = document.getElementById('custom-popup-menu');
+              menu.style.display = 'block';
+              menu.style.left = e.pageX + 'px';
+              menu.style.top = e.pageY + 'px';
+            });
+
+            grigliaTavoli.appendChild(card);
           });
-
-          grigliaTavoli.appendChild(card);
-        });
+        }
       });
-    }
-
-    function mostraPopupMenu(e, tavolo, nomeTavolo) {
-      tavoloSelezionatoCorrente = { tavolo, nomeTavolo };
-      const menu = document.getElementById('custom-popup-menu');
-      
-      menu.style.display = 'block';
-      menu.style.left = e.pageX + 'px';
-      menu.style.top = e.pageY + 'px';
     }
 
     function azioneMenu(tipo) {
@@ -161,47 +174,31 @@
       localStorage.setItem('tavoloSelezionato', nomeTavolo);
       localStorage.setItem('tavoloSelezionatoId', tavolo.id);
 
-      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-      let db = JSON.parse(datiSalvati);
+      let db = JSON.parse(localStorage.getItem('winbeach_archivio_ristorante'));
 
       if (tipo === 'apri') {
-        // Opzione 1: Apri Tavolo -> Imposta Orario, diventa rosso (occupato)
         const oraAttuale = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-        localStorage.setItem(`ora_apertura_tavolo_${tavelo.id}`, oraAttuale);
-        
-        // Aggiorna lo stato nel DB locale
+        localStorage.setItem(`ora_apertura_tavolo_${tavolo.id}`, oraAttuale);
         db.tavoli = db.tavoli.map(t => t.id === tavolo.id ? { ...t, stato: 'occupato' } : t);
         localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
-        
         generaMappaTavoli();
-      } 
-      else if (tipo === 'comanda') {
-        // Opzione 2: Va al POS normalmente per aggiungere piatti
-        localStorage.setItem('pos_azione_richiesta', 'ordinazione');
-        reindirizzaVersoPOS();
-      } 
-      else if (tipo === 'chiudi') {
-        // Opzione 3: Va al POS ma richiede direttamente la schermata di pagamento
-        localStorage.setItem('pos_azione_richiesta', 'pagamento');
-        reindirizzaVersoPOS();
-      }
-
-      chiudiMenu();
-    }
-
-    function reindirizzaVersoPOS() {
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
       } else {
-        window.location.href = 'pointsale.html';
+        localStorage.setItem('pos_azione_richiesta', tipo === 'chiudi' ? 'pagamento' : 'ordinazione');
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ comando: 'cambiaPagina', target: 'pointsale' }, '*');
+        } else {
+          window.location.href = 'pointsale.html';
+        }
       }
-    }
-
-    function chiudiMenu() {
       document.getElementById('custom-popup-menu').style.display = 'none';
     }
 
-    document.addEventListener('click', chiudiMenu);
+    // Chiude il menu se si clicca in un punto qualsiasi fuori dal popup
+    document.addEventListener('click', () => {
+      const menu = document.getElementById('custom-popup-menu');
+      if (menu) menu.style.display = 'none';
+    });
+
     window.addEventListener('pageshow', generaMappaTavoli);
     window.onload = generaMappaTavoli;
   </script>
