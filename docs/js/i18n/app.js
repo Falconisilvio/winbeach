@@ -10,7 +10,7 @@ export const APP_LANGS = [
 
 export const APP_I18N = {
   it: {
-    'app.title': 'Beach Manager',
+    'app.title': 'WinBeach',
     'nav.menu': 'Apri menu',
     'nav.search': 'Ricerca globale',
     'search.placeholder': 'Ricerca cliente, postazione, hotel, voucher…',
@@ -76,7 +76,7 @@ export const APP_I18N = {
     'toast.error': 'Errore operazione',
   },
   en: {
-    'app.title': 'Beach Manager',
+    'app.title': 'WinBeach',
     'nav.menu': 'Open menu',
     'nav.search': 'Global search',
     'search.placeholder': 'Search customer, spot, hotel, voucher…',
@@ -142,7 +142,7 @@ export const APP_I18N = {
     'toast.error': 'Operation error',
   },
   es: {
-    'app.title': 'Beach Manager',
+    'app.title': 'WinBeach',
     'nav.menu': 'Abrir menú',
     'nav.search': 'Búsqueda global',
     'search.placeholder': 'Buscar cliente, puesto, hotel, voucher…',
@@ -208,7 +208,7 @@ export const APP_I18N = {
     'toast.error': 'Error en la operación',
   },
   fr: {
-    'app.title': 'Beach Manager',
+    'app.title': 'WinBeach',
     'nav.menu': 'Ouvrir le menu',
     'nav.search': 'Recherche globale',
     'search.placeholder': 'Client, emplacement, hôtel, voucher…',
@@ -274,7 +274,7 @@ export const APP_I18N = {
     'toast.error': 'Erreur',
   },
   de: {
-    'app.title': 'Beach Manager',
+    'app.title': 'WinBeach',
     'nav.menu': 'Menü öffnen',
     'nav.search': 'Globale Suche',
     'search.placeholder': 'Kunde, Platz, Hotel, Gutschein…',
