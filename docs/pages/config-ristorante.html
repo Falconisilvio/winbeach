@@ -9,19 +9,16 @@
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
-    /* Navigazione a Tab */
     .nav-tabs { display: flex; gap: 10px; margin: 0 20px 20px 20px; border-bottom: 2px solid var(--wb-border, #eee); padding-bottom: 10px; }
     .tab-btn { background: #e0e0e0; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; color: #333; transition: all 0.2s; }
     .tab-btn.active { background: var(--wb-accent, #0084FF); color: #fff; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Layout Logistica */
     .config-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 20px 20px 20px; }
     .config-card { background: var(--wb-bg-card, #fff); border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
     .config-card h2 { margin-top: 0; border-bottom: 2px solid var(--wb-accent, #0084FF); padding-bottom: 8px; font-size: 1.2rem; color: var(--wb-text); }
     
-    /* Layout Registri (Prodotti e Categorie) */
     .registro-container { background: var(--wb-bg-card, #fff); margin: 0 20px 20px 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .registro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .registro-stats { display: flex; gap: 15px; margin-bottom: 20px; }
@@ -29,13 +26,11 @@
     .stat-box .num { font-size: 1.5rem; font-weight: bold; color: var(--wb-accent, #0084FF); }
     .search-bar { width: 100%; max-width: 300px; padding: 8px 12px; border: 1px solid var(--wb-border, #ccc); border-radius: 4px; margin-bottom: 15px; }
     
-    /* Tabelle */
     .wb-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     .wb-table th, .wb-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--wb-border, #eee); vertical-align: middle; }
     .wb-table th { background: var(--wb-bg-item, #f5f5f5); font-weight: bold; }
     .wb-table tr:hover { background: var(--wb-bg-item, #fafafa); }
 
-    /* Form */
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
     .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid var(--wb-border, #ccc); border-radius: 4px; background: var(--wb-bg-input, #fff); color: var(--wb-text); box-sizing: border-box; }
@@ -54,7 +49,6 @@
     .img-preview-mini { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; vertical-align: middle; border: 1px solid #ccc; }
     .stato-modifica-badge { background: #ff9800; color: white; padding: 2px 6px; font-size: 0.75rem; border-radius: 3px; font-weight: bold; margin-left: 8px; display: none; }
     
-    /* Modale */
     .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center; }
     .modal-box { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #000; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
@@ -70,7 +64,6 @@
     <p>Configura la disposizione logistica delle sale ed inserisci i prodotti/categorie nel listino vendite.</p>
   </div>
 
-  <!-- MENU A TRE TAB COMPLETATO -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('tab-logistica')"><i class="fa-solid fa-layer-group"></i> 1. Sale e Tavoli</button>
     <button class="tab-btn" onclick="switchTab('tab-categorie')"><i class="fa-solid fa-tags"></i> 2. Registro Categorie</button>
@@ -116,7 +109,7 @@
     </div>
   </div>
 
-  <!-- TAB 2: REGISTRO CATEGORIE (NUOVO NUOVO!) -->
+  <!-- TAB 2: REGISTRO CATEGORIE -->
   <div id="tab-categorie" class="tab-content">
     <div class="registro-container">
       <div class="registro-header">
@@ -172,7 +165,7 @@
     </div>
   </div>
 
-  <!-- FINESTRA MODALE FORMS PRODOTTI / CATEGORIE -->
+  <!-- FINESTRA MODALE FORMS -->
   <div class="modal-overlay" id="modal-container">
     <div class="modal-box" id="box-modal-prodotto" style="display:none;">
       <div class="modal-header">
@@ -230,7 +223,11 @@
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (datiSalvati !== null) {
-        dbRistorante = JSON.parse(datiSalvati);
+        try {
+          dbRistorante = JSON.parse(datiSalvati);
+        } catch(e) {
+          console.error("Errore lettura localStorage, resetto.", e);
+        }
         if(!dbRistorante.sale) dbRistorante.sale = [];
         if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
         if(!dbRistorante.categorie) dbRistorante.categorie = [];
@@ -240,7 +237,12 @@
     }
 
     function salvaNelStorage() {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbRistorante));
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbRistorante));
+      } catch (e) {
+        alert("Attenzione: Spazio di archiviazione del browser pieno! Prova a ricaricare un'immagine più piccola.");
+        console.error("LocalStorage pieno!", e);
+      }
     }
 
     function aggiornaInterfaccia() {
@@ -290,16 +292,13 @@
       });
     }
 
-    /* RENDER TABELLA CATEGORIE */
     function renderCategorieTabella() {
       const tbody = document.getElementById('tbody-registro-categorie');
       tbody.innerHTML = '';
-      
       if(dbRistorante.categorie.length === 0) {
         tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: gray; padding:20px;">Nessuna categoria inserita.</td></tr>`;
         return;
       }
-
       dbRistorante.categorie.forEach(c => {
         let imgTag = c.immagine ? `<img src="${c.immagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tags" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
@@ -317,7 +316,6 @@
       });
     }
 
-    /* RENDER TABELLA PRODOTTI */
     function renderRegistroTabella() {
       document.getElementById('stat-tot-categorie').innerText = dbRistorante.categorie.length;
       document.getElementById('stat-tot-prodotti').innerText = dbRistorante.prodotti.length;
@@ -333,7 +331,6 @@
       });
 
       const prodottiFiltrati = dbRistorante.prodotti.filter(p => p.nome.toLowerCase().includes(query));
-
       if(prodottiFiltrati.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: gray; padding:20px;">Nessun prodotto trovato.</td></tr>`;
         return;
@@ -364,7 +361,7 @@
       document.getElementById('box-modal-categoria').style.display = 'none';
       document.getElementById('modal-prodotto-titolo').innerText = "Nuovo Prodotto";
       document.getElementById('edit-prodotto-id').value = '';
-      document.getElementById('edit-prodotto-img-salvata').value = ''; // CORRETTO ID QUI
+      document.getElementById('edit-prodotto-img-salvata').value = '';
       document.getElementById('form-prodotto').reset();
     }
 
@@ -417,6 +414,7 @@
       document.getElementById('badge-modifica-tavoli').style.display = 'inline-block';
     }
 
+    function群体voce(tipo, id) { eliminaVoce(tipo, id); }
     function eliminaVoce(tipo, id) {
       if (confirm("Vuoi eliminare definitivamente questo elemento?")) {
         dbRistorante[tipo] = dbRistorante[tipo].filter(x => x.id !== id);
@@ -425,7 +423,8 @@
       }
     }
 
-    function convertiFileInBase64(fileInput) {
+    // FUNZIONE DI COMPRESSIONE ED OTTIMIZZAZIONE IMMAGINI IN LINEA PER LOCALSTORAGE
+    function convertiEComprimiFileInBase64(fileInput) {
       return new Promise((resolve, reject) => {
         if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
           resolve("");
@@ -433,7 +432,34 @@
         }
         const file = fileInput.files[0];
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
+        
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Forziamo proporzioni piccole e scattanti (max 300px lato lungo)
+            const MAX_WIDTH = 300;
+            const MAX_HEIGHT = 300;
+            if (width > height) {
+              if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+              if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Salviamo in JPEG compresso al 70% di qualità (poche decine di kb)
+            const dataURL = canvas.toDataURL('image/jpeg', 0.7);
+            resolve(dataURL);
+          };
+          img.src = e.target.result;
+        };
         reader.onerror = error => reject(error);
         reader.readAsDataURL(file);
       });
@@ -482,8 +508,7 @@
       const fileInput = document.getElementById('file-categoria');
       const editId = document.getElementById('edit-categoria-id').value;
       
-      let stringaImmagine = "";
-      try { stringaImmagine = await convertiFileInBase64(fileInput); } catch(err) { console.error(err); }
+      let stringaImmagine = await convertiEComprimiFileInBase64(fileInput);
       
       if(editId) {
         if(!stringaImmagine || stringaImmagine === "") { stringaImmagine = document.getElementById('edit-categoria-img-salvata').value; }
@@ -505,12 +530,11 @@
       const fileInput = document.getElementById('file-prodotto');
       const editId = document.getElementById('edit-prodotto-id').value;
 
-      let stringaImmagine = "";
-      try { stringaImmagine = await convertiFileInBase64(fileInput); } catch(err) { console.error(err); }
+      let stringaImmagine = await convertiEComprimiFileInBase64(fileInput);
 
       if(editId) {
         if(!stringaImmagine || stringaImmagine === "") { stringaImmagine = document.getElementById('edit-prodotto-img-salvata').value; }
-        dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: stringaImmagine } : p);
+        dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoryId: categoriaNome, categoriaId: categoriaNome, immagine: stringaImmagine } : p);
       } else {
         const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
         dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: stringaImmagine });
