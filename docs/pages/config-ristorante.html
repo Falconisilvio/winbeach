@@ -9,122 +9,208 @@
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
-    .config-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+    /* Stili per la navigazione a Tab */
+    .nav-tabs { display: flex; gap: 10px; margin: 0 20px 20px 20px; border-bottom: 2px solid var(--wb-border, #eee); padding-bottom: 10px; }
+    .tab-btn { background: #e0e0e0; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; color: #333; transition: all 0.2s; }
+    .tab-btn.active { background: var(--wb-accent, #0084FF); color: #fff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Layout Griglie esistenti */
+    .config-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 20px 20px 20px; }
     .config-card { background: var(--wb-bg-card, #fff); border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
     .config-card h2 { margin-top: 0; border-bottom: 2px solid var(--wb-accent, #0084FF); padding-bottom: 8px; font-size: 1.2rem; color: var(--wb-text); }
+    
+    /* Layout Tabella Registro Prodotti (Stile Anagrafica Clienti) */
+    .registro-container { background: var(--wb-bg-card, #fff); margin: 0 20px 20px 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .registro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .registro-stats { display: flex; gap: 15px; margin-bottom: 20px; }
+    .stat-box { border: 1px solid var(--wb-border, #eee); padding: 10px 20px; border-radius: 6px; text-align: center; background: var(--wb-bg-item, #f9f9f9); min-width: 100px; }
+    .stat-box .num { font-size: 1.5rem; font-weight: bold; color: var(--wb-accent, #0084FF); }
+    .search-bar { width: 100%; max-width: 300px; padding: 8px 12px; border: 1px solid var(--wb-border, #ccc); border-radius: 4px; margin-bottom: 15px; }
+    
+    /* Tabelle standardizzate */
+    .wb-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .wb-table th, .wb-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--wb-border, #eee); }
+    .wb-table th { background: var(--wb-bg-item, #f5f5f5); font-weight: bold; }
+    .wb-table tr:hover { background: var(--wb-bg-item, #fafafa); }
+
+    /* Form e utility generiche */
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
     .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid var(--wb-border, #ccc); border-radius: 4px; background: var(--wb-bg-input, #fff); color: var(--wb-text); box-sizing: border-box; }
-    .btn-save { background: var(--wb-accent, #0084FF); color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+    .btn-save { background: var(--wb-accent, #0084FF); color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-save:hover { opacity: 0.9; }
-    .data-list { margin-top: 15px; max-height: 180px; overflow-y: auto; border: 1px solid var(--wb-border, #eee); border-radius: 4px; padding: 0; list-style: none; flex-grow: 1; }
+    .btn-add-new { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    
+    /* Liste laterali piccole */
+    .data-list { margin-top: 15px; max-height: 180px; overflow-y: auto; border: 1px solid var(--wb-border, #eee); border-radius: 4px; padding: 0; list-style: none; }
     .data-list li { padding: 8px 12px; border-bottom: 1px solid var(--wb-border, #eee); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; background: var(--wb-bg-item, #f9f9f9); margin-bottom: 4px; border-radius: 4px; color: #000; }
-    .data-list li:last-child { border-bottom: none; margin-bottom: 0; }
+    
+    /* Azioni pulsanti */
     .action-buttons { display: flex; gap: 5px; }
     .btn-del-item { background: transparent; border: none; color: #ff4d4d; cursor: pointer; padding: 4px 8px; font-size: 1rem; }
     .btn-del-item:hover { color: #cc0000; }
     .btn-edit-item { background: transparent; border: none; color: #0084FF; cursor: pointer; padding: 4px 8px; font-size: 1rem; }
-    .btn-edit-item:hover { color: #0056b3; }
-    .img-preview-mini { width: 30px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px; vertical-align: middle; border: 1px solid #ccc; }
+    
+    .img-preview-mini { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; vertical-align: middle; border: 1px solid #ccc; margin-right: 8px; }
     .stato-modifica-badge { background: #ff9800; color: white; padding: 2px 6px; font-size: 0.75rem; border-radius: 3px; font-weight: bold; margin-left: 8px; display: none; }
+    
+    /* Finestra Modale per Inserimento/Modifica Prodotti e Categorie */
+    .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center; }
+    .modal-box { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .modal-close { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+    
     @media (max-width: 768px) { .config-container { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body class="config-ristorante-page">
 
-  <div class="page-header" style="padding: 20px 20px 0 20px;">
-    <h1><i class="fa-solid fa-gears"></i> Pannello Configurazione Ristorante & Bar</h1>
-    <p>Gestisci l'archivio delle sale, dei tavoli, delle categorie del menu e dei singoli prodotti inserendo le immagini.</p>
+  <div class="page-header" style="padding: 20px 20px 10px 20px;">
+    <h1><i class="fa-solid fa-gears"></i> Gestione Configurazione Ristorante</h1>
+    <p>Configura la disposizione logistica delle sale ed inserisci i prodotti/categorie nel listino vendite.</p>
   </div>
 
-  <div class="config-container">
-    
-    <!-- GESTIONE SALE -->
-    <div class="config-card">
-      <div>
-        <h2><i class="fa-solid fa-house-user"></i> 1. Gestione Sale / Zone <span id="badge-modifica-sale" class="stato-modifica-badge">MODIFICA IN CORSO</span></h2>
-        <form id="form-sala">
-          <input type="hidden" id="edit-sala-id" value="">
-          <div class="form-group">
-            <label for="nome-sala">Nome Sala:</label>
-            <input type="text" id="nome-sala" placeholder="Es: Terrazza Mare, Sala Interna..." required>
-          </div>
-          <button type="submit" id="btn-submit-sala" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Sala</button>
-        </form>
+  <!-- MENU A TAB STILE PROFESSIONALE -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-logistica')"><i class="fa-solid fa-layer-group"></i> 1. Sale e Tavoli</button>
+    <button class="tab-btn" onclick="switchTab('tab-registro')"><i class="fa-solid fa-utensils"></i> 2. Registro Menu & Prodotti</button>
+  </div>
+
+  <!-- SEZIONE 1: LOGISTICA SALE E TAVOLI -->
+  <div id="tab-logistica" class="tab-content active">
+    <div class="config-container">
+      <!-- GESTIONE SALE -->
+      <div class="config-card">
+        <div>
+          <h2><i class="fa-solid fa-house-user"></i> Gestione Sale / Zone <span id="badge-modifica-sale" class="stato-modifica-badge">MODIFICA IN CORSO</span></h2>
+          <form id="form-sala">
+            <input type="hidden" id="edit-sala-id" value="">
+            <div class="form-group">
+              <label for="nome-sala">Nome Sala:</label>
+              <input type="text" id="nome-sala" placeholder="Es: Terrazza Mare, Sala Interna..." required>
+            </div>
+            <button type="submit" id="btn-submit-sala" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Sala</button>
+          </form>
+        </div>
+        <ul class="data-list" id="lista-sale"></ul>
       </div>
-      <ul class="data-list" id="lista-sale"></ul>
+
+      <!-- GESTIONE TAVOLI -->
+      <div class="config-card">
+        <div>
+          <h2><i class="fa-solid fa-circle-dot"></i> Inserimento Tavoli <span id="badge-modifica-tavoli" class="stato-modifica-badge">MODIFICA IN CORSO</span></h2>
+          <form id="form-tavolo">
+            <input type="hidden" id="edit-tavolo-id" value="">
+            <div class="form-group">
+              <label for="select-sala">Seleziona Sala:</label>
+              <select id="select-sala" required><option value="">Caricamento sale...</option></select>
+            </div>
+            <div class="form-group">
+              <label for="numero-tavolo">Numero o Nome Tavolo:</label>
+              <input type="text" id="numero-tavolo" placeholder="Es: 1, 14, Privè..." required>
+            </div>
+            <button type="submit" id="btn-submit-tavolo" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Tavolo</button>
+          </form>
+        </div>
+        <ul class="data-list" id="lista-tavoli"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEZIONE 2: REGISTRO PRODOTTI (STILE ANAGRAFICA CLIENTI) -->
+  <div id="tab-registro" class="tab-content">
+    <div class="registro-container">
+      <div class="registro-header">
+        <h2><i class="fa-solid fa-folder-open"></i> Registro Articoli e Categorie Menu</h2>
+        <div class="action-buttons">
+          <button class="btn-save" style="background:#6c757d;" onclick="apriModalCategoria()"><i class="fa-solid fa-tags"></i> Nuova Categoria</button>
+          <button class="btn-add-new" onclick="apriModalProdotto()"><i class="fa-solid fa-plus"></i> Nuovo Prodotto</button>
+        </div>
+      </div>
+
+      <div class="registro-stats">
+        <div class="stat-box">
+          <div class="num" id="stat-tot-categorie">0</div>
+          <small>Categorie</small>
+        </div>
+        <div class="stat-box">
+          <div class="num" id="stat-tot-prodotti">0</div>
+          <small>Prodotti Totali</small>
+        </div>
+      </div>
+
+      <input type="text" id="search-prodotti" class="search-bar" placeholder="Cerca prodotto per nome..." oninput="renderRegistroTabella()">
+
+      <table class="wb-table">
+        <thead>
+          <tr>
+            <th>Immagine</th>
+            <th>Nome Articolo</th>
+            <th>Categoria</th>
+            <th>Prezzo di Vendita</th>
+            <th style="text-align: right;">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-registro-prodotti">
+          <!-- Righe popolate via Javascript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FINESTRA MODALE FORMS PRODOTTI / CATEGORIE -->
+  <div class="modal-overlay" id="modal-container">
+    <!-- CONTENUTO COMPATTO PRODOTTO -->
+    <div class="modal-box" id="box-modal-prodotto" style="display:none;">
+      <div class="modal-header">
+        <h3 id="modal-prodotto-titolo">Nuovo Prodotto</h3>
+        <button class="modal-close" onclick="chiudiModale()">&times;</button>
+      </div>
+      <form id="form-prodotto">
+        <input type="hidden" id="edit-prodotto-id" value="">
+        <input type="hidden" id="edit-prodotto-img-salvata" value="">
+        <div class="form-group">
+          <label for="select-categoria">Categoria Prodotto:</label>
+          <select id="select-categoria" required></select>
+        </div>
+        <div class="form-group">
+          <label for="nome-prodotto">Nome Articolo:</label>
+          <input type="text" id="nome-prodotto" required>
+        </div>
+        <div class="form-group">
+          <label for="prezzo-prodotto">Prezzo (€):</label>
+          <input type="number" id="prezzo-prodotto" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="file-prodotto">Foto Prodotto (Lascia vuoto per mantenere attuale):</label>
+          <input type="file" id="file-prodotto" accept="image/*">
+        </div>
+        <button type="submit" class="btn-save" style="width:100%;">Salva Prodotto</button>
+      </form>
     </div>
 
-    <!-- GESTIONE TAVOLI -->
-    <div class="config-card">
-      <div>
-        <h2><i class="fa-solid fa-circle-dot"></i> 2. Inserimento Tavoli <span id="badge-modifica-tavoli" class="stato-modifica-badge">MODIFICA IN CORSO</span></h2>
-        <form id="form-tavolo">
-          <input type="hidden" id="edit-tavolo-id" value="">
-          <div class="form-group">
-            <label for="select-sala">Seleziona Sala:</label>
-            <select id="select-sala" required><option value="">Caricamento sale...</option></select>
-          </div>
-          <div class="form-group">
-            <label for="numero-tavolo">Numero o Nome Tavolo:</label>
-            <input type="text" id="numero-tavolo" placeholder="Es: 1, 14, Privè..." required>
-          </div>
-          <button type="submit" id="btn-submit-tavolo" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Tavolo</button>
-        </form>
+    <!-- CONTENUTO COMPATTO CATEGORIA -->
+    <div class="modal-box" id="box-modal-categoria" style="display:none;">
+      <div class="modal-header">
+        <h3 id="modal-categoria-titolo">Nuova Categoria</h3>
+        <button class="modal-close" onclick="chiudiModale()">&times;</button>
       </div>
-      <ul class="data-list" id="lista-tavoli"></ul>
+      <form id="form-categoria">
+        <input type="hidden" id="edit-categoria-id" value="">
+        <input type="hidden" id="edit-categoria-img-salvata" value="">
+        <div class="form-group">
+          <label for="nome-categoria">Nome Categoria:</label>
+          <input type="text" id="nome-categoria" required>
+        </div>
+        <div class="form-group">
+          <label for="file-categoria">Foto Categoria (Opzionale):</label>
+          <input type="file" id="file-categoria" accept="image/*">
+        </div>
+        <button type="submit" class="btn-save" style="width:100%;">Salva Categoria</button>
+      </form>
     </div>
-
-    <!-- CATEGORIE MENU -->
-    <div class="config-card">
-      <div>
-        <h2><i class="fa-solid fa-tags"></i> 3. Categorie Menu <span id="badge-modifica-categorie" class="stato-modifica-badge">MODIFICA IN CORSO</span></h2>
-        <form id="form-categoria">
-          <input type="hidden" id="edit-categoria-id" value="">
-          <input type="hidden" id="edit-categoria-img-salvata" value="">
-          <div class="form-group">
-            <label for="nome-categoria">Nome Categoria:</label>
-            <input type="text" id="nome-categoria" placeholder="Es: Antipasti, Pizze, Primi, Bevande..." required>
-          </div>
-          <div class="form-group">
-            <label for="file-categoria">Immagine Categoria (Lascia vuoto per non cambiare):</label>
-            <input type="file" id="file-categoria" accept="image/*">
-          </div>
-          <button type="submit" id="btn-submit-categoria" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Categoria</button>
-        </form>
-      </div>
-      <ul class="data-list" id="lista-categorie"></ul>
-    </div>
-
-    <!-- PRODOTTI E LISTINO PIATTI -->
-    <div class="config-card">
-      <div>
-        <h2><i class="fa-solid fa-utensils"></i> 4. Prodotti e Listino Piatti <span id="badge-modifica-prodotti" class="stato-modifica-badge">MODIFICA IN CORSO</span></h2>
-        <form id="form-prodotto">
-          <input type="hidden" id="edit-prodotto-id" value="">
-          <input type="hidden" id="edit-prodotto-img-salvata" value="">
-          <div class="form-group">
-            <label for="select-categoria">Categoria Prodotto:</label>
-            <select id="select-categoria" required><option value="">Caricamento categorie...</option></select>
-          </div>
-          <div class="form-group">
-            <label for="nome-prodotto">Nome Piatto / Articolo:</label>
-            <input type="text" id="nome-prodotto" placeholder="Es: Margherita, Spaghetti..." required>
-          </div>
-          <div class="form-group">
-            <label for="prezzo-prodotto">Prezzo di Vendita (€):</label>
-            <input type="number" id="prezzo-prodotto" step="0.01" placeholder="Es: 6.50" required>
-          </div>
-          <div class="form-group">
-            <label for="file-prodotto">Immagine Prodotto (Lascia vuoto per non cambiare):</label>
-            <input type="file" id="file-prodotto" accept="image/*">
-          </div>
-          <button type="submit" id="btn-submit-prodotto" class="btn-save"><i class="fa-solid fa-plus"></i> Aggiungi Prodotto al Listino</button>
-        </form>
-      </div>
-      <ul class="data-list" id="lista-prodotti"></ul>
-    </div>
-
   </div>
 
   <script>
@@ -139,9 +225,6 @@
         if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
         if(!dbRistorante.categorie) dbRistorante.categorie = [];
         if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
-      } else {
-        dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
-        salvaNelStorage();
       }
       aggiornaInterfaccia();
     }
@@ -153,10 +236,17 @@
     function aggiornaInterfaccia() {
       renderSale();
       renderTavoli();
-      renderCategorie();
-      renderProdotti();
+      renderRegistroTabella();
     }
 
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    /* RENDER LOGISTICA BASE */
     function renderSale() {
       const lista = document.getElementById('lista-sale');
       const select = document.getElementById('select-sala');
@@ -190,40 +280,84 @@
       });
     }
 
-    function renderCategorie() {
-      const lista = document.getElementById('lista-categorie');
-      const select = document.getElementById('select-categoria');
-      lista.innerHTML = '';
-      select.innerHTML = '<option value="">-- Seleziona una Categoria --</option>';
+    /* RENDER TABELLA REGISTRO COMPLETA (STILE ANAGRAFICA CLIENTI) */
+    function renderRegistroTabella() {
+      document.getElementById('stat-tot-categorie').innerText = dbRistorante.categorie.length;
+      document.getElementById('stat-tot-prodotti').innerText = dbRistorante.prodotti.length;
+
+      const query = document.getElementById('search-prodotti').value.toLowerCase().trim();
+      const tbody = document.getElementById('tbody-registro-prodotti');
+      tbody.innerHTML = '';
+
+      // Popolamento select categoria dinamico dentro la modale
+      const selectCat = document.getElementById('select-categoria');
+      selectCat.innerHTML = '<option value="">-- Seleziona Categoria --</option>';
       dbRistorante.categorie.forEach(c => {
-        let imgTag = c.immagine ? `<img src="${c.immagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tag" style="margin-right:8px;"></i>`;
-        lista.innerHTML += `<li>
-          <span>${imgTag} ${c.nome}</span>
-          <div class="action-buttons">
-            <button class="btn-edit-item" onclick="avviaModificaCategoria(${c.id}, '${c.nome.replace(/'/g, "\\'")}')"><i class="fa-solid fa-marker"></i></button>
-            <button class="btn-del-item" onclick="eliminaVoce('categorie', ${c.id})"><i class="fa-regular fa-trash-can"></i></button>
-          </div>
-        </li>`;
-        select.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+         selectCat.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+      });
+
+      const prodottiFiltrati = dbRistorante.prodotti.filter(p => p.nome.toLowerCase().includes(query));
+
+      if(prodottiFiltrati.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: gray; padding:20px;">Nessun prodotto trovato nel registro.</td></tr>`;
+        return;
+      }
+
+      prodottiFiltrati.forEach(p => {
+        let imgTag = p.immagine ? `<img src="${p.immagine}" class="img-preview-mini">` : `<i class="fa-solid fa-utensils" style="font-size:1.5rem; margin-right:12px; color:#ccc;"></i>`;
+        tbody.innerHTML += `
+          <tr>
+            <td>${imgTag}</td>
+            <td><strong>${p.nome}</strong></td>
+            <td><span class="badge" style="background:#e0e0e0; padding:4px 8px; border-radius:4px;">${p.categoriaId}</span></td>
+            <td><strong>${Number(p.prezzo).toFixed(2)} €</strong></td>
+            <td style="text-align: right;">
+              <div class="action-buttons" style="justify-content: flex-end;">
+                <button class="btn-edit-item" onclick="apriModificaProdotto(${p.id}, '${p.nome.replace(/'/g, "\\'")}', ${p.prezzo}, '${p.categoriaId}')"><i class="fa-solid fa-marker"></i></button>
+                <button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
       });
     }
 
-    function renderProdotti() {
-      const lista = document.getElementById('lista-prodotti');
-      lista.innerHTML = '';
-      dbRistorante.prodotti.forEach(p => {
-        let imgTag = p.immagine ? `<img src="${p.immagine}" class="img-preview-mini">` : `<i class="fa-solid fa-utensils" style="margin-right:8px; color:gray;"></i>`;
-        lista.innerHTML += `<li>
-          <span>${imgTag} <strong>${p.nome}</strong> - ${Number(p.prezzo).toFixed(2)} € <small>(${p.categoriaId})</small></span>
-          <div class="action-buttons">
-            <button class="btn-edit-item" onclick="avviaModificaProdotto(${p.id}, '${p.nome.replace(/'/g, "\\'")}', ${p.prezzo}, '${p.categoriaId}')"><i class="fa-solid fa-marker"></i></button>
-            <button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button>
-          </div>
-        </li>`;
-      });
+    /* APERTURA E GESTIONE FINESTRE MODALI */
+    function apriModalProdotto() {
+      document.getElementById('modal-container').style.display = 'flex';
+      document.getElementById('box-modal-prodotto').style.display = 'block';
+      document.getElementById('box-modal-categoria').style.display = 'none';
+      document.getElementById('modal-prodotto-titolo').innerText = "Nuovo Prodotto";
+      document.getElementById('edit-prodotto-id').value = '';
+      document.getElementById('edit-prodotto-img-salvata').value = '';
+      document.getElementById('form-prodotto').reset();
     }
 
-    /* FUNZIONI PER AVVIARE LA MODIFICA NEI FORM IN ALTO */
+    function apriModalCategoria() {
+      document.getElementById('modal-container').style.display = 'flex';
+      document.getElementById('box-modal-categoria').style.display = 'block';
+      document.getElementById('box-modal-prodotto').style.display = 'none';
+      document.getElementById('modal-categoria-titolo').innerText = "Nuova Categoria";
+      document.getElementById('edit-categoria-id').value = '';
+      document.getElementById('edit-categoria-img-salvata').value = '';
+      document.getElementById('form-categoria').reset();
+    }
+
+    function apriModificaProdotto(id, nome, prezzo, categoriaId) {
+      apriModalProdotto();
+      const prod = dbRistorante.prodotti.find(p => p.id === id);
+      document.getElementById('modal-prodotto-titolo').innerText = "Modifica Prodotto";
+      document.getElementById('edit-prodotto-id').value = id;
+      document.getElementById('select-categoria').value = categoriaId;
+      document.getElementById('nome-prodotto').value = nome;
+      document.getElementById('prezzo-prodotto').value = prezzo;
+      document.getElementById('edit-prodotto-img-salvata').value = prod ? (prod.immagine || "") : "";
+    }
+
+    function chiudiModale() {
+      document.getElementById('modal-container').style.display = 'none';
+    }
+
     function avviaModificaSala(id, nome) {
       document.getElementById('edit-sala-id').value = id;
       document.getElementById('nome-sala').value = nome;
@@ -237,26 +371,6 @@
       document.getElementById('numero-tavolo').value = numero;
       document.getElementById('btn-submit-tavolo').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Aggiorna Tavolo';
       document.getElementById('badge-modifica-tavoli').style.display = 'inline-block';
-    }
-
-    function avviaModificaCategoria(id, nome) {
-      const cat = dbRistorante.categorie.find(c => c.id === id);
-      document.getElementById('edit-categoria-id').value = id;
-      document.getElementById('nome-categoria').value = nome;
-      document.getElementById('edit-categoria-img-salvata').value = cat ? (cat.immagine || "") : "";
-      document.getElementById('btn-submit-categoria').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Aggiorna Categoria';
-      document.getElementById('badge-modifica-categorie').style.display = 'inline-block';
-    }
-
-    function avviaModificaProdotto(id, nome, prezzo, categoriaId) {
-      const prod = dbRistorante.prodotti.find(p => p.id === id);
-      document.getElementById('edit-prodotto-id').value = id;
-      document.getElementById('select-categoria').value = categoriaId;
-      document.getElementById('nome-prodotto').value = nome;
-      document.getElementById('prezzo-prodotto').value = prezzo;
-      document.getElementById('edit-prodotto-img-salvata').value = prod ? (prod.immagine || "") : "";
-      document.getElementById('btn-submit-prodotto').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Aggiorna Prodotto';
-      document.getElementById('badge-modifica-prodotti').style.display = 'inline-block';
     }
 
     function eliminaVoce(tipo, id) {
@@ -280,15 +394,14 @@
       });
     }
 
-    /* GESTIONE SUBMIT FORM (SALVATAGGIO O AGGIORNAMENTO) */
+    /* EVENT LISTENER DEI FORM */
     document.getElementById('form-sala').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-sala').value.trim();
       const editId = document.getElementById('edit-sala-id').value;
 
       if(editId) {
-        const idNum = Number(editId);
-        dbRistorante.sale = dbRistorante.sale.map(s => s.id === idNum ? { ...s, nome: nome } : s);
+        dbRistorante.sale = dbRistorante.sale.map(s => s.id === Number(editId) ? { ...s, nome: nome } : s);
         document.getElementById('edit-sala-id').value = '';
         document.getElementById('btn-submit-sala').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Sala';
         document.getElementById('badge-modifica-sale').style.display = 'none';
@@ -296,7 +409,6 @@
         const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
         dbRistorante.sale.push({ id: nuovoId, nome: nome });
       }
-      
       document.getElementById('nome-sala').value = '';
       salvaNelStorage();
       aggiornaInterfaccia();
@@ -309,8 +421,7 @@
       const editId = document.getElementById('edit-tavolo-id').value;
 
       if(editId) {
-        const idNum = Number(editId);
-        dbRistorante.tavoli = dbRistorante.tavoli.map(t => t.id === idNum ? { ...t, numero: numero, salaId: salaId } : t);
+        dbRistorante.tavoli = dbRistorante.tavoli.map(t => t.id === Number(editId) ? { ...t, numero: numero, salaId: salaId } : t);
         document.getElementById('edit-tavolo-id').value = '';
         document.getElementById('btn-submit-tavolo').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Tavolo';
         document.getElementById('badge-modifica-tavoli').style.display = 'none';
@@ -318,7 +429,6 @@
         const nuovoId = dbRistorante.tavoli.length > 0 ? Math.max(...dbRistorante.tavoli.map(t => t.id)) + 1 : 1;
         dbRistorante.tavoli.push({ id: nuovoId, numero: numero, salaId: salaId, stato: 'libero' });
       }
-
       document.getElementById('numero-tavolo').value = '';
       salvaNelStorage();
       aggiornaInterfaccia();
@@ -333,22 +443,14 @@
       let stringaImmagine = await convertiFileInBase64(fileInput);
       
       if(editId) {
-        const idNum = Number(editId);
-        if(!stringaImmagine) { 
-          stringaImmagine = document.getElementById('edit-categoria-img-salvataggio').value || ""; 
-        }
-        dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === idNum ? { ...c, nome: nome, immagine: stringaImmagine || c.immagine } : c);
-        document.getElementById('edit-categoria-id').value = '';
-        document.getElementById('edit-categoria-img-salvata').value = '';
-        document.getElementById('btn-submit-categoria').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Categoria';
-        document.getElementById('badge-modifica-categorie').style.display = 'none';
+        // CORRETTO: se non carica una nuova immagine usa quella del campo nascosto di backup
+        if(!stringaImmagine) { stringaImmagine = document.getElementById('edit-categoria-img-salvata').value; }
+        dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, immagine: stringaImmagine } : c);
       } else {
         const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
         dbRistorante.categorie.push({ id: nuovoId, nome: nome, immagine: stringaImmagine });
       }
-      
-      document.getElementById('nome-categoria').value = '';
-      fileInput.value = '';
+      chiudiModale();
       salvaNelStorage();
       aggiornaInterfaccia();
     });
@@ -364,23 +466,14 @@
       let stringaImmagine = await convertiFileInBase64(fileInput);
 
       if(editId) {
-        const idNum = Number(editId);
-        if(!stringaImmagine) { 
-          stringaImmagine = document.getElementById('edit-prodotto-img-salvata').value || ""; 
-        }
-        dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === idNum ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: stringaImmagine || p.immagine } : p);
-        document.getElementById('edit-prodotto-id').value = '';
-        document.getElementById('edit-prodotto-img-salvata').value = '';
-        document.getElementById('btn-submit-prodotto').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Prodotto al Listino';
-        document.getElementById('badge-modifica-prodotti').style.display = 'none';
+        // CORRETTO: Se l'utente non ha selezionato un nuovo file, riprende la stringa base64 precedentemente registrata
+        if(!stringaImmagine) { stringaImmagine = document.getElementById('edit-prodotto-img-salvata').value; }
+        dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: stringaImmagine } : p);
       } else {
         const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
         dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: stringaImmagine });
       }
-      
-      document.getElementById('nome-prodotto').value = '';
-      document.getElementById('prezzo-prodotto').value = '';
-      fileInput.value = '';
+      chiudiModale();
       salvaNelStorage();
       aggiornaInterfaccia();
     });
