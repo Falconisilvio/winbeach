@@ -11,52 +11,27 @@ let statoRistorante = {
 
 /**
  * Carica l'intero archivio del ristorante dal Database/LocalStorage.
- * Se non sono presenti dati, inizializza delle voci di esempio predefinite.
+ * Se non sono presenti dati, inizializza un archivio vuoto e pulito senza dati demo forzati.
  */
 export async function loadRistoranteFromDb() {
-    const token = getToken();
     try {
-        // Recupera i dati salvati nel LocalStorage per garantire la persistenza locale
+        // Recupera i dati salvati nel LocalStorage per garantire la prima persistenza locale
         const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
         
         if (datiSalvati) {
             statoRistorante = JSON.parse(datiSalvati);
         } else {
-            // Inizializzazione dati predefiniti di fallback se l'archivio è totalmente vuoto
-            statoRistorante.sale = [
-                { id: 1, nome: "Sala Interna" },
-                { id: 2, nome: "Terrazza Mare" }
-            ];
+            // STRUTTURA PULITA: Nessun dato demo forzato che si rigenera da solo
+            statoRistorante = {
+                sale: [],
+                tavoli: [],
+                categorie: [],
+                prodotti: []
+            };
             
-            statoRistorante.tavoli = [
-                { id: 101, numero: "1", salaId: 1, stato: "libero", comanda: [] },
-                { id: 102, numero: "2", salaId: 1, stato: "libero", comanda: [] },
-                { id: 201, numero: "10", salaId: 2, stato: "libero", comanda: [] }
-            ];
-
-            statoRistorante.categorie = [
-                { id: 10, nome: "Ristorante" },
-                { id: 11, nome: "Bevande" }
-            ];
-
-            statoRistorante.prodotti = [
-                { id: 50, nome: "Acqua Minerale 1L", prezzo: 2.50, categoriaId: 11 },
-                { id: 51, nome: "Spaghetti allo Scoglio", prezzo: 15.00, categoriaId: 10 }
-            ];
-            
-            // Salva lo stato iniziale nel localStorage
+            // Salva lo stato vuoto iniziale nel localStorage
             localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(statoRistorante));
         }
-
-        // Se nel tuo backend hai endpoint API reali attivi, puoi scommentare la parte sotto:
-        /*
-        const response = await fetch('/api/ristorante', { 
-            headers: { 'Authorization': `Bearer ${token}` } 
-        });
-        if (response.ok) {
-            statoRistorante = await response.json();
-        }
-        */
         
         updateDbBar(true); // Aggiorna la barra di stato del DB nell'interfaccia principale
         return statoRistorante;
@@ -71,10 +46,11 @@ export async function loadRistoranteFromDb() {
  * Ritorna l'elenco delle sale mappando al loro interno i relativi tavoli appartenenti
  */
 export function getTavoliDivisiPerSale() {
+    if (!statoRistorante.sale) return [];
     return statoRistorante.sale.map(sala => {
         return {
             ...sala,
-            tavoli: statoRistorante.tavoli.filter(t => t.salaId === sala.id)
+            tavoli: statoRistorante.tavoli ? statoRistorante.tavoli.filter(t => t.salaId === sala.id) : []
         };
     });
 }
@@ -83,6 +59,7 @@ export function getTavoliDivisiPerSale() {
  * Seleziona un tavolo specifico tramite ID
  */
 export function selezionaTavolo(tavoloId) {
+    if (!statoRistorante.tavoli) return null;
     return statoRistorante.tavoli.find(t => t.id === Number(tavoloId)) || null;
 }
 
@@ -105,18 +82,6 @@ export async function saveRistoranteItemToDb(tipo, item) {
 
         // Rende persistente la modifica salvando su LocalStorage
         localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(statoRistorante));
-
-        // Predisposizione per sincronizzazione Cloud (Fetch API)
-        /*
-        await fetch(`/api/ristorante/${tipo}`, { 
-            method: 'POST', 
-            body: JSON.stringify(item), 
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}` 
-            } 
-        });
-        */
 
         updateDbBar(true);
         return true;
@@ -144,19 +109,12 @@ export async function deleteRistoranteItemFromDb(tipo, id) {
         
         // Cascade Delete Logico: se eliminiamo una categoria, rimuoviamo i relativi prodotti
         if (tipo === 'categorie') {
-            statoRistorante.prodotti = statoRistorante.prodotti.filter(p => p.categoriaId !== Number(id));
+            // Nota di compatibilità: gestisce sia ID numerici che stringhe (nomi di categoria)
+            statoRistorante.prodotti = statoRistorante.prodotti.filter(p => p.categoriaId !== id && p.categoriaId !== Number(id));
         }
 
         // Aggiorna il LocalStorage
         localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(statoRistorante));
-
-        // Predisposizione per sincronizzazione Cloud (Fetch API)
-        /*
-        await fetch(`/api/ristorante/${tipo}/${id}`, { 
-            method: 'DELETE', 
-            headers: { 'Authorization': `Bearer ${getToken()}` } 
-        });
-        */
 
         updateDbBar(true);
         return true;
