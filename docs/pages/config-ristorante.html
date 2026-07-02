@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <script src="../js/theme-init.js"></script>
   <script src="../js/lang-init.js"></script>
-  <!-- Import della configurazione globale del ristorante per il percorso immagini -->
+  <!-- Import della configurazione globale del ristorante -->
   <script src="../js/ristorante-config.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Configurazione Ristorante</title>
@@ -225,6 +225,9 @@
     let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     const LOCAL_STORAGE_KEY = 'winbeach_archivio_ristorante';
     
+    // Paracadute se il file globale carica in ritardo
+    const ottieniPathImmagini = () => (typeof PATH_IMMAGINI_RISTORANTE !== 'undefined') ? PATH_IMMAGINI_RISTORANTE : 'https://falconisilvio.github.io/winbeach/images/';
+    
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (datiSalvati !== null) {
@@ -302,7 +305,7 @@
         return;
       }
       dbRistorante.categorie.forEach(c => {
-        let srcImmagine = c.immagine ? (c.immagine.startsWith('data:') ? c.immagine : PATH_IMMAGINI_RISTORANTE + c.immagine) : '';
+        let srcImmagine = c.immagine ? (c.immagine.startsWith('data:') ? c.immagine : ottieniPathImmagini() + c.immagine) : '';
         let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tags" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
           <tr>
@@ -340,7 +343,7 @@
       }
 
       prodottiFiltrati.forEach(p => {
-        let srcImmagine = p.immagine ? (p.immagine.startsWith('data:') ? p.immagine : PATH_IMMAGINI_RISTORANTE + p.immagine) : '';
+        let srcImmagine = p.immagine ? (p.immagine.startsWith('data:') ? p.immagine : ottieniPathImmagini() + p.immagine) : '';
         let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-utensils" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
           <tr>
