@@ -34,7 +34,20 @@
     .griglia-prodotti-fissa { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; height: 460px; overflow-y: auto; padding-right: 5px; padding-bottom: 15px; }
     
     /* CARTE PRODOTTI AUTO-ADATTIVE IN ALTEZZA */
-    .articolo-card { border: 1px solid #e0e0e0; background: #fff; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-sizing: border-box; min-height: 145px; justify-content: transform; }
+    /* FORZA L'ALTEZZA DELLE TESSERE ANCHE SE MANCA L'IMMAGINE */
+.articolo-card { 
+  border: 1px solid #e0e0e0; 
+  background: #fff; 
+  border-radius: 8px; 
+  padding: 8px; 
+  display: flex; 
+  flex-direction: column; 
+  cursor: pointer; 
+  transition: transform 0.15s, box-shadow 0.15s; 
+  box-sizing: border-box; 
+  height: 155px; /* <--- ALTEZZA FISSA IDENTICA PER TUTTI I COMPONENTI */
+  justify-content: space-between; 
+}
     .articolo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
     .articolo-card .img-container { width: 100%; height: 75px; margin-bottom: 6px; border-radius: 6px; overflow: hidden; background-color: #f1f1f1; }
     .articolo-card img { width: 100%; height: 100%; object-fit: cover; }
