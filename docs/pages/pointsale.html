@@ -49,7 +49,7 @@
     .articolo-card .price { color: #2e7d32; font-weight: bold; font-size: 0.95rem; margin-top: auto; text-align: left; padding-top: 2px; }
 
     .sezione-comanda-destra { width: 380px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; flex-direction: column; height: 560px; }
-    .comanda-header { background: #f8f9fa; padding: 12px; font-weight: bold; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; color: #333; }
+    .comanda-header { background: #f8f9fa; padding: 12px; font-weight: bold; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; color: #333; justify-content: space-between; }
     .comanda-body { flex: 1; overflow-y: auto; padding: 10px; }
     
     .xbrowse-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
@@ -62,9 +62,10 @@
     .btn-del:hover { color: #cc0000; }
 
     .comanda-footer { padding: 15px; border-top: 2px dashed #eee; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-    .riga-totale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .riga-totale span { font-size: 1.1rem; font-weight: bold; color: #333; }
-    .riga-totale #txt-totale { font-size: 1.4rem; color: #2e7d32; }
+    .riga-totale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .riga-totale span { font-size: 1rem; font-weight: bold; color: #444; }
+    .riga-totale.totale-generale span { font-size: 1.2rem; color: #333; }
+    .riga-totale #txt-totale { font-size: 1.4rem; color: #2e7d32; font-weight: bold; }
     
     .btn-invia-comanda { width: 100%; background: #0076ff; color: white; border: none; padding: 12px; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
     .btn-invia-comanda:hover { background: #0056b3; }
@@ -74,10 +75,12 @@
     .btn-coperti:hover { background: #cbd5e1; }
 
     .btn-divisori { flex: 1; padding: 8px; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .btn-supplemento { background: #607d8b; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: bold; }
+    .btn-supplemento:hover { background: #455a64; }
 
     dialog::backdrop { background: rgba(0,0,0,0.5); }
 
-    /* STILE DI STAMPA COMANDA DIRETTA (NASCONDE TUTTO IL RESTO) */
+    /* STILE DI STAMPA COMANDA DIRETTA O FATTURA */
     @media print {
       body * { display: none !important; }
       #sezione-stampa-comanda, #sezione-stampa-comanda * { display: block !important; }
@@ -113,7 +116,8 @@
 
     <div class="sezione-comanda-destra">
       <div class="comanda-header">
-        <i class="fa-solid fa-list-check"></i> Righe Comanda Attiva
+        <span><i class="fa-solid fa-list-check"></i> Righe Comanda Attiva</span>
+        <button type="button" class="btn-supplemento" onclick="aggiungiSupplementoManuale()"><i class="fa-solid fa-plus"></i> Suppl.</button>
       </div>
       <div class="comanda-body">
         <table class="xbrowse-table">
@@ -129,13 +133,18 @@
         </table>
       </div>
       <div class="comanda-footer">
-        <!-- Box dinamico per divisione conti -->
-        <div id="box-funzioni-pagamento" style="margin-bottom: 12px; display: none; gap: 8px;">
+        <!-- Box ripristinato per divisione conti e fatturazione -->
+        <div id="box-funzioni-pagamento" style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
           <button type="button" class="btn-divisori" onclick="eseguiContoUguale()" style="background:#9c27b0;"><i class="fa-solid fa-calculator"></i> Divis. Uguale</button>
           <button type="button" class="btn-divisori" onclick="apriModalRomana()" style="background:#ff9800;"><i class="fa-solid fa-people-arrows"></i> Alla Romana</button>
+          <button type="button" class="btn-divisori" onclick="apriModalFattura()" style="background:#009688; width: 100%; flex: initial;"><i class="fa-solid fa-file-invoice-dollar"></i> Emetti Fattura Cliente</button>
         </div>
 
         <div class="riga-totale">
+          <span>Totale Coperti:</span>
+          <span id="txt-totale-coperti">0.00 €</span>
+        </div>
+        <div class="riga-totale totale-generale">
           <span>TOTALE CONTO:</span>
           <span id="txt-totale">0.00 €</span>
         </div>
@@ -161,8 +170,31 @@
     </div>
   </dialog>
 
+  <!-- DIALOG FATTURAZIONE ELETTRONICA / CLIENTE -->
+  <dialog id="modal-fattura-cliente" style="border:none; border-radius:8px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.3); width:420px;">
+    <h3 style="margin-top:0; color: #009688;"><i class="fa-solid fa-file-invoice-dollar"></i> Intestazione Fattura</h3>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;">
+      <label style="font-weight:bold; font-size:0.85rem;">Ragione Sociale / Nome Cognome:
+        <input type="text" id="fat-ragione-sociale" style="width:100%; padding:6px; box-sizing:border-box; margin-top:4px;" placeholder="Mario Rossi S.r.l.">
+      </label>
+      <label style="font-weight:bold; font-size:0.85rem;">Partita IVA / Codice Fiscale:
+        <input type="text" id="fat-piva" style="width:100%; padding:6px; box-sizing:border-box; margin-top:4px;" placeholder="01234567890">
+      </label>
+      <label style="font-weight:bold; font-size:0.85rem;">Indirizzo di Fatturazione:
+        <input type="text" id="fat-indirizzo" style="width:100%; padding:6px; box-sizing:border-box; margin-top:4px;" placeholder="Via Roma 10, Milano">
+      </label>
+      <label style="font-weight:bold; font-size:0.85rem;">Codice Destinatario (SDI) / PEC:
+        <input type="text" id="fat-sdi" style="width:100%; padding:6px; box-sizing:border-box; margin-top:4px;" placeholder="SUBM70N">
+      </label>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #eee; padding-top:12px;">
+      <button type="button" onclick="document.getElementById('modal-fattura-cliente').close()" style="padding:8px 12px; background:#757575; color:white; border:none; border-radius:4px; cursor:pointer;">Annulla</button>
+      <button type="button" onclick="stampaEFirmaFattura()" style="padding:8px 15px; background:#009688; color:white; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-print"></i> Genera & Stampa</button>
+    </div>
+  </dialog>
+
   <script>
-    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
+    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [], impostazioni: { coperto: 2.00 } };
     let carrello = [];
     let categoriaAttiva = "";
     
@@ -175,9 +207,16 @@
       const lblTavolo = document.getElementById('lbl-tavolo');
       if (lblTavolo) { lblTavolo.innerText = tbl; }
       
+      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+      if (datiSalvati) { 
+        dbRistorante = JSON.parse(datiSalvati); 
+      }
+      if (!dbRistorante.impostazioni) {
+        dbRistorante.impostazioni = { coperto: 2.00 };
+      }
+      
       disegnaCopertiCassa(tavoloId);
       
-      // Creazione della finestra cambio tavolo rapido se non presente
       if (!document.getElementById('dialog-cambio-tavolo-rapido')) {
         const rigaDialog = document.createElement('dialog');
         rigaDialog.id = 'dialog-cambio-tavolo-rapido';
@@ -199,9 +238,6 @@
       if (btnCambioNativo) {
         btnCambioNativo.onclick = function(e) { e.preventDefault(); apriDialogCambioTavoloRapido(); };
       }
-      
-      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-      if (datiSalvati) { dbRistorante = JSON.parse(datiSalvati); }
       
       if (tavoloId) {
         const carrelloSalvato = localStorage.getItem(`carrello_tavolo_${tavoloId}`);
@@ -229,15 +265,16 @@
       
       const gestisciVisibilitaConti = () => {
         const boxFunzioni = document.getElementById('box-funzioni-pagamento');
-        if(boxFunzioni) boxFunzioni.style.display = numCoperti > 1 ? 'flex' : 'none';
+        if(boxFunzioni) boxFunzioni.style.display = 'flex';
       };
 
       document.getElementById('btn-coperti-meno').onclick = function() {
-        if (numCoperti > 1) {
+        if (numCoperti > 0) {
           numCoperti--;
           localStorage.setItem(`coperti_tavolo_${tavoloId}`, numCoperti.toString());
           document.getElementById('lbl-valore-coperti').innerText = numCoperti;
           gestisciVisibilitaConti();
+          aggiornaXBrowse();
         }
       };
       document.getElementById('btn-coperti-piu').onclick = function() {
@@ -245,6 +282,7 @@
         localStorage.setItem(`coperti_tavolo_${tavoloId}`, numCoperti.toString());
         document.getElementById('lbl-valore-coperti').innerText = numCoperti;
         gestisciVisibilitaConti();
+        aggiornaXBrowse();
       };
       gestisciVisibilitaConti();
     }
@@ -324,10 +362,20 @@
     function aggiungiProdotto(nome, prezzo, categoriaId) {
       const item = carrello.find((i) => i.nome === nome);
       if (item) item.qta++;
-      else carrello.push({ nome, qta: 1, prezzo, categoriaId });
+      else carrello.push({ nome, qta: 1, prezzo: parseFloat(prezzo), categoriaId });
       
       salvaStatoCarrello();
       aggiornaXBrowse();
+    }
+
+    function aggiungiSupplementoManuale() {
+      let nomeS = prompt("Inserisci il nome del supplemento / variante:", "Aggiunta Mozzarella di Bufala");
+      if(!nomeS) return;
+      let prezzoS = prompt("Inserisci il costo del supplemento (€):", "1.50");
+      if(prezzoS === null) return;
+      
+      let prezzoVal = parseFloat(prezzoS) || 0;
+      aggiungiProdotto(`+ ${nomeS}`, prezzoVal, "Supplementi");
     }
 
     window.cambiaQtaRiga = function(idx, valore) {
@@ -352,11 +400,17 @@
       const tbody = document.getElementById('xbrowse-body');
       if (!tbody) return;
       tbody.innerHTML = '';
-      let totaleConto = 0;
+      
+      let totaleProdotti = 0;
+      let costoCopertoUnitario = dbRistorante.impostazioni.coperto !== undefined ? parseFloat(dbRistorante.impostazioni.coperto) : 2.00;
+      
+      const inputCoperti = document.getElementById('lbl-valore-coperti');
+      const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 0;
+      let totaleCoperti = numCoperti * costoCopertoUnitario;
 
       carrello.forEach((item, idx) => {
         const rigaTot = item.qta * item.prezzo;
-        totaleConto += rigaTot;
+        totaleProdotti += rigaTot;
         tbody.innerHTML += `
           <tr>
             <td><strong>${item.nome}</strong></td>
@@ -374,20 +428,29 @@
           </tr>`;
       });
       
+      let totaleContoCompleto = totaleProdotti + totaleCoperti;
+      
+      const txtTotaleCoperti = document.getElementById('txt-totale-coperti');
+      if (txtTotaleCoperti) { txtTotaleCoperti.innerText = totaleCoperti.toFixed(2) + ' €'; }
+
       const txtTotale = document.getElementById('txt-totale');
-      if (txtTotale) { txtTotale.innerText = totaleConto.toFixed(2) + ' €'; }
+      if (txtTotale) { txtTotale.innerText = totaleContoCompleto.toFixed(2) + ' €'; }
     }
 
     /* LOGICA DIVISIONE CONTO UGUALE */
     window.eseguiContoUguale = function() {
-      let totaleConto = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+      let totaleProdotti = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+      let costoCopertoUnitario = dbRistorante.impostazioni.coperto !== undefined ? parseFloat(dbRistorante.impostazioni.coperto) : 2.00;
       const inputCoperti = document.getElementById('lbl-valore-coperti');
       const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 1;
       
-      if(totaleConto === 0) return;
-      let quota = (totaleConto / numCoperti).toFixed(2);
+      let totaleContoCompleto = totaleProdotti + (numCoperti * costoCopertoUnitario);
+      if(totaleContoCompleto === 0) return;
       
-      if(confirm(`Il totale è ${totaleConto.toFixed(2)} € diviso per ${numCoperti} coperti.\nQuota a persona: ${quota} €.\n\nInviare richiesta transazione al Bancomat?`)) {
+      let divisore = numCoperti > 0 ? numCoperti : 1;
+      let quota = (totaleContoCompleto / divisore).toFixed(2);
+      
+      if(confirm(`Il totale è ${totaleContoCompleto.toFixed(2)} € diviso per ${divisore} persone.\nQuota a persona: ${quota} €.\n\nInviare richiesta transazione al Bancomat?`)) {
         alert(`Collegamento Bancomat Attivo...\nInviato comando POS per: ${quota} €.\nAttendere inserimento carta...`);
         alert("Transazione Approvata dal POS! Scontrino in stampa.");
       }
@@ -397,12 +460,12 @@
     window.apriModalRomana = function() {
       const container = document.getElementById('lista-prodotti-romana');
       container.innerHTML = '';
-      if(carrello.length === 0) return;
+      if(carrello.length === 0) return alert("Nessun articolo presente in comanda.");
 
       carrello.forEach((item, idx) => {
         container.innerHTML += `
-          <div style="display:flex; justify-content:between; align-items:center; margin-bottom:8px; background:#f8f9fa; padding:6px; border-radius:4px;">
-            <label style="flex:1; cursor:pointer; font-weight:bold; color: black;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8f9fa; padding:6px; border-radius:4px;">
+            <label style="flex:1; cursor:pointer; font-weight:bold; color: black; font-size:0.85rem;">
               <input type="checkbox" class="chk-romana" data-idx="${idx}" data-prezzo="${item.prezzo}" onchange="ricalcolaParzialeRomana()" style="margin-right:10px;">
               ${item.nome} (${item.prezzo.toFixed(2)} €)
             </label>
@@ -434,7 +497,6 @@
       if(confirm(`Inviare richiesta al Bancomat per l'importo parziale di ${totaleDaPagare.toFixed(2)} €?`)) {
         alert(`Richiesta inviata al POS BANCOMAT per ${totaleDaPagare.toFixed(2)} €... Pagamento OK.`);
         
-        // Sottrae le quantità pagate dal carrello principale
         document.querySelectorAll('.chk-romana:checked').forEach(chk => {
           const idx = parseInt(chk.getAttribute('data-idx'), 10);
           const divGenitore = chk.closest('div');
@@ -443,14 +505,12 @@
           carrello[idx].qta -= qtaPagata;
         });
 
-        // Pulisce le righe azzerate
         carrello = carrello.filter(item => item.qta > 0);
         
         salvaStatoCarrello();
         aggiornaXBrowse();
         document.getElementById('modal-alla-romana').close();
 
-        // Se il carrello si è svuotato del tutto, libera il tavolo
         if(carrello.length === 0) {
           alert("Tutti gli elementi sono stati saldati! Il tavolo viene chiuso automaticamente.");
           liberaTavoloCorrente();
@@ -458,25 +518,114 @@
       }
     };
 
-    /* SMISTAMENTO STAMPE COMANDA PER REPARTO (Cucina, Pizzeria, Bar) */
+    /* GESTIONE APERTURA MODAL FATTURAZIONE CLIENTE */
+    window.apriModalFattura = function() {
+      if(carrello.length === 0) return alert("Impossibile emettere fattura su un conto vuoto!");
+      document.getElementById('modal-fattura-cliente').showModal();
+    };
+
+    /* INSERIMENTO E STAMPA FISICA DELLA FATTURA */
+    window.stampaEFirmaFattura = function() {
+      const ragSoc = document.getElementById('fat-ragione-sociale').value.trim();
+      const piva = document.getElementById('fat-piva').value.trim();
+      const ind = document.getElementById('fat-indirizzo').value.trim();
+      const sdi = document.getElementById('fat-sdi').value.trim();
+
+      if(!ragSoc || !piva) {
+        return alert("I campi Ragione Sociale e Partita IVA/CF sono obbligatori per emettere fattura!");
+      }
+
+      const areaStampa = document.getElementById('sezione-stampa-comanda');
+      const tavoloNome = localStorage.getItem('tavoloSelezionato') || 'Banco';
+      
+      let totaleProdotti = 0;
+      let costoCopertoUnitario = dbRistorante.impostazioni.coperto !== undefined ? parseFloat(dbRistorante.impostazioni.coperto) : 2.00;
+      const inputCoperti = document.getElementById('lbl-valore-coperti');
+      const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 0;
+      let totaleCoperti = numCoperti * costoCopertoUnitario;
+
+      let htmlFattura = `
+        <div style="text-align:center; font-weight:bold; border-bottom:1px solid #000; padding-bottom:5px; margin-bottom:10px;">
+          FATTURA ELETTRONICA CLIENTE<br>
+          Data: ${new Date().toLocaleDateString('it-IT')} - Ora: ${new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'})}<br>
+          Rif: ${tavoloNome}
+        </div>
+        <div style="font-size:10px; margin-bottom:10px; border-bottom:1px dashed #000; padding-bottom:5px;">
+          <strong>DESTINATARIO:</strong><br>
+          ${ragSoc}<br>
+          P.IVA/CF: ${piva}<br>
+          ${ind ? 'Indirizzo: ' + ind + '<br>' : ''}
+          SDI/PEC: ${sdi || '0000000'}
+        </div>
+        <div style="margin-bottom:5px;">
+      `;
+
+      carrello.forEach(p => {
+        let rigaT = p.qta * p.prezzo;
+        totaleProdotti += rigaT;
+        htmlFattura += `
+          <div class="riga-stampa">
+            <span>${p.qta}x ${p.nome}</span>
+            <span>${rigaT.toFixed(2)} €</span>
+          </div>
+        `;
+      });
+
+      if(totaleCoperti > 0) {
+        htmlFattura += `
+          <div class="riga-stampa">
+            <span>${numCoperti}x Servizio Coperto</span>
+            <span>${totaleCoperti.toFixed(2)} €</span>
+          </div>
+        `;
+      }
+
+      let grandTotal = totaleProdotti + totaleCoperti;
+
+      htmlFattura += `
+        </div>
+        <div style="border-top:1px solid #000; padding-top:5px; margin-top:5px; font-weight:bold; font-size:14px;" class="riga-stampa">
+          <span>TOTALE FATTURATO:</span>
+          <span>${grandTotal.toFixed(2)} €</span>
+        </div>
+        <div style="text-align:center; font-size:9px; margin-top:15px; color:#555;">
+          Documento valido ai fini fiscali trasmesso al Sistema di Interscambio.<br>Grazie per averci scelto.
+        </div>
+      `;
+
+      document.getElementById('modal-fattura-cliente').close();
+      areaStampa.innerHTML = htmlFattura;
+      window.print();
+      
+      // Chiusura automatica tavolo dopo fatturazione completa
+      alert("Fattura emessa con successo e inviata all'AdE.");
+      completaPagamentoESvotaTavolo();
+    };
+
+    /* SMISTAMENTO STAMPE COMANDA PER REPARTO */
     window.gestisciInvioComanda = function() {
       if (carrello.length === 0) return alert("La comanda è vuota!");
       
       const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
       if (azioneRichiesta === 'pagamento') {
-        let tot = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
-        if(confirm(`Chiudere il conto totale di ${tot.toFixed(2)} € con carta/bancomat?`)) {
+        let totProd = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+        let costoCopertoUnitario = dbRistorante.impostazioni.coperto !== undefined ? parseFloat(dbRistorante.impostazioni.coperto) : 2.00;
+        const inputCoperti = document.getElementById('lbl-valore-coperti');
+        const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 0;
+        let totConto = totProd + (numCoperti * costoCopertoUnitario);
+        
+        if(confirm(`Chiudere il conto totale di ${totConto.toFixed(2)} € con carta/bancomat?`)) {
           alert("Segnale inviato al POS fisco... Pagamento Ricevuto!");
           completaPagamentoESvotaTavolo();
         }
         return;
       }
 
-      // Raggruppa i prodotti per stampante di reparto (Cucina, Pizzeria o Bar)
       const reparti = {
         "CUCINA": carrello.filter(p => ["Antipasti", "Primi piatti", "Secondi Di Pesce", "Secondi Piatti", "Contorni"].includes(p.categoriaId)),
         "PIZZERIA": carrello.filter(p => ["Pizze"].includes(p.categoriaId)),
-        "BAR": carrello.filter(p => ["Bar", "Bevande"].includes(p.categoriaId))
+        "BAR": carrello.filter(p => ["Bar", "Bevande"].includes(p.categoriaId)),
+        "SUPPLEMENTI": carrello.filter(p => ["Supplementi"].includes(p.categoriaId))
       };
 
       const tavoloNome = localStorage.getItem('tavoloSelezionato') || 'Banco';
@@ -518,8 +667,6 @@
       htmlComanda += `<div style="border-top:1px dashed #000; margin-top:5px; padding-top:5px; text-align:center; font-size:10px;">WINBEACH GESTIONALE</div>`;
       
       areaStampa.innerHTML = htmlComanda;
-      
-      // Avvia la stampa nativa di Windows. Qui l'operatore seleziona la stampante corrispondente al reparto.
       window.print();
     }
 
