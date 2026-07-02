@@ -64,7 +64,7 @@
 
   <div class="page-header" style="padding: 20px 20px 10px 20px;">
     <h1><i class="fa-solid fa-gears"></i> Gestione Configurazione Ristorante</h1>
-    <p>Configura la disposizione logistica delle sale ed inserisci i prodotti/categorie nel listino vendite.</p>
+    <p>Configura la dispositione logistica delle sale ed inserisci i prodotti/categorie nel listino vendite.</p>
   </div>
 
   <div class="nav-tabs">
@@ -240,6 +240,11 @@
             <label for="port-bar"><i class="fa-solid fa-glass-water"></i> Stampante BAR (Porta / Nome):</label>
             <input type="text" id="port-bar" placeholder="Es: LPT2 oppure Stampante_Bar">
           </div>
+          <!-- Nuova stampante per fatture A4 -->
+          <div class="form-group">
+            <label for="port-fatture"><i class="fa-solid fa-file-invoice"></i> Stampante FATTURE A4 (Porta / Nome):</label>
+            <input type="text" id="port-fatture" placeholder="Es: HP_LaserJet_A4 oppure PDF_Printer">
+          </div>
           <button type="submit" class="btn-save" style="background: #28a745;"><i class="fa-solid fa-floppy-disk"></i> Salva Porte Stampanti</button>
         </form>
       </div>
@@ -329,7 +334,7 @@
         if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
         if(!dbRistorante.impostazioni) dbRistorante.impostazioni = { coperto: 0, intestazione: "" };
         if(!dbRistorante.pos) dbRistorante.pos = { tipo: "demo", ip: "", metodoStampa: "window-print" };
-        if(!dbRistorante.stampantiPorte) dbRistorante.stampantiPorte = { cucina: "", pizzeria: "", bar: "" };
+        if(!dbRistorante.stampantiPorte) dbRistorante.stampantiPorte = { cucina: "", pizzeria: "", bar: "", fatture: "" };
       }
       
       caricaCampiConfigurazione();
@@ -350,6 +355,7 @@
         document.getElementById('port-cucina').value = dbRistorante.stampantiPorte.cucina || '';
         document.getElementById('port-pizzeria').value = dbRistorante.stampantiPorte.pizzeria || '';
         document.getElementById('port-bar').value = dbRistorante.stampantiPorte.bar || '';
+        document.getElementById('port-fatture').value = dbRistorante.stampantiPorte.fatture || '';
       }
     }
 
@@ -627,7 +633,7 @@
         dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine } : p);
       } else {
         const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
-        dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine });
+        dbRistorante.prodotti.push({ id: nuevoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine });
       }
       chiudiModale();
       salvaNelStorage();
@@ -656,13 +662,14 @@
       alert("Configurazione POS aggiornata!");
     });
 
-    // NUOVO INSERIMENTO: SALVATAGGIO PORTE STAMPANTI FISICHE
+    // NUOVO INSERIMENTO: SALVATAGGIO PORTE STAMPANTI FISICHE (Compreso di fatture A4)
     document.getElementById('form-config-stampanti').addEventListener('submit', function(e) {
       e.preventDefault();
       dbRistorante.stampantiPorte = {
         cucina: document.getElementById('port-cucina').value.trim(),
         pizzeria: document.getElementById('port-pizzeria').value.trim(),
-        bar: document.getElementById('port-bar').value.trim()
+        bar: document.getElementById('port-bar').value.trim(),
+        fatture: document.getElementById('port-fatture').value.trim()
       };
       salvaNelStorage();
       alert("Indirizzi fisici delle stampanti di reparto salvati!");
