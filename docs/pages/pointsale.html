@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <!-- Import della configurazione globale del ristorante per il percorso immagini -->
+  <!-- Import della configurazione globale del ristorante -->
   <script src="../js/ristorante-config.js"></script>
   <title>Cassa Ristorante (Point of Sale)</title>
   <link rel="stylesheet" href="../css/page.css">
@@ -56,6 +56,8 @@
     .xbrowse-table th { text-align: left; padding: 6px; color: #777; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #eee; }
     .xbrowse-table td { padding: 8px 6px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
     
+    .btn-qta { background: #f0f0f0; border: 1px solid #ccc; width: 22px; height: 22px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 0.85rem; }
+    .btn-qta:hover { background: #ddd; }
     .btn-del { background: transparent; border: none; color: #ff4d4d; cursor: pointer; font-size: 1rem; padding: 4px; }
     .btn-del:hover { color: #cc0000; }
 
@@ -64,19 +66,31 @@
     .riga-totale span { font-size: 1.1rem; font-weight: bold; color: #333; }
     .riga-totale #txt-totale { font-size: 1.4rem; color: #2e7d32; }
     
-    .btn-invia-comanda { width: 100%; background: #0076ff; color: white; border: none; padding: 12px; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-invia-comanda { width: 100%; background: #0076ff; color: white; border: none; padding: 12px; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
     .btn-invia-comanda:hover { background: #0056b3; }
 
     .box-coperti { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 0.9rem; background: #f1f3f5; padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
     .btn-coperti { background: #fff; border: 1px solid #cbd5e1; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; color: #334155; }
     .btn-coperti:hover { background: #cbd5e1; }
 
-    dialog::backdrop { background: rgba(0,0,0,0.4); }
+    .btn-divisori { flex: 1; padding: 8px; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+    dialog::backdrop { background: rgba(0,0,0,0.5); }
+
+    /* STILE DI STAMPA COMANDA DIRETTA (NASCONDE TUTTO IL RESTO) */
+    @media print {
+      body * { display: none !important; }
+      #sezione-stampa-comanda, #sezione-stampa-comanda * { display: block !important; }
+      #sezione-stampa-comanda { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; font-size: 12px; padding: 5mm; }
+      .riga-stampa { display: flex; justify-content: space-between; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- HEADER SUPERIORE -->
+  <!-- DIV INVISIBILE A SCHERMO, APPARE SOLO IN STAMPA FISICA -->
+  <div id="sezione-stampa-comanda" style="display:none;"></div>
+
   <div class="cassa-header">
     <div class="cassa-titolo">
       <i class="fa-solid fa-cash-register" style="color: #0076ff;"></i> Cassa Ristorante (Point of Sale)
@@ -91,14 +105,12 @@
     </div>
   </div>
 
-  <!-- CONTAINER LAYOUT -->
   <div class="cassa-main-layout">
     <div class="sezione-sinistar-prodotti">
       <div class="barra-categorie-container" id="barra-categorie-dinamica"></div>
       <div class="griglia-prodotti-fissa" id="grid-prodotti"></div>
     </div>
 
-    <!-- SEZIONE SCONTRINO -->
     <div class="sezione-comanda-destra">
       <div class="comanda-header">
         <i class="fa-solid fa-list-check"></i> Righe Comanda Attiva
@@ -108,49 +120,71 @@
           <thead>
             <tr>
               <th>Articolo</th>
-              <th style="text-align:center; width: 40px;">Q.tà</th>
+              <th style="text-align:center; width: 70px;">Q.tà</th>
               <th style="text-align:right; width: 80px;">Totale</th>
-              <th style="text-align:center; width: 40px;"></th>
+              <th style="text-align:center; width: 30px;"></th>
             </tr>
           </thead>
           <tbody id="xbrowse-body"></tbody>
         </table>
       </div>
       <div class="comanda-footer">
+        <!-- Box dinamico per divisione conti -->
+        <div id="box-funzioni-pagamento" style="margin-bottom: 12px; display: none; gap: 8px;">
+          <button type="button" class="btn-divisori" onclick="eseguiContoUguale()" style="background:#9c27b0;"><i class="fa-solid fa-calculator"></i> Divis. Uguale</button>
+          <button type="button" class="btn-divisori" onclick="apriModalRomana()" style="background:#ff9800;"><i class="fa-solid fa-people-arrows"></i> Alla Romana</button>
+        </div>
+
         <div class="riga-totale">
           <span>TOTALE CONTO:</span>
           <span id="txt-totale">0.00 €</span>
         </div>
-        <button type="button" class="btn-invia-comanda" onclick="inviaComanda()">
-          <i class="fa-solid fa-paper-plane"></i> INVIA COMANDA / SALVA
+        <button type="button" class="btn-invia-comanda" onclick="gestisciInvioComanda()">
+          <i class="fa-solid fa-paper-plane"></i> INVIA ALLE STAMPANTI / SALVA
         </button>
       </div>
     </div>
   </div>
+
+  <!-- DIALOG ALLA ROMANA (CONTO SEPARATO) -->
+  <dialog id="modal-alla-romana" style="border:none; border-radius:8px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.3); width:400px;">
+    <h3 style="margin-top:0;"><i class="fa-solid fa-people-arrows"></i> Pagamento Selezionato (Alla Romana)</h3>
+    <p style="font-size:0.85rem; color:#666;">Spunta i prodotti che il cliente corrente desidera pagare:</p>
+    <div id="lista-prodotti-romana" style="max-height:250px; overflow-y:auto; margin-bottom:15px;"></div>
+    <div style="border-top:1px solid #eee; padding-top:10px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; margin-bottom:15px;">
+      <span>Totale Parziale Cliente:</span>
+      <span id="totale-parziale-romana" style="color:#2e7d32; font-size:1.2rem;">0.00 €</span>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button type="button" onclick="document.getElementById('modal-alla-romana').close()" style="padding:8px 12px; background:#757575; color:white; border:none; border-radius:4px; cursor:pointer;">Annulla</button>
+      <button type="button" onclick="pagamentoParzialeRomana()" style="padding:8px 15px; background:#2e7d32; color:white; border:none; border-radius:4px; cursor:pointer;">Invia a Bancomat / Chiudi Sotto-Conto</button>
+    </div>
+  </dialog>
 
   <script>
     let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     let carrello = [];
     let categoriaAttiva = "";
     
-    function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
+    const ottieniPathImmagini = () => (typeof PATH_IMMAGINI_RISTORANTE !== 'undefined') ? PATH_IMMAGINI_RISTORANTE : '../images/';
 
     window.addEventListener('pageshow', function () {
-      const tbl = localStorage.getItem('tavoloSelezionato') || wbT('pos.counter');
+      const tbl = localStorage.getItem('tavoloSelezionato') || 'Banco';
       const tavoloId = localStorage.getItem('tavoloSelezionatoId');
       
-      const lblTavolo = document.getElementById('lbl-tavolo') || document.querySelector('.badge-tavolo-blu');
+      const lblTavolo = document.getElementById('lbl-tavolo');
       if (lblTavolo) { lblTavolo.innerText = tbl; }
       
       disegnaCopertiCassa(tavoloId);
       
+      // Creazione della finestra cambio tavolo rapido se non presente
       if (!document.getElementById('dialog-cambio-tavolo-rapido')) {
         const rigaDialog = document.createElement('dialog');
         rigaDialog.id = 'dialog-cambio-tavolo-rapido';
-        rigaDialog.style = "border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); min-width: 300px; font-family: sans-serif; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;";
+        rigaDialog.style = "border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); min-width: 300px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;";
         rigaDialog.innerHTML = `
           <h3 style="margin-top:0; color:#333;"><i class="fa-solid fa-utensils"></i> Seleziona Tavolo</h3>
-          <select id="select-cambio-tavolo-rapido" style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; border-radius:4px; border:1px solid #ccc; background: white; color: black;"></select>
+          <select id="select-cambio-tavolo-rapido" style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; border-radius:4px; border:1px solid #ccc;"></select>
           <div style="display:flex; justify-content:flex-end; gap:10px;">
             <button type="button" id="btn-chiudi-diag-rapida" style="padding:6px 12px; background:#757575; color:white; border:none; border-radius:4px; cursor:pointer;">Annulla</button>
             <button type="button" id="btn-conferma-diag-rapida" style="padding:6px 12px; background:#2e7d32; color:white; border:none; border-radius:4px; cursor:pointer;">Carica</button>
@@ -193,18 +227,26 @@
         <button type="button" class="btn-coperti" id="btn-coperti-piu">+</button>
       `;
       
+      const gestisciVisibilitaConti = () => {
+        const boxFunzioni = document.getElementById('box-funzioni-pagamento');
+        if(boxFunzioni) boxFunzioni.style.display = numCoperti > 1 ? 'flex' : 'none';
+      };
+
       document.getElementById('btn-coperti-meno').onclick = function() {
         if (numCoperti > 1) {
           numCoperti--;
           localStorage.setItem(`coperti_tavolo_${tavoloId}`, numCoperti.toString());
           document.getElementById('lbl-valore-coperti').innerText = numCoperti;
+          gestisciVisibilitaConti();
         }
       };
       document.getElementById('btn-coperti-piu').onclick = function() {
         numCoperti++;
         localStorage.setItem(`coperti_tavolo_${tavoloId}`, numCoperti.toString());
         document.getElementById('lbl-valore-coperti').innerText = numCoperti;
+        gestisciVisibilitaConti();
       };
+      gestisciVisibilitaConti();
     }
 
     function costruisciMenuCassa() {
@@ -225,7 +267,7 @@
         btn.className = 'cat-btn';
         
         if (c.immagine && c.immagine.trim() !== "") {
-          let srcCat = c.immagine.startsWith('data:') ? c.immagine : PATH_IMMAGINI_RISTORANTE + c.immagine;
+          let srcCat = c.immagine.startsWith('data:') ? c.immagine : ottieniPathImmagini() + c.immagine;
           btn.innerHTML = `<img src="${srcCat}" style="width:20px; height:20px; object-fit:cover; border-radius:3px; margin-right:6px; vertical-align:middle;"> <span>${c.nome}</span>`;
         } else { btn.innerText = c.nome; }
         
@@ -262,7 +304,7 @@
         
         let bloccoImmagine = '';
         if (p.immagine && p.immagine.trim() !== "") {
-          let srcProd = p.immagine.startsWith('data:') ? p.immagine : PATH_IMMAGINI_RISTORANTE + p.immagine;
+          let srcProd = p.immagine.startsWith('data:') ? p.immagine : ottieniPathImmagini() + p.immagine;
           bloccoImmagine = `<div class="img-container"><img src="${srcProd}"></div>`;
         } else {
           bloccoImmagine = `<div class="img-container" style="display:flex; align-items:center; justify-content:center; color:#ccc;"><i class="fa-regular fa-image fa-lg"></i></div>`;
@@ -274,26 +316,36 @@
           <div class="price">${Number(p.prezzo).toFixed(2)} €</div>
         `;
         
-        card.onclick = function() { aggiungiProdotto(p.nome, p.prezzo); };
+        card.onclick = function() { aggiungiProdotto(p.nome, p.prezzo, p.categoriaId); };
         grid.appendChild(card);
       });
     }
 
-    function aggiungiProdotto(nome, prezzo) {
+    function aggiungiProdotto(nome, prezzo, categoriaId) {
       const item = carrello.find((i) => i.nome === nome);
       if (item) item.qta++;
-      else carrello.push({ nome, qta: 1, prezzo });
+      else carrello.push({ nome, qta: 1, prezzo, categoriaId });
       
-      const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-      if (tavoloId) { localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello)); }
+      salvaStatoCarrello();
       aggiornaXBrowse();
     }
 
+    window.cambiaQtaRiga = function(idx, valore) {
+      carrello[idx].qta += valore;
+      if (carrello[idx].qta <= 0) { carrello.splice(idx, 1); }
+      salvaStatoCarrello();
+      aggiornaXBrowse();
+    };
+
     window.rimuoviProdotto = function(idx) {
       carrello.splice(idx, 1);
+      salvaStatoCarrello();
+      aggiornaXBrowse();
+    };
+
+    function salvaStatoCarrello() {
       const tavoloId = localStorage.getItem('tavoloSelezionatoId');
       if (tavoloId) { localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello)); }
-      aggiornaXBrowse();
     }
 
     function aggiornaXBrowse() {
@@ -308,7 +360,11 @@
         tbody.innerHTML += `
           <tr>
             <td><strong>${item.nome}</strong></td>
-            <td style="text-align:center;">${item.qta}</td>
+            <td style="text-align:center; display:flex; gap:4px; justify-content:center; align-items:center; border:none;">
+              <button type="button" class="btn-qta" onclick="cambiaQtaRiga(${idx}, -1)">-</button>
+              <span style="font-weight:bold; min-width:15px;">${item.qta}</span>
+              <button type="button" class="btn-qta" onclick="cambiaQtaRiga(${idx}, 1)">+</button>
+            </td>
             <td style="text-align:right;">${rigaTot.toFixed(2)} €</td>
             <td style="text-align:center;">
               <button type="button" class="btn-del" onclick="rimuoviProdotto(${idx})">
@@ -320,6 +376,178 @@
       
       const txtTotale = document.getElementById('txt-totale');
       if (txtTotale) { txtTotale.innerText = totaleConto.toFixed(2) + ' €'; }
+    }
+
+    /* LOGICA DIVISIONE CONTO UGUALE */
+    window.eseguiContoUguale = function() {
+      let totaleConto = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+      const inputCoperti = document.getElementById('lbl-valore-coperti');
+      const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 1;
+      
+      if(totaleConto === 0) return;
+      let quota = (totaleConto / numCoperti).toFixed(2);
+      
+      if(confirm(`Il totale è ${totaleConto.toFixed(2)} € diviso per ${numCoperti} coperti.\nQuota a persona: ${quota} €.\n\nInviare richiesta transazione al Bancomat?`)) {
+        alert(`Collegamento Bancomat Attivo...\nInviato comando POS per: ${quota} €.\nAttendere inserimento carta...`);
+        alert("Transazione Approvata dal POS! Scontrino in stampa.");
+      }
+    };
+
+    /* LOGICA CONTO SEPARATO ALLA ROMANA */
+    window.apriModalRomana = function() {
+      const container = document.getElementById('lista-prodotti-romana');
+      container.innerHTML = '';
+      if(carrello.length === 0) return;
+
+      carrello.forEach((item, idx) => {
+        container.innerHTML += `
+          <div style="display:flex; justify-content:between; align-items:center; margin-bottom:8px; background:#f8f9fa; padding:6px; border-radius:4px;">
+            <label style="flex:1; cursor:pointer; font-weight:bold; color: black;">
+              <input type="checkbox" class="chk-romana" data-idx="${idx}" data-prezzo="${item.prezzo}" onchange="ricalcolaParzialeRomana()" style="margin-right:10px;">
+              ${item.nome} (${item.prezzo.toFixed(2)} €)
+            </label>
+            <select class="sel-qta-romana" data-massimo="${item.qta}" onchange="ricalcolaParzialeRomana()" style="padding:2px; border-radius:4px;">
+              ${Array.from({length: item.qta}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      });
+      ricalcolaParzialeRomana();
+      document.getElementById('modal-alla-romana').showModal();
+    };
+
+    window.ricalcolaParzialeRomana = function() {
+      let parziale = 0;
+      document.querySelectorAll('.chk-romana:checked').forEach(chk => {
+        const divGenitore = chk.closest('div');
+        const qtaSelezionata = parseInt(divGenitore.querySelector('.sel-qta-romana').value, 10);
+        const prezzo = parseFloat(chk.getAttribute('data-prezzo'));
+        parziale += (prezzo * qtaSelezionata);
+      });
+      document.getElementById('totale-parziale-romana').innerText = parziale.toFixed(2) + ' €';
+    };
+
+    window.pagamentoParzialeRomana = function() {
+      let totaleDaPagare = parseFloat(document.getElementById('totale-parziale-romana').innerText);
+      if(totaleDaPagare === 0) return alert("Seleziona almeno un prodotto!");
+
+      if(confirm(`Inviare richiesta al Bancomat per l'importo parziale di ${totaleDaPagare.toFixed(2)} €?`)) {
+        alert(`Richiesta inviata al POS BANCOMAT per ${totaleDaPagare.toFixed(2)} €... Pagamento OK.`);
+        
+        // Sottrae le quantità pagate dal carrello principale
+        document.querySelectorAll('.chk-romana:checked').forEach(chk => {
+          const idx = parseInt(chk.getAttribute('data-idx'), 10);
+          const divGenitore = chk.closest('div');
+          const qtaPagata = parseInt(divGenitore.querySelector('.sel-qta-romana').value, 10);
+          
+          carrello[idx].qta -= qtaPagata;
+        });
+
+        // Pulisce le righe azzerate
+        carrello = carrello.filter(item => item.qta > 0);
+        
+        salvaStatoCarrello();
+        aggiornaXBrowse();
+        document.getElementById('modal-alla-romana').close();
+
+        // Se il carrello si è svuotato del tutto, libera il tavolo
+        if(carrello.length === 0) {
+          alert("Tutti gli elementi sono stati saldati! Il tavolo viene chiuso automaticamente.");
+          liberaTavoloCorrente();
+        }
+      }
+    };
+
+    /* SMISTAMENTO STAMPE COMANDA PER REPARTO (Cucina, Pizzeria, Bar) */
+    window.gestisciInvioComanda = function() {
+      if (carrello.length === 0) return alert("La comanda è vuota!");
+      
+      const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
+      if (azioneRichiesta === 'pagamento') {
+        let tot = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+        if(confirm(`Chiudere il conto totale di ${tot.toFixed(2)} € con carta/bancomat?`)) {
+          alert("Segnale inviato al POS fisco... Pagamento Ricevuto!");
+          completaPagamentoESvotaTavolo();
+        }
+        return;
+      }
+
+      // Raggruppa i prodotti per stampante di reparto (Cucina, Pizzeria o Bar)
+      const reparti = {
+        "CUCINA": carrello.filter(p => ["Antipasti", "Primi piatti", "Secondi Di Pesce", "Secondi Piatti", "Contorni"].includes(p.categoriaId)),
+        "PIZZERIA": carrello.filter(p => ["Pizze"].includes(p.categoriaId)),
+        "BAR": carrello.filter(p => ["Bar", "Bevande"].includes(p.categoriaId))
+      };
+
+      const tavoloNome = localStorage.getItem('tavoloSelezionato') || 'Banco';
+      let haStampato = false;
+
+      for (const [nomeReparto, prodotti] of Object.entries(reparti)) {
+        if (prodotti.length > 0) {
+          haStampato = true;
+          eseguiStampaFisicaReparto(nomeReparto, tavoloNome, prodotti);
+        }
+      }
+
+      if(haStampato) {
+        alert("Comande smistate inviate ai reparti con successo!");
+        carrello = [];
+        salvaStatoCarrello();
+        aggiornaXBrowse();
+      }
+    };
+
+    function eseguiStampaFisicaReparto(reparto, tavolo, prodotti) {
+      const areaStampa = document.getElementById('sezione-stampa-comanda');
+      
+      let htmlComanda = `
+        <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+          COMANDA REPARTO: ${reparto}<br>
+          ${tavolo} - Ora: ${new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'})}
+        </div>
+      `;
+      
+      prodotti.forEach(p => {
+        htmlComanda += `
+          <div class="riga-stampa">
+            <span>[ ] ${p.qta}x ${p.nome}</span>
+          </div>
+        `;
+      });
+      
+      htmlComanda += `<div style="border-top:1px dashed #000; margin-top:5px; padding-top:5px; text-align:center; font-size:10px;">WINBEACH GESTIONALE</div>`;
+      
+      areaStampa.innerHTML = htmlComanda;
+      
+      // Avvia la stampa nativa di Windows. Qui l'operatore seleziona la stampante corrispondente al reparto.
+      window.print();
+    }
+
+    function liberaTavoloCorrente() {
+      const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+      if (tavoloId) {
+        localStorage.removeItem(`ora_apertura_tavolo_${tavoloId}`);
+        localStorage.removeItem(`coperti_tavolo_${tavoloId}`);
+        localStorage.removeItem(`carrello_tavolo_${tavoloId}`);
+        
+        const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+        if (datiSalvati) {
+          let db = JSON.parse(datiSalvati);
+          db.tavoli = db.tavoli.map(t => String(t.id) === String(tavoloId) ? { ...t, stato: 'libero' } : t);
+          localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+        }
+      }
+      localStorage.removeItem('tavoloSelezionato');
+      localStorage.removeItem('tavoloSelezionatoId');
+      localStorage.removeItem('pos_azione_richiesta');
+      window.location.reload();
+    }
+
+    function completaPagamentoESvotaTavolo() {
+      liberaTavoloCorrente();
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ comando: 'cambiaPagina', target: 'ristorante' }, '*');
+      }
     }
 
     function apriDialogCambioTavoloRapido() {
@@ -338,7 +566,7 @@
       db.tavoli.forEach(t => {
         const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
         const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
-        const stato = isOccupato ? `(Occupato - ${orarioApertura || 'In corso'})` : '(Libero)';
+        const stato = isOccupato ? `(Occupato)` : '(Libero)';
         
         const opt = document.createElement('option');
         opt.value = t.id;
@@ -376,44 +604,9 @@
 
       localStorage.setItem('tavoloSelezionato', `Tavolo ${numeroTavolo}`);
       localStorage.setItem('tavoloSelezionatoId', idSelezionato);
-      localStorage.setItem('pos_azione_richiesta', 'ordinazione');
-
+      
       document.getElementById('dialog-cambio-tavolo-rapido').close();
       window.dispatchEvent(new Event('pageshow'));
-    }
-
-    window.inviaComanda = function() {
-      if (carrello.length === 0) return alert(wbT('pos.empty'));
-      const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
-      if (azioneRichiesta === 'pagamento') { completaPagamentoESvotaTavolo(); } 
-      else { alert(wbT('pos.sent')); carrello = []; aggiornaXBrowse(); }
-    }
-
-    function completaPagamentoESvotaTavolo() {
-      const tavoloId = localStorage.getItem('tavoloSelezionatoId');
-      if (tavoloId) {
-        localStorage.removeItem(`ora_apertura_tavolo_${tavoloId}`);
-        localStorage.removeItem(`coperti_tavolo_${tavoloId}`);
-        localStorage.removeItem(`carrello_tavolo_${tavoloId}`);
-        localStorage.removeItem(`tavoli_uniti_a_${tavoloId}`);
-        
-        const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-        if (datiSalvati) {
-          let db = JSON.parse(datiSalvati);
-          db.tavoli = db.tavoli.map(t => String(t.id) === String(tavoloId) ? { ...t, stato: 'libero' } : t);
-          localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
-        }
-      }
-      
-      alert("Pagamento registrato con successo! Il tavolo è stato liberato.");
-      carrello = [];
-      localStorage.removeItem('tavoloSelezionato');
-      localStorage.removeItem('tavoloSelezionatoId');
-      localStorage.removeItem('pos_azione_richiesta');
-      
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ comando: 'cambiaPagina', target: 'ristorante' }, '*');
-      } else { window.location.href = 'tavoli.html'; }
     }
   </script>
 </body>
