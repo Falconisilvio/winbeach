@@ -64,7 +64,7 @@
 
   <div class="page-header" style="padding: 20px 20px 10px 20px;">
     <h1><i class="fa-solid fa-gears"></i> Gestione Configurazione Ristorante</h1>
-    <p>Configura la dispositione logistica delle sale ed inserisci i prodotti/categorie nel listino vendite.</p>
+    <p>Configura la disposizione logistica delle sale ed inserisci i prodotti/categorie nel listino vendite.</p>
   </div>
 
   <div class="nav-tabs">
@@ -182,6 +182,22 @@
           <label for="costo-coperto">Costo Pane & Coperto (€ a persona):</label>
           <input type="number" id="costo-coperto" step="0.01" min="0" placeholder="Es: 2.00">
         </div>
+        
+        <!-- BLOCCO SUPPLEMENTI RICHIESTO: SERVIZIO E MANCIA -->
+        <fieldset style="border: 1px solid var(--wb-border, #ccc); border-radius: 6px; padding: 15px; margin-bottom: 15px; background: var(--wb-bg-item, #fafafa);">
+          <legend style="font-weight: bold; padding: 0 10px; font-size: 0.95rem; color: var(--wb-accent, #0084FF);"><i class="fa-solid fa-percentage"></i> Supplementi Conto</legend>
+          
+          <div class="form-group">
+            <label for="percentuale-servizio">Tasso Servizio (% applicata al totale tavolo):</label>
+            <input type="number" id="percentuale-servizio" step="0.1" min="0" max="100" placeholder="Es: 10">
+          </div>
+          
+          <div class="form-group">
+            <label for="valore-mancia">Mancia Predefinita (% o Importo Fisso):</label>
+            <input type="number" id="valore-mancia" step="0.01" min="0" placeholder="Es: 5.00">
+          </div>
+        </fieldset>
+
         <div class="form-group">
           <label for="intestazione-ricevuta">Intestazione Scontrino / Ricevuta:</label>
           <input type="text" id="intestazione-ricevuta" placeholder="Es: Ristorante Da Beach">
@@ -332,7 +348,7 @@
         if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
         if(!dbRistorante.categorie) dbRistorante.categorie = [];
         if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
-        if(!dbRistorante.impostazioni) dbRistorante.impostazioni = { coperto: 0, intestazione: "" };
+        if(!dbRistorante.impostazioni) dbRistorante.impostazioni = { coperto: 0, servizio: 0, mancia: 0, intestazione: "" };
         if(!dbRistorante.pos) dbRistorante.pos = { tipo: "demo", ip: "", metodoStampa: "window-print" };
         if(!dbRistorante.stampantiPorte) dbRistorante.stampantiPorte = { cucina: "", pizzeria: "", bar: "", fatture: "" };
       }
@@ -344,6 +360,8 @@
     function caricaCampiConfigurazione() {
       if(dbRistorante.impostazioni) {
         document.getElementById('costo-coperto').value = dbRistorante.impostazioni.coperto || '';
+        document.getElementById('percentuale-servizio').value = dbRistorante.impostazioni.servizio || '';
+        document.getElementById('valore-mancia').value = dbRistorante.impostazioni.mancia || '';
         document.getElementById('intestazione-ricevuta').value = dbRistorante.impostazioni.intestazione || '';
       }
       if(dbRistorante.pos) {
@@ -546,7 +564,7 @@
       document.getElementById('badge-modifica-tavoli').style.display = 'inline-block';
     }
 
-    function eliminaVoce(tipo, id) {
+    function自由eliminaVoce(tipo, id) {
       if (confirm("Vuoi eliminare definitivamente questo elemento?")) {
         dbRistorante[tipo] = dbRistorante[tipo].filter(x => x.id !== id);
         salvaNelStorage();
@@ -565,7 +583,7 @@
         document.getElementById('badge-modifica-sale').style.display = 'none';
       } else {
         const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
-        dbRistorante.sale.push({ id: nuovoId, nome: nome });
+        dbRistorante.sale.push({ id: nuevoId, nome: nome });
       }
       document.getElementById('nome-sala').value = '';
       salvaNelStorage();
@@ -608,7 +626,7 @@
         dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, stampante: stampante, immagine: nomeImmagine } : c);
       } else {
         const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
-        dbRistorante.categorie.push({ id: nuovoId, nome: nome, stampante: stampante, immagine: nomeImmagine });
+        dbRistorante.categorie.push({ id: nuevoId, nome: nome, stampante: stampante, immagine: nomeImmagine });
       }
       chiudiModale();
       salvaNelStorage();
@@ -640,15 +658,17 @@
       aggiornaInterfaccia();
     });
 
-    // CONFIGURAZIONI TAB 4 E 5
+    // CONFIGURAZIONI TAB 4 (AGGIORNATA CON SALVATAGGIO SERVIZIO E MANCIA)
     document.getElementById('form-config-generale').addEventListener('submit', function(e) {
       e.preventDefault();
       dbRistorante.impostazioni = {
         coperto: Number(document.getElementById('costo-coperto').value) || 0,
+        servizio: Number(document.getElementById('percentuale-servizio').value) || 0,
+        mancia: Number(document.getElementById('valore-mancia').value) || 0,
         intestazione: document.getElementById('intestazione-ricevuta').value.trim()
       };
       salvaNelStorage();
-      alert("Impostazioni generali salvate!");
+      alert("Impostazioni generali e supplementi salvati!");
     });
 
     document.getElementById('form-config-pos').addEventListener('submit', function(e) {
@@ -662,7 +682,6 @@
       alert("Configurazione POS aggiornata!");
     });
 
-    // NUOVO INSERIMENTO: SALVATAGGIO PORTE STAMPANTI FISICHE (Compreso di fatture A4)
     document.getElementById('form-config-stampanti').addEventListener('submit', function(e) {
       e.preventDefault();
       dbRistorante.stampantiPorte = {
