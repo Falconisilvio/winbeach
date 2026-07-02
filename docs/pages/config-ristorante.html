@@ -191,35 +191,59 @@
     </div>
   </div>
 
-  <!-- TAB 5: HARDWARE & POS -->
+  <!-- TAB 5: HARDWARE, POS & STAMPANTI -->
   <div id="tab-pos" class="tab-content">
-    <div class="registro-container" style="max-width: 600px;">
-      <div class="registro-header">
-        <h2><i class="fa-solid fa-credit-card"></i> Configurazione Hardware e Terminali POS</h2>
+    <div class="config-container">
+      
+      <!-- Blocco POS e Terminali -->
+      <div class="config-card" style="justify-content: flex-start;">
+        <h2><i class="fa-solid fa-credit-card"></i> Collegamento POS / Registratore</h2>
+        <form id="form-config-pos">
+          <div class="form-group">
+            <label for="tipo-pos">Modello Terminale POS Collegato:</label>
+            <select id="tipo-pos">
+              <option value="demo">Simulazione Cassa (Nessun hardware fisico)</option>
+              <option value="sumup">SumUp Local API (Wifi/Bluetooth)</option>
+              <option value="axon">Axon / XON-XOFF Scontrino Telematico</option>
+              <option value="custom">Server Seriale/LAN Locale (Node.js Link)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ip-hardware">Indirizzo IP Terminale / Stampante Fiscale:</label>
+            <input type="text" id="ip-hardware" placeholder="Es: 192.168.1.150">
+          </div>
+          <div class="form-group">
+            <label for="tipo-stampa-comande">Metodo Invio Comande:</label>
+            <select id="tipo-stampa-comande">
+              <option value="window-print">Driver di Stampa Windows (Predefinito)</option>
+              <option value="esc-pos">Comandi Diretti ESC/POS (Porte Fisiche/Raw)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> Salva Connessioni Hardware</button>
+        </form>
       </div>
-      <form id="form-config-pos">
-        <div class="form-group">
-          <label for="tipo-pos">Modello Terminale POS Collegato:</label>
-          <select id="tipo-pos">
-            <option value="demo">Simulazione Cassa (Nessun hardware fisico)</option>
-            <option value="sumup">SumUp Local API (Wifi/Bluetooth)</option>
-            <option value="axon">Axon / XON-XOFF Scontrino Telematico</option>
-            <option value="custom">Server Seriale/LAN Locale (Node.js Link)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="ip-hardware">Indirizzo IP Terminale / Stampante Fiscale:</label>
-          <input type="text" id="ip-hardware" placeholder="Es: 192.168.1.150">
-        </div>
-        <div class="form-group">
-          <label for="tipo-stampa-comande">Metodo Invio Comande:</label>
-          <select id="tipo-stampa-comande">
-            <option value="window-print">Driver di Stampa Windows (Predefinito)</option>
-            <option value="esc-pos">Comandi Diretti ESC/POS (Raw Printing)</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> Salva Connessioni Hardware</button>
-      </form>
+
+      <!-- Blocco Configurazione Porte Stampanti -->
+      <div class="config-card" style="justify-content: flex-start;">
+        <h2><i class="fa-solid fa-print"></i> Indirizzi Fisici Stampanti di Reparto</h2>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Associa a ciascun reparto il nome esatto della stampante Windows o la porta fisica (es: <em>LPT1, COM1, Pizzeria_80mm, 192.168.1.200</em>).</p>
+        <form id="form-config-stampanti">
+          <div class="form-group">
+            <label for="port-cucina"><i class="fa-solid fa-fire"></i> Stampante CUCINA (Porta / Nome):</label>
+            <input type="text" id="port-cucina" placeholder="Es: LPT1 oppure Stampante_Cucina">
+          </div>
+          <div class="form-group">
+            <label for="port-pizzeria"><i class="fa-solid fa-pizza-slice"></i> Stampante PIZZERIA (Porta / Nome):</label>
+            <input type="text" id="port-pizzeria" placeholder="Es: COM1 oppure Stampante_Pizze">
+          </div>
+          <div class="form-group">
+            <label for="port-bar"><i class="fa-solid fa-glass-water"></i> Stampante BAR (Porta / Nome):</label>
+            <input type="text" id="port-bar" placeholder="Es: LPT2 oppure Stampante_Bar">
+          </div>
+          <button type="submit" class="btn-save" style="background: #28a745;"><i class="fa-solid fa-floppy-disk"></i> Salva Porte Stampanti</button>
+        </form>
+      </div>
+
     </div>
   </div>
 
@@ -270,9 +294,9 @@
           <label for="stampante-categoria">Assegna Stampante di Reparto:</label>
           <select id="stampante-categoria">
             <option value="Nessuna">Nessuna (Non stampa comanda)</option>
-            <option value="Cucina">Cucina (Primi, Secondi, Contorni)</option>
-            <option value="Pizzeria">Pizzeria (Pizze e Forno)</option>
-            <option value="Bar">Bar (Bevande, Caffetteria)</option>
+            <option value="Cucina">Cucina</option>
+            <option value="Pizzeria">Pizzeria</option>
+            <option value="Bar">Bar</option>
           </select>
         </div>
         <div class="form-group">
@@ -286,7 +310,7 @@
   </div>
 
   <script>
-    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [], impostazioni: {}, pos: {} };
+    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [], impostazioni: {}, pos: {}, stampantiPorte: {} };
     const LOCAL_STORAGE_KEY = 'winbeach_archivio_ristorante';
     
     const ottieniPathImmagini = () => (typeof PATH_IMMAGINI_RISTORANTE !== 'undefined') ? PATH_IMMAGINI_RISTORANTE : 'https://falconisilvio.github.io/winbeach/images/';
@@ -305,6 +329,7 @@
         if(!dbRistorante.prodotti) dbRistorante.prodotti = [];
         if(!dbRistorante.impostazioni) dbRistorante.impostazioni = { coperto: 0, intestazione: "" };
         if(!dbRistorante.pos) dbRistorante.pos = { tipo: "demo", ip: "", metodoStampa: "window-print" };
+        if(!dbRistorante.stampantiPorte) dbRistorante.stampantiPorte = { cucina: "", pizzeria: "", bar: "" };
       }
       
       caricaCampiConfigurazione();
@@ -320,6 +345,11 @@
         document.getElementById('tipo-pos').value = dbRistorante.pos.tipo || 'demo';
         document.getElementById('ip-hardware').value = dbRistorante.pos.ip || '';
         document.getElementById('tipo-stampa-comande').value = dbRistorante.pos.metodoStampa || 'window-print';
+      }
+      if(dbRistorante.stampantiPorte) {
+        document.getElementById('port-cucina').value = dbRistorante.stampantiPorte.cucina || '';
+        document.getElementById('port-pizzeria').value = dbRistorante.stampantiPorte.pizzeria || '';
+        document.getElementById('port-bar').value = dbRistorante.stampantiPorte.bar || '';
       }
     }
 
@@ -338,8 +368,8 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      if(event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
+      if(window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('active');
       }
     }
 
@@ -392,7 +422,7 @@
           <tr>
             <td style="width: 60px;">${imgTag}</td>
             <td><strong>${c.nome}</strong></td>
-            <td><span style="background: #eef5ff; color:#0084FF; padding:4px 10px; border-radius:15px; font-weight:bold; font-size:0.85rem;"><i class="fa-solid fa-print"></i> ${stampanteAssegnata}</span></td>
+            <td><span style="background: #eef5ff; color:#0084FF; padding:4px 10px; border-radius:15px; font-weight:bold; font-size:0.85rem;"><i class="fa-solid fa-print"></i> Reparto: ${stampanteAssegnata}</span></td>
             <td style="text-align: right;">
               <div class="action-buttons" style="justify-content: flex-end;">
                 <button class="btn-edit-item" onclick="apriModificaCategoria(${c.id}, '${c.nome.replace(/'/g, "\\'")}', '${c.stampante || "Nessuna"}', '${c.immagine || ""}')"><i class="fa-solid fa-marker"></i></button>
@@ -572,7 +602,7 @@
         dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, stampante: stampante, immagine: nomeImmagine } : c);
       } else {
         const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
-        dbRistorante.categorie.push({ id: nuevoId, nome: nome, stampante: stampante, immagine: nomeImmagine });
+        dbRistorante.categorie.push({ id: nuovoId, nome: nome, stampante: stampante, immagine: nomeImmagine });
       }
       chiudiModale();
       salvaNelStorage();
@@ -604,7 +634,7 @@
       aggiornaInterfaccia();
     });
 
-    // EVENTI DI SALVATAGGIO DEI NUOVI TAB 4 E 5
+    // CONFIGURAZIONI TAB 4 E 5
     document.getElementById('form-config-generale').addEventListener('submit', function(e) {
       e.preventDefault();
       dbRistorante.impostazioni = {
@@ -612,7 +642,7 @@
         intestazione: document.getElementById('intestazione-ricevuta').value.trim()
       };
       salvaNelStorage();
-      alert("Impostazioni generali salvate con successo!");
+      alert("Impostazioni generali salvate!");
     });
 
     document.getElementById('form-config-pos').addEventListener('submit', function(e) {
@@ -623,7 +653,19 @@
         metodoStampa: document.getElementById('tipo-stampa-comande').value
       };
       salvaNelStorage();
-      alert("Configurazione Hardware & POS aggiornata!");
+      alert("Configurazione POS aggiornata!");
+    });
+
+    // NUOVO INSERIMENTO: SALVATAGGIO PORTE STAMPANTI FISICHE
+    document.getElementById('form-config-stampanti').addEventListener('submit', function(e) {
+      e.preventDefault();
+      dbRistorante.stampantiPorte = {
+        cucina: document.getElementById('port-cucina').value.trim(),
+        pizzeria: document.getElementById('port-pizzeria').value.trim(),
+        bar: document.getElementById('port-bar').value.trim()
+      };
+      salvaNelStorage();
+      alert("Indirizzi fisici delle stampanti di reparto salvati!");
     });
 
     window.addEventListener('DOMContentLoaded', inizializzaDatabaseLocale);
