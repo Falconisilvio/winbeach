@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <script src="../js/theme-init.js"></script>
   <script src="../js/lang-init.js"></script>
+  <!-- Import della configurazione globale del ristorante per il percorso immagini -->
+  <script src="../js/ristorante-config.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Configurazione Ristorante</title>
   <link rel="stylesheet" href="../css/page.css">
@@ -223,9 +225,6 @@
     let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     const LOCAL_STORAGE_KEY = 'winbeach_archivio_ristorante';
     
-    // Il percorso relativo della tua nuova cartella su GitHub
-  const PATH_IMAGINI = '/winbeach/assets/images/';
-    
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (datiSalvati !== null) {
@@ -257,7 +256,9 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
+      if(event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+      }
     }
 
     function renderSale() {
@@ -301,7 +302,7 @@
         return;
       }
       dbRistorante.categorie.forEach(c => {
-        let srcImmagine = c.immagine ? (c.immagine.startsWith('data:') ? c.immagine : PATH_IMAGINI + c.immagine) : '';
+        let srcImmagine = c.immagine ? (c.immagine.startsWith('data:') ? c.immagine : PATH_IMMAGINI_RISTORANTE + c.immagine) : '';
         let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tags" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
           <tr>
@@ -339,7 +340,7 @@
       }
 
       prodottiFiltrati.forEach(p => {
-        let srcImmagine = p.immagine ? (p.immagine.startsWith('data:') ? p.immagine : PATH_IMAGINI + p.immagine) : '';
+        let srcImmagine = p.immagine ? (p.immagine.startsWith('data:') ? p.immagine : PATH_IMMAGINI_RISTORANTE + p.immagine) : '';
         let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-utensils" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
           <tr>
@@ -438,7 +439,7 @@
       if(editId) {
         dbRistorante.sale = dbRistorante.sale.map(s => s.id === Number(editId) ? { ...s, nome: nome } : s);
         document.getElementById('edit-sala-id').value = '';
-        document.getElementById('btn-submit-sala').innerHTML = '<i class="fa-solid fa-plus"></i> Aungi Sala';
+        document.getElementById('btn-submit-sala').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Sala';
         document.getElementById('badge-modifica-sale').style.display = 'none';
       } else {
         const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
@@ -476,7 +477,6 @@
       
       let nomeImmagine = document.getElementById('edit-categoria-img-salvata').value || "";
       
-      // Se l'utente ha selezionato un nuovo file, prendiamo solo la stringa del nome del file
       if (fileInput.files && fileInput.files.length > 0) {
         nomeImmagine = fileInput.files[0].name;
       }
@@ -502,7 +502,6 @@
 
       let nomeImmagine = document.getElementById('edit-prodotto-img-salvata').value || "";
 
-      // Se l'utente ha selezionato un nuovo file, prendiamo solo la stringa del nome del file
       if (fileInput.files && fileInput.files.length > 0) {
         nomeImmagine = fileInput.files[0].name;
       }
