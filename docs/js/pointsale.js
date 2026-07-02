@@ -113,9 +113,10 @@ function costruisciMenuCassa() {
     btn.type = 'button';
     btn.className = 'cat-btn';
     
-    if (c.immagine && c.immagine.trim() !== "") {
-      btn.innerHTML = `<img src="${c.immagine}" style="width:20px; height:20px; object-fit:cover; border-radius:3px; margin-right:6px; vertical-align:middle;"> <span>${c.nome}</span>`;
-    } else {
+ 
+if (p.immagine && p.immagine.trim() !== "") {
+  bloccoImmagine = `<div class="img-container"><img src="/winbeach/assets/images/${p.immagine}"></div>`;
+} else {
       btn.innerText = c.nome;
     }
     
