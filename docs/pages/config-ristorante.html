@@ -70,7 +70,7 @@
     <button class="tab-btn" onclick="switchTab('tab-registro')"><i class="fa-solid fa-utensils"></i> 3. Registro Prodotti</button>
   </div>
 
-  <!-- TAB 1: LOGISTICA SALE E TAVOLI -->
+  <!-- TAB 1: LOGISTICA -->
   <div id="tab-logistica" class="tab-content active">
     <div class="config-container">
       <div class="config-card">
@@ -109,7 +109,7 @@
     </div>
   </div>
 
-  <!-- TAB 2: REGISTRO CATEGORIE -->
+  <!-- TAB 2: CATEGORIE -->
   <div id="tab-categorie" class="tab-content">
     <div class="registro-container">
       <div class="registro-header">
@@ -129,7 +129,7 @@
     </div>
   </div>
 
-  <!-- TAB 3: REGISTRO PRODOTTI -->
+  <!-- TAB 3: PRODOTTI -->
   <div id="tab-registro" class="tab-content">
     <div class="registro-container">
       <div class="registro-header">
@@ -174,7 +174,6 @@
       </div>
       <form id="form-prodotto">
         <input type="hidden" id="edit-prodotto-id" value="">
-        <input type="hidden" id="edit-prodotto-img-salvata" value="">
         <div class="form-group">
           <label for="select-categoria">Categoria Prodotto:</label>
           <select id="select-categoria" required></select>
@@ -188,8 +187,8 @@
           <input type="number" id="prezzo-prodotto" step="0.01" required>
         </div>
         <div class="form-group">
-          <label for="file-prodotto">Foto Prodotto (Lascia vuoto per mantenere attuale):</label>
-          <input type="file" id="file-prodotto" accept="image/*">
+          <label for="file-prodotto">Nome file immagine (Es: `brioche.jpg` o `cappuccino.png`):</label>
+          <input type="text" id="file-prodotto" placeholder="Es: prosciutto.jpg">
         </div>
         <button type="submit" class="btn-save" style="width:100%;">Salva Prodotto</button>
       </form>
@@ -202,14 +201,13 @@
       </div>
       <form id="form-categoria">
         <input type="hidden" id="edit-categoria-id" value="">
-        <input type="hidden" id="edit-categoria-img-salvata" value="">
         <div class="form-group">
           <label for="nome-categoria">Nome Categoria:</label>
           <input type="text" id="nome-categoria" required>
         </div>
         <div class="form-group">
-          <label for="file-categoria">Foto Categoria (Lascia vuoto per mantenere attuale):</label>
-          <input type="file" id="file-categoria" accept="image/*">
+          <label for="file-categoria">Nome file immagine (Es: `antipasti.jpg`):</label>
+          <input type="text" id="file-categoria" placeholder="Es: pizze.jpg">
         </div>
         <button type="submit" class="btn-save" style="width:100%;">Salva Categoria</button>
       </form>
@@ -219,15 +217,14 @@
   <script>
     let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     const LOCAL_STORAGE_KEY = 'winbeach_archivio_ristorante';
+    
+    // Configura il percorso relativo alla cartella delle immagini
+    const PATH_IMAGINI = '../assets/images/';
 
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (datiSalvati !== null) {
-        try {
-          dbRistorante = JSON.parse(datiSalvati);
-        } catch(e) {
-          console.error("Errore lettura localStorage, resetto.", e);
-        }
+        dbRistorante = JSON.parse(datiSalvati);
         if(!dbRistorante.sale) dbRistorante.sale = [];
         if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
         if(!dbRistorante.categorie) dbRistorante.categorie = [];
@@ -237,12 +234,7 @@
     }
 
     function salvaNelStorage() {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbRistorante));
-      } catch (e) {
-        alert("Attenzione: Spazio di archiviazione del browser pieno! Prova a ricaricare un'immagine più piccola.");
-        console.error("LocalStorage pieno!", e);
-      }
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbRistorante));
     }
 
     function aggiornaInterfaccia() {
@@ -300,14 +292,16 @@
         return;
       }
       dbRistorante.categorie.forEach(c => {
-        let imgTag = c.immagine ? `<img src="${c.immagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tags" style="font-size:1.3rem; color:#bbb;"></i>`;
+        // Se c'è scritto il nome del file, punta alla cartella assets/images
+        let srcImmagine = c.immagine ? (c.immagine.startsWith('data:') ? c.immagine : PATH_IMAGINI + c.immagine) : '';
+        let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tags" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
           <tr>
             <td style="width: 60px;">${imgTag}</td>
             <td><strong>${c.nome}</strong></td>
             <td style="text-align: right;">
               <div class="action-buttons" style="justify-content: flex-end;">
-                <button class="btn-edit-item" onclick="apriModificaCategoria(${c.id}, '${c.nome.replace(/'/g, "\\'")}')"><i class="fa-solid fa-marker"></i></button>
+                <button class="btn-edit-item" onclick="apriModificaCategoria(${c.id}, '${c.nome.replace(/'/g, "\\'")}', '${c.immagine || ""}')"><i class="fa-solid fa-marker"></i></button>
                 <button class="btn-del-item" onclick="eliminaVoce('categorie', ${c.id})"><i class="fa-regular fa-trash-can"></i></button>
               </div>
             </td>
@@ -337,7 +331,8 @@
       }
 
       prodottiFiltrati.forEach(p => {
-        let imgTag = p.immagine ? `<img src="${p.immagine}" class="img-preview-mini">` : `<i class="fa-solid fa-utensils" style="font-size:1.3rem; color:#bbb;"></i>`;
+        let srcImmagine = p.immagine ? (p.immagine.startsWith('data:') ? p.immagine : PATH_IMAGINI + p.immagine) : '';
+        let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-utensils" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
           <tr>
             <td style="width: 60px;">${imgTag}</td>
@@ -346,7 +341,7 @@
             <td><strong>${Number(p.prezzo).toFixed(2)} €</strong></td>
             <td style="text-align: right;">
               <div class="action-buttons" style="justify-content: flex-end;">
-                <button class="btn-edit-item" onclick="apriModificaProdotto(${p.id}, '${p.nome.replace(/'/g, "\\'")}', ${p.prezzo}, '${p.categoriaId}')"><i class="fa-solid fa-marker"></i></button>
+                <button class="btn-edit-item" onclick="apriModificaProdotto(${p.id}, '${p.nome.replace(/'/g, "\\'")}', ${p.prezzo}, '${p.categoriaId}', '${p.immagine || ""}')"><i class="fa-solid fa-marker"></i></button>
                 <button class="btn-del-item" onclick="eliminaVoce('prodotti', ${p.id})"><i class="fa-regular fa-trash-can"></i></button>
               </div>
             </td>
@@ -361,7 +356,6 @@
       document.getElementById('box-modal-categoria').style.display = 'none';
       document.getElementById('modal-prodotto-titolo').innerText = "Nuovo Prodotto";
       document.getElementById('edit-prodotto-id').value = '';
-      document.getElementById('edit-prodotto-img-salvata').value = '';
       document.getElementById('form-prodotto').reset();
     }
 
@@ -371,28 +365,26 @@
       document.getElementById('box-modal-prodotto').style.display = 'none';
       document.getElementById('modal-categoria-titolo').innerText = "Nuova Categoria";
       document.getElementById('edit-categoria-id').value = '';
-      document.getElementById('edit-categoria-img-salvata').value = '';
       document.getElementById('form-categoria').reset();
     }
 
-    function apriModificaProdotto(id, nome, prezzo, categoriaId) {
+    function apriModificaProdotto(id, nome, prezzo, categoriaId, immagineNome) {
       apriModalProdotto();
-      const prod = dbRistorante.prodotti.find(p => p.id === id);
       document.getElementById('modal-prodotto-titolo').innerText = "Modifica Prodotto";
       document.getElementById('edit-prodotto-id').value = id;
       document.getElementById('select-categoria').value = categoriaId;
       document.getElementById('nome-prodotto').value = nome;
       document.getElementById('prezzo-prodotto').value = prezzo;
-      document.getElementById('edit-prodotto-img-salvata').value = prod ? (prod.immagine || "") : "";
+      // Mostra nel campo testo il nome del file se non è un vecchio base64
+      document.getElementById('file-prodotto').value = immagineNome.startsWith('data:') ? "" : immagineNome;
     }
 
-    function apriModificaCategoria(id, nome) {
+    function apriModificaCategoria(id, nome, immagineNome) {
       apriModalCategoria();
-      const cat = dbRistorante.categorie.find(c => c.id === id);
       document.getElementById('modal-categoria-titolo').innerText = "Modifica Categoria";
       document.getElementById('edit-categoria-id').value = id;
       document.getElementById('nome-categoria').value = nome;
-      document.getElementById('edit-categoria-img-salvata').value = cat ? (cat.immagine || "") : "";
+      document.getElementById('file-categoria').value = immagineNome.startsWith('data:') ? "" : immagineNome;
     }
 
     function chiudiModale() {
@@ -414,55 +406,12 @@
       document.getElementById('badge-modifica-tavoli').style.display = 'inline-block';
     }
 
-    function群体voce(tipo, id) { eliminaVoce(tipo, id); }
     function eliminaVoce(tipo, id) {
       if (confirm("Vuoi eliminare definitivamente questo elemento?")) {
         dbRistorante[tipo] = dbRistorante[tipo].filter(x => x.id !== id);
         salvaNelStorage();
         aggiornaInterfaccia();
       }
-    }
-
-    // FUNZIONE DI COMPRESSIONE ED OTTIMIZZAZIONE IMMAGINI IN LINEA PER LOCALSTORAGE
-    function convertiEComprimiFileInBase64(fileInput) {
-      return new Promise((resolve, reject) => {
-        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-          resolve("");
-          return;
-        }
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-            
-            // Forziamo proporzioni piccole e scattanti (max 300px lato lungo)
-            const MAX_WIDTH = 300;
-            const MAX_HEIGHT = 300;
-            if (width > height) {
-              if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-            } else {
-              if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            // Salviamo in JPEG compresso al 70% di qualità (poche decine di kb)
-            const dataURL = canvas.toDataURL('image/jpeg', 0.7);
-            resolve(dataURL);
-          };
-          img.src = e.target.result;
-        };
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-      });
     }
 
     document.getElementById('form-sala').addEventListener('submit', function(e) {
@@ -502,42 +451,36 @@
       aggiornaInterfaccia();
     });
 
-    document.getElementById('form-categoria').addEventListener('submit', async function(e) {
+    document.getElementById('form-categoria').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-categoria').value.trim();
-      const fileInput = document.getElementById('file-categoria');
+      const nomeImmagine = document.getElementById('file-categoria').value.trim();
       const editId = document.getElementById('edit-categoria-id').value;
       
-      let stringaImmagine = await convertiEComprimiFileInBase64(fileInput);
-      
       if(editId) {
-        if(!stringaImmagine || stringaImmagine === "") { stringaImmagine = document.getElementById('edit-categoria-img-salvata').value; }
-        dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, immagine: stringaImmagine } : c);
+        dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, immagine: nomeImmagine } : c);
       } else {
         const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
-        dbRistorante.categorie.push({ id: nuovoId, nome: nome, immagine: stringaImmagine });
+        dbRistorante.categorie.push({ id: nuovoId, nome: nome, immagine: nomeImmagine });
       }
       chiudiModale();
       salvaNelStorage();
       aggiornaInterfaccia();
     });
 
-    document.getElementById('form-prodotto').addEventListener('submit', async function(e) {
+    document.getElementById('form-prodotto').addEventListener('submit', function(e) {
       e.preventDefault();
       const categoriaNome = document.getElementById('select-categoria').value; 
       const nome = document.getElementById('nome-prodotto').value.trim();
       const prezzo = Number(document.getElementById('prezzo-prodotto').value);
-      const fileInput = document.getElementById('file-prodotto');
+      const nomeImmagine = document.getElementById('file-prodotto').value.trim();
       const editId = document.getElementById('edit-prodotto-id').value;
 
-      let stringaImmagine = await convertiEComprimiFileInBase64(fileInput);
-
       if(editId) {
-        if(!stringaImmagine || stringaImmagine === "") { stringaImmagine = document.getElementById('edit-prodotto-img-salvata').value; }
-        dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoryId: categoriaNome, categoriaId: categoriaNome, immagine: stringaImmagine } : p);
+        dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine } : p);
       } else {
         const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
-        dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: stringaImmagine });
+        dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine });
       }
       chiudiModale();
       salvaNelStorage();
