@@ -6,47 +6,46 @@
   <link rel="stylesheet" href="../css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
-    /* STILI STRUTTURALI ORIGINALI DELLA CASSA */
+    /* STILI STRUTTURALI DELLA CASSA */
     body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; margin: 0; padding: 10px; }
     
     .cassa-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; background: #fff; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 10px; }
     .cassa-titolo { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: bold; color: #333; }
-    .info-tavolo-box { display: flex; align-items: center; gap: 8px; }
+    .info-tavolo-box { display: flex; align-items: center; gap: 12px; }
     
-    /* BADGE TAVOLO ORIGINALE BLU */
+    /* BADGE TAVOLO */
     .badge-tavolo-blu { background: #0076ff; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.95rem; }
     
-    /* NUOVO PULSANTE CAMBIO TAVOLO: PICCOLO E ROSA/FUCSIA */
+    /* PULSANTE CAMBIO TAVOLO FUCSIA */
     .btn-cambio-rapido-fucsia { background: #e91e63; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
     .btn-cambio-rapido-fucsia:hover { background: #c2185b; }
 
-    /* CONTENITORE LAYOUT CORRETTO (PRODOTTI A SINISTRA, COMANDA A DESTRA) */
+    /* LAYOUT PRINCIPALE */
     .cassa-main-layout { display: flex; gap: 15px; margin-top: 10px; align-items: flex-start; }
     
     .sezione-sinistra-prodotti { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
-    /* BARRA CATEGORIE SU MAX 2 RIGHE CON SCORRIMENTO SE AUMENTANO */
+    /* BARRA CATEGORIE */
     .barra-categorie-container { display: flex; flex-wrap: wrap; gap: 8px; max-height: 90px; overflow-y: auto; padding: 4px 0; }
-    
-    /* BOTTONI CATEGORIE */
     .cat-btn { padding: 10px 18px; border: 1px solid #e0e0e0; background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; color: #333; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: inline-flex; align-items: center; gap: 6px; }
     .cat-btn.active { background: #0076ff; color: white; border-color: #0076ff; }
 
-    /* GRIGLIA PRODOTTI BLOCCATA A 4 RIGHE FISSE */
-    .griglia-prodotti-fissa { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-template-rows: repeat(4, 1fr); gap: 10px; height: 420px; overflow-y: auto; padding-right: 5px; }
+    /* GRIGLIA PRODOTTI RE-INGEGNERIZZATA PER EVITARE SCHIACCIAMENTI */
+    .griglia-prodotti-fissa { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; height: 460px; overflow-y: auto; padding-right: 5px; padding-bottom: 15px; }
     
-    /* CARTE PRODOTTI */
-    .articolo-card { border: 1px solid #e0e0e0; background: #fff; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; height: 90px; box-sizing: border-box; }
-    .articolo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
-    .articolo-card .name { font-weight: bold; font-size: 0.9rem; color: #222; margin-bottom: 4px; line-height: 1.2; }
-    .articolo-card .price { color: #2e7d32; font-weight: bold; font-size: 0.95rem; margin-top: auto; }
+    /* CARTE PRODOTTI AUTO-ADATTIVE IN ALTEZZA */
+    .articolo-card { border: 1px solid #e0e0e0; background: #fff; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-sizing: border-box; min-height: 145px; justify-content: transform; }
+    .articolo-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    .articolo-card .img-container { width: 100%; height: 75px; margin-bottom: 6px; border-radius: 6px; overflow: hidden; background-color: #f1f1f1; }
+    .articolo-card img { width: 100%; height: 100%; object-fit: cover; }
+    .articolo-card .name { font-weight: bold; font-size: 0.85rem; color: #222; margin-bottom: 6px; line-height: 1.2; text-align: left; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 32px; }
+    .articolo-card .price { color: #2e7d32; font-weight: bold; font-size: 0.95rem; margin-top: auto; text-align: left; padding-top: 2px; }
 
-    /* SEZIONE RIGHE COMANDA ATTIVA (SCONTRINO A DESTRA) */
-    .sezione-comanda-destra { width: 380px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; flex-direction: column; height: 530px; }
+    /* SEZIONE SCONTRINO DESTRA */
+    .sezione-comanda-destra { width: 380px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; flex-direction: column; height: 560px; }
     .comanda-header { background: #f8f9fa; padding: 12px; font-weight: bold; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; color: #333; }
     .comanda-body { flex: 1; overflow-y: auto; padding: 10px; }
     
-    /* TABELLA COMANDA ORIGINALE XBROWSE */
     .xbrowse-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .xbrowse-table th { text-align: left; padding: 6px; color: #777; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #eee; }
     .xbrowse-table td { padding: 8px 6px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
@@ -54,7 +53,6 @@
     .btn-del { background: transparent; border: none; color: #ff4d4d; cursor: pointer; font-size: 1rem; padding: 4px; }
     .btn-del:hover { color: #cc0000; }
 
-    /* TOTALE SCONTRINO */
     .comanda-footer { padding: 15px; border-top: 2px dashed #eee; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
     .riga-totale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .riga-totale span { font-size: 1.1rem; font-weight: bold; color: #333; }
@@ -63,10 +61,10 @@
     .btn-invia-comanda { width: 100%; background: #0076ff; color: white; border: none; padding: 12px; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-invia-comanda:hover { background: #0056b3; }
 
-    /* INTERFACCIA COPERTI ORIGINALE */
-    .box-coperti { display: flex; align-items: center; gap: 5px; font-weight: bold; font-size: 0.95rem; }
-    .btn-coperti { background: #eee; border: 1px solid #ccc; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; }
-    .btn-coperti:hover { background: #ddd; }
+    /* INTERFACCIA COPERTI */
+    .box-coperti { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 0.9rem; background: #f1f3f5; padding: 4px 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
+    .btn-coperti { background: #fff; border: 1px solid #cbd5e1; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; color: #334155; }
+    .btn-coperti:hover { background: #cbd5e1; }
 
     dialog::backdrop { background: rgba(0,0,0,0.4); }
   </style>
@@ -81,40 +79,27 @@
     
     <div class="info-tavolo-box">
       <span class="badge-tavolo-blu" id="lbl-tavolo">Caricamento...</span>
-      <button type="button" class="btn-cambio-rapido-fucsia" onclick="apriDialogCambioTavoloRapido()">
+      <button type="button" class="btn-cambio-rapido-fucsia">
         <i class="fa-solid fa-shuffle"></i> Cambia Tavolo
       </button>
-    </div>
-
-    <div class="box-coperti" id="box-coperti-cassa">
-      <!-- Gestito dinamicamente da JS -->
+      <div class="box-coperti" id="box-coperti-cassa">
+        <!-- Generato via JavaScript -->
+      </div>
     </div>
   </div>
 
-  <!-- CONTAINER PRINCIPALE GRAPHIQUE -->
+  <!-- CONTAINER LAYOUT -->
   <div class="cassa-main-layout">
-    
-    <!-- SEZIONE SINISTRA: CATEGORIE E GRIGLIA PRODOTTI -->
     <div class="sezione-sinistra-prodotti">
-      
-      <!-- CONTENITORE DELLE CATEGORIE -->
-      <div class="barra-categorie-container" id="barra-categorie-dinamica">
-        <!-- I bottoni delle categorie compariranno qui -->
-      </div>
-      
-      <!-- GRIGLIA PRODOTTI BLOCCATA SU 4 RIGHE -->
-      <div class="griglia-prodotti-fissa" id="grid-prodotti">
-        <!-- I prodotti della categoria attiva compariranno qui -->
-      </div>
-
+      <div class="barra-categorie-container" id="barra-categorie-dinamica"></div>
+      <div class="griglia-prodotti-fissa" id="grid-prodotti"></div>
     </div>
 
-    <!-- SEZIONE DESTRA: RIGHE COMANDA ATTIVA (SCONTRINO) -->
+    <!-- SEZIONE SCONTRINO -->
     <div class="sezione-comanda-destra">
       <div class="comanda-header">
         <i class="fa-solid fa-list-check"></i> Righe Comanda Attiva
       </div>
-      
       <div class="comanda-body">
         <table class="xbrowse-table">
           <thead>
@@ -125,12 +110,9 @@
               <th style="text-align:center; width: 40px;"></th>
             </tr>
           </thead>
-          <tbody id="xbrowse-body">
-            <!-- Righe carrello inserite dinamicamente da JS -->
-          </tbody>
+          <tbody id="xbrowse-body"></tbody>
         </table>
       </div>
-      
       <div class="comanda-footer">
         <div class="riga-totale">
           <span>TOTALE CONTO:</span>
@@ -141,10 +123,8 @@
         </button>
       </div>
     </div>
-
   </div>
 
-  <!-- Carica il file JavaScript contenente tutta la logica operativa delle immagini e dei tavoli -->
   <script src="../js/pointsale.js"></script>
 </body>
 </html>
