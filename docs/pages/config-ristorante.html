@@ -53,6 +53,7 @@
     .modal-box { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: #000; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     .modal-close { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+    .info-file-attuale { font-size: 0.8rem; color: #666; display: block; margin-top: 4px; font-style: italic; }
     
     @media (max-width: 768px) { .config-container { grid-template-columns: 1fr; } }
   </style>
@@ -174,6 +175,7 @@
       </div>
       <form id="form-prodotto">
         <input type="hidden" id="edit-prodotto-id" value="">
+        <input type="hidden" id="edit-prodotto-img-salvata" value="">
         <div class="form-group">
           <label for="select-categoria">Categoria Prodotto:</label>
           <select id="select-categoria" required></select>
@@ -187,8 +189,9 @@
           <input type="number" id="prezzo-prodotto" step="0.01" required>
         </div>
         <div class="form-group">
-          <label for="file-prodotto">Nome file immagine (Es: `brioche.jpg` o `cappuccino.png`):</label>
-          <input type="text" id="file-prodotto" placeholder="Es: prosciutto.jpg">
+          <label for="file-prodotto">Scegli la Foto del Prodotto:</label>
+          <input type="file" id="file-prodotto" accept="image/*">
+          <span id="info-img-prodotto-attuale" class="info-file-attuale"></span>
         </div>
         <button type="submit" class="btn-save" style="width:100%;">Salva Prodotto</button>
       </form>
@@ -201,13 +204,15 @@
       </div>
       <form id="form-categoria">
         <input type="hidden" id="edit-categoria-id" value="">
+        <input type="hidden" id="edit-categoria-img-salvata" value="">
         <div class="form-group">
           <label for="nome-categoria">Nome Categoria:</label>
           <input type="text" id="nome-categoria" required>
         </div>
         <div class="form-group">
-          <label for="file-categoria">Nome file immagine (Es: `antipasti.jpg`):</label>
-          <input type="text" id="file-categoria" placeholder="Es: pizze.jpg">
+          <label for="file-categoria">Scegli la Foto della Categoria:</label>
+          <input type="file" id="file-categoria" accept="image/*">
+          <span id="info-img-categoria-attuale" class="info-file-attuale"></span>
         </div>
         <button type="submit" class="btn-save" style="width:100%;">Salva Categoria</button>
       </form>
@@ -218,13 +223,17 @@
     let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
     const LOCAL_STORAGE_KEY = 'winbeach_archivio_ristorante';
     
-    // Configura il percorso relativo alla cartella delle immagini
+    // Il percorso relativo della tua nuova cartella su GitHub
     const PATH_IMAGINI = '../assets/images/';
 
     function inizializzaDatabaseLocale() {
       const datiSalvati = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (datiSalvati !== null) {
-        dbRistorante = JSON.parse(datiSalvati);
+        try {
+          dbRistorante = JSON.parse(datiSalvati);
+        } catch(e) {
+          console.error("Errore lettura database.");
+        }
         if(!dbRistorante.sale) dbRistorante.sale = [];
         if(!dbRistorante.tavoli) dbRistorante.tavoli = [];
         if(!dbRistorante.categorie) dbRistorante.categorie = [];
@@ -292,7 +301,6 @@
         return;
       }
       dbRistorante.categorie.forEach(c => {
-        // Se c'è scritto il nome del file, punta alla cartella assets/images
         let srcImmagine = c.immagine ? (c.immagine.startsWith('data:') ? c.immagine : PATH_IMAGINI + c.immagine) : '';
         let imgTag = srcImmagine ? `<img src="${srcImmagine}" class="img-preview-mini">` : `<i class="fa-solid fa-tags" style="font-size:1.3rem; color:#bbb;"></i>`;
         tbody.innerHTML += `
@@ -356,6 +364,8 @@
       document.getElementById('box-modal-categoria').style.display = 'none';
       document.getElementById('modal-prodotto-titolo').innerText = "Nuovo Prodotto";
       document.getElementById('edit-prodotto-id').value = '';
+      document.getElementById('edit-prodotto-img-salvata').value = '';
+      document.getElementById('info-img-prodotto-attuale').innerText = '';
       document.getElementById('form-prodotto').reset();
     }
 
@@ -365,6 +375,8 @@
       document.getElementById('box-modal-prodotto').style.display = 'none';
       document.getElementById('modal-categoria-titolo').innerText = "Nuova Categoria";
       document.getElementById('edit-categoria-id').value = '';
+      document.getElementById('edit-categoria-img-salvata').value = '';
+      document.getElementById('info-img-categoria-attuale').innerText = '';
       document.getElementById('form-categoria').reset();
     }
 
@@ -375,8 +387,10 @@
       document.getElementById('select-categoria').value = categoriaId;
       document.getElementById('nome-prodotto').value = nome;
       document.getElementById('prezzo-prodotto').value = prezzo;
-      // Mostra nel campo testo il nome del file se non è un vecchio base64
-      document.getElementById('file-prodotto').value = immagineNome.startsWith('data:') ? "" : immagineNome;
+      document.getElementById('edit-prodotto-img-salvata').value = immagineNome;
+      if (immagineNome && !immagineNome.startsWith('data:')) {
+        document.getElementById('info-img-prodotto-attuale').innerText = "File attuale: " + immagineNome;
+      }
     }
 
     function apriModificaCategoria(id, nome, immagineNome) {
@@ -384,7 +398,10 @@
       document.getElementById('modal-categoria-titolo').innerText = "Modifica Categoria";
       document.getElementById('edit-categoria-id').value = id;
       document.getElementById('nome-categoria').value = nome;
-      document.getElementById('file-categoria').value = immagineNome.startsWith('data:') ? "" : immagineNome;
+      document.getElementById('edit-categoria-img-salvata').value = immagineNome;
+      if (immagineNome && !immagineNome.startsWith('data:')) {
+        document.getElementById('info-img-categoria-attuale').innerText = "File attuale: " + immagineNome;
+      }
     }
 
     function chiudiModale() {
@@ -421,7 +438,7 @@
       if(editId) {
         dbRistorante.sale = dbRistorante.sale.map(s => s.id === Number(editId) ? { ...s, nome: nome } : s);
         document.getElementById('edit-sala-id').value = '';
-        document.getElementById('btn-submit-sala').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Sala';
+        document.getElementById('btn-submit-sala').innerHTML = '<i class="fa-solid fa-plus"></i> Aungi Sala';
         document.getElementById('badge-modifica-sale').style.display = 'none';
       } else {
         const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
@@ -454,8 +471,15 @@
     document.getElementById('form-categoria').addEventListener('submit', function(e) {
       e.preventDefault();
       const nome = document.getElementById('nome-categoria').value.trim();
-      const nomeImmagine = document.getElementById('file-categoria').value.trim();
+      const fileInput = document.getElementById('file-categoria');
       const editId = document.getElementById('edit-categoria-id').value;
+      
+      let nomeImmagine = document.getElementById('edit-categoria-img-salvata').value || "";
+      
+      // Se l'utente ha selezionato un nuovo file, prendiamo solo la stringa del nome del file
+      if (fileInput.files && fileInput.files.length > 0) {
+        nomeImmagine = fileInput.files[0].name;
+      }
       
       if(editId) {
         dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, immagine: nomeImmagine } : c);
@@ -473,8 +497,15 @@
       const categoriaNome = document.getElementById('select-categoria').value; 
       const nome = document.getElementById('nome-prodotto').value.trim();
       const prezzo = Number(document.getElementById('prezzo-prodotto').value);
-      const nomeImmagine = document.getElementById('file-prodotto').value.trim();
+      const fileInput = document.getElementById('file-prodotto');
       const editId = document.getElementById('edit-prodotto-id').value;
+
+      let nomeImmagine = document.getElementById('edit-prodotto-img-salvata').value || "";
+
+      // Se l'utente ha selezionato un nuovo file, prendiamo solo la stringa del nome del file
+      if (fileInput.files && fileInput.files.length > 0) {
+        nomeImmagine = fileInput.files[0].name;
+      }
 
       if(editId) {
         dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine } : p);
