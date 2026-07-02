@@ -62,7 +62,7 @@
     .btn-del:hover { color: #cc0000; }
 
     .comanda-footer { padding: 15px; border-top: 2px dashed #eee; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-    .riga-totale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .riga-totale { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .riga-totale span { font-size: 1.1rem; font-weight: bold; color: #333; }
     .riga-totale #txt-totale { font-size: 1.4rem; color: #2e7d32; }
     
@@ -135,6 +135,12 @@
           <button type="button" class="btn-divisori" onclick="apriModalRomana()" style="background:#ff9800;"><i class="fa-solid fa-people-arrows"></i> Alla Romana</button>
         </div>
 
+        <!-- Visualizzazione Riepilogo dei Coperti nel calcolo finale -->
+        <div id="info-coperti-conto" style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #555; font-style: italic; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #eee;">
+          <span>Coperti (<span id="txt-dettaglio-coperti">0 x 0.00 €</span>):</span>
+          <span id="txt-totale-coperti">0.00 €</span>
+        </div>
+
         <div class="riga-totale">
           <span>TOTALE CONTO:</span>
           <span id="txt-totale">0.00 €</span>
@@ -162,9 +168,10 @@
   </dialog>
 
   <script>
-    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
+    let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [], impostazioni: {} };
     let carrello = [];
     let categoriaAttiva = "";
+    let costoCopertoUnitario = 0;
     
     const ottieniPathImmagini = () => (typeof PATH_IMMAGINI_RISTORANTE !== 'undefined') ? PATH_IMMAGINI_RISTORANTE : '../images/';
 
@@ -174,6 +181,14 @@
       
       const lblTavolo = document.getElementById('lbl-tavolo');
       if (lblTavolo) { lblTavolo.innerText = tbl; }
+      
+      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+      if (datiSalvati) { 
+        dbRistorante = JSON.parse(datiSalvati); 
+      }
+      
+      // Caricamento del costo coperto dalle impostazioni globali (Tab 4)
+      costoCopertoUnitario = (dbRistorante.impostazioni && dbRistorante.impostazioni.coperto) ? Number(dbRistorante.impostazioni.coperto) : 0;
       
       disegnaCopertiCassa(tavoloId);
       
@@ -200,9 +215,6 @@
         btnCambioNativo.onclick = function(e) { e.preventDefault(); apriDialogCambioTavoloRapido(); };
       }
       
-      const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
-      if (datiSalvati) { dbRistorante = JSON.parse(datiSalvati); }
-      
       if (tavoloId) {
         const carrelloSalvato = localStorage.getItem(`carrello_tavolo_${tavoloId}`);
         carrello = carrelloSalvato ? JSON.parse(carrelloSalvato) : [];
@@ -214,10 +226,20 @@
 
     function disegnaCopertiCassa(tavoloId) {
       const boxCoperti = document.getElementById('box-coperti-cassa');
+      const boxRiepilogoCoperti = document.getElementById('info-coperti-conto');
+      
       if (!boxCoperti) return;
-      if (!tavoloId) { boxCoperti.style.display = 'none'; return; }
+      
+      // Se siamo al banco o non c'è tavolo, nascondiamo i coperti sia dai bottoni che dal conto
+      if (!tavoloId) { 
+        boxCoperti.style.display = 'none'; 
+        if(boxRiepilogoCoperti) boxRiepilogoCoperti.style.display = 'none';
+        return; 
+      }
       
       boxCoperti.style.display = 'flex';
+      if(boxRiepilogoCoperti) boxRiepilogoCoperti.style.display = 'flex';
+      
       let numCoperti = parseInt(localStorage.getItem(`coperti_tavolo_${tavoloId}`) || "1", 10);
       
       boxCoperti.innerHTML = `
@@ -230,6 +252,7 @@
       const gestisciVisibilitaConti = () => {
         const boxFunzioni = document.getElementById('box-funzioni-pagamento');
         if(boxFunzioni) boxFunzioni.style.display = numCoperti > 1 ? 'flex' : 'none';
+        aggiornaXBrowse(); // Forza il ricalcolo istantaneo del totale includendo la variazione dei coperti
       };
 
       document.getElementById('btn-coperti-meno').onclick = function() {
@@ -352,11 +375,11 @@
       const tbody = document.getElementById('xbrowse-body');
       if (!tbody) return;
       tbody.innerHTML = '';
-      let totaleConto = 0;
+      let totaleProdotti = 0;
 
       carrello.forEach((item, idx) => {
         const rigaTot = item.qta * item.prezzo;
-        totaleConto += rigaTot;
+        totaleProdotti += rigaTot;
         tbody.innerHTML += `
           <tr>
             <td><strong>${item.nome}</strong></td>
@@ -374,30 +397,71 @@
           </tr>`;
       });
       
+      // Calcolo e visualizzazione finanziaria dei coperti
+      const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+      let totaleCoperti = 0;
+      let numCoperti = 0;
+
+      if (tavoloId) {
+        const inputCoperti = document.getElementById('lbl-valore-coperti');
+        numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 0;
+        totaleCoperti = numCoperti * costoCopertoUnitario;
+        
+        const txtDettaglioCoperti = document.getElementById('txt-dettaglio-coperti');
+        const txtTotaleCoperti = document.getElementById('txt-totale-coperti');
+        if (txtDettaglioCoperti) txtDettaglioCoperti.innerText = `${numCoperti} x ${costoCopertoUnitario.toFixed(2)} €`;
+        if (txtTotaleCoperti) txtTotaleCoperti.innerText = totaleCoperti.toFixed(2) + ' €';
+      }
+      
+      // Il totale conto complessivo è dato da Prodotti + Coperti
+      let totaleComplessivo = totaleProdotti + totaleCoperti;
       const txtTotale = document.getElementById('txt-totale');
-      if (txtTotale) { txtTotale.innerText = totaleConto.toFixed(2) + ' €'; }
+      if (txtTotale) { txtTotale.innerText = totaleComplessivo.toFixed(2) + ' €'; }
     }
 
-    /* LOGICA DIVISIONE CONTO UGUALE */
+    /* LOGICA DIVISIONE CONTO UGUALE (COMPRENSIVO DI COPERTI) */
     window.eseguiContoUguale = function() {
-      let totaleConto = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+      let totaleProdotti = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
       const inputCoperti = document.getElementById('lbl-valore-coperti');
       const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 1;
+      
+      let totaleCoperti = numCoperti * costoCopertoUnitario;
+      let totaleConto = totaleProdotti + totaleCoperti;
       
       if(totaleConto === 0) return;
       let quota = (totaleConto / numCoperti).toFixed(2);
       
-      if(confirm(`Il totale è ${totaleConto.toFixed(2)} € diviso per ${numCoperti} coperti.\nQuota a persona: ${quota} €.\n\nInviare richiesta transazione al Bancomat?`)) {
+      if(confirm(`Il totale (inclusi coperti) è ${totaleConto.toFixed(2)} € diviso per ${numCoperti} persone.\nQuota a persona: ${quota} €.\n\nInviare richiesta transazione al Bancomat?`)) {
         alert(`Collegamento Bancomat Attivo...\nInviato comando POS per: ${quota} €.\nAttendere inserimento carta...`);
         alert("Transazione Approvata dal POS! Scontrino in stampa.");
       }
     };
 
-    /* LOGICA CONTO SEPARATO ALLA ROMANA */
+    /* LOGICA CONTO SEPARATO ALLA ROMANA (CON COPERTO ADDEBITATO AL PRIMO PAGANTE / COMPONIBILE) */
     window.apriModalRomana = function() {
       const container = document.getElementById('lista-prodotti-romana');
       container.innerHTML = '';
-      if(carrello.length === 0) return;
+      
+      // Inseriamo anche una riga selezionabile per il coperto se presente
+      const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+      let numCopertiRimasti = tavoloId ? parseInt(localStorage.getItem(`coperti_tavolo_${tavoloId}`) || "0", 10) : 0;
+      
+      if(carrello.length === 0 && numCopertiRimasti === 0) return;
+
+      // Se ci sono coperti ancora da saldare per il tavolo, mostriamo l'opzione
+      if (numCopertiRimasti > 0 && costoCopertoUnitario > 0) {
+        container.innerHTML += `
+          <div style="display:flex; justify-content:between; align-items:center; margin-bottom:8px; background:#e3f2fd; padding:6px; border-radius:4px;">
+            <label style="flex:1; cursor:pointer; font-weight:bold; color: #0d47a1;">
+              <input type="checkbox" class="chk-romana-coperto" data-prezzo="${costoCopertoUnitario}" onchange="ricalcolaParzialeRomana()" style="margin-right:10px;">
+              Servizio / Coperto (${costoCopertoUnitario.toFixed(2)} €)
+            </label>
+            <select class="sel-qta-romana-coperto" data-massimo="${numCopertiRimasti}" onchange="ricalcolaParzialeRomana()" style="padding:2px; border-radius:4px;">
+              ${Array.from({length: numCopertiRimasti}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }
 
       carrello.forEach((item, idx) => {
         container.innerHTML += `
@@ -418,23 +482,45 @@
 
     window.ricalcolaParzialeRomana = function() {
       let parziale = 0;
+      
+      // Calcolo prodotti scelti alla romana
       document.querySelectorAll('.chk-romana:checked').forEach(chk => {
         const divGenitore = chk.closest('div');
         const qtaSelezionata = parseInt(divGenitore.querySelector('.sel-qta-romana').value, 10);
         const prezzo = parseFloat(chk.getAttribute('data-prezzo'));
         parziale += (prezzo * qtaSelezionata);
       });
+
+      // Calcolo coperti scelti alla romana
+      document.querySelectorAll('.chk-romana-coperto:checked').forEach(chk => {
+        const divGenitore = chk.closest('div');
+        const qtaSelezionata = parseInt(divGenitore.querySelector('.sel-qta-romana-coperto').value, 10);
+        const prezzo = parseFloat(chk.getAttribute('data-prezzo'));
+        parziale += (prezzo * qtaSelezionata);
+      });
+
       document.getElementById('totale-parziale-romana').innerText = parziale.toFixed(2) + ' €';
     };
 
     window.pagamentoParzialeRomana = function() {
       let totaleDaPagare = parseFloat(document.getElementById('totale-parziale-romana').innerText);
-      if(totaleDaPagare === 0) return alert("Seleziona almeno un prodotto!");
+      if(totaleDaPagare === 0) return alert("Seleziona almeno un prodotto o un coperto!");
 
       if(confirm(`Inviare richiesta al Bancomat per l'importo parziale di ${totaleDaPagare.toFixed(2)} €?`)) {
         alert(`Richiesta inviata al POS BANCOMAT per ${totaleDaPagare.toFixed(2)} €... Pagamento OK.`);
         
-        // Sottrae le quantità pagate dal carrello principale
+        // Sottrae i coperti pagati dal LocalStorage del tavolo
+        const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+        document.querySelectorAll('.chk-romana-coperto:checked').forEach(chk => {
+          const divGenitore = chk.closest('div');
+          const qtaCopertiPagati = parseInt(divGenitore.querySelector('.sel-qta-romana-coperto').value, 10);
+          if (tavoloId) {
+            let rimasti = parseInt(localStorage.getItem(`coperti_tavolo_${tavoloId}`) || "0", 10) - qtaCopertiPagati;
+            localStorage.setItem(`coperti_tavolo_${tavoloId}`, Math.max(0, rimasti).toString());
+          }
+        });
+
+        // Sottrae le quantità dei prodotti pagati dal carrello principale
         document.querySelectorAll('.chk-romana:checked').forEach(chk => {
           const idx = parseInt(chk.getAttribute('data-idx'), 10);
           const divGenitore = chk.closest('div');
@@ -447,12 +533,16 @@
         carrello = carrello.filter(item => item.qta > 0);
         
         salvaStatoCarrello();
-        aggiornaXBrowse();
+        
+        // Aggiorna l'interfaccia principale e riallinea i bottoni dei coperti
+        disegnaCopertiCassa(tavoloId);
+        
         document.getElementById('modal-alla-romana').close();
 
-        // Se il carrello si è svuotato del tutto, libera il tavolo
-        if(carrello.length === 0) {
-          alert("Tutti gli elementi sono stati saldati! Il tavolo viene chiuso automaticamente.");
+        // Se il carrello si è svuotato del tutto e i coperti sono 0, libera il tavolo
+        let copertiRimasti = tavoloId ? parseInt(localStorage.getItem(`coperti_tavolo_${tavoloId}`) || "0", 10) : 0;
+        if(carrello.length === 0 && copertiRimasti === 0) {
+          alert("Tutti gli elementi e i coperti sono stati saldati! Il tavolo viene chiuso automaticamente.");
           liberaTavoloCorrente();
         }
       }
@@ -464,8 +554,12 @@
       
       const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
       if (azioneRichiesta === 'pagamento') {
-        let tot = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
-        if(confirm(`Chiudere il conto totale di ${tot.toFixed(2)} € con carta/bancomat?`)) {
+        let totaleProdotti = carrello.reduce((acc, item) => acc + (item.qta * item.prezzo), 0);
+        const inputCoperti = document.getElementById('lbl-valore-coperti');
+        const numCoperti = inputCoperti ? parseInt(inputCoperti.innerText, 10) : 0;
+        let totaleConto = totaleProdotti + (numCoperti * costoCopertoUnitario);
+
+        if(confirm(`Chiudere il conto totale di ${totaleConto.toFixed(2)} € (inclusi coperti) con carta/bancomat?`)) {
           alert("Segnale inviato al POS fisco... Pagamento Ricevuto!");
           completaPagamentoESvotaTavolo();
         }
@@ -518,8 +612,6 @@
       htmlComanda += `<div style="border-top:1px dashed #000; margin-top:5px; padding-top:5px; text-align:center; font-size:10px;">WINBEACH GESTIONALE</div>`;
       
       areaStampa.innerHTML = htmlComanda;
-      
-      // Avvia la stampa nativa di Windows. Qui l'operatore seleziona la stampante corrispondente al reparto.
       window.print();
     }
 
