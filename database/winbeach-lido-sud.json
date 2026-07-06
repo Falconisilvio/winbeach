@@ -1732,82 +1732,17 @@
     },
     "elementi": {
       "columns": [
-        {
-          "name": "id",
-          "type": "INT"
-        },
-        {
-          "name": "codice",
-          "type": "TEXT"
-        },
-        {
-          "name": "nome",
-          "type": "TEXT"
-        },
-        {
-          "name": "alquilabile",
-          "type": "BOOL"
-        },
-        {
-          "name": "icona",
-          "type": "TEXT"
-        },
-        {
-          "name": "colore",
-          "type": "TEXT"
-        },
-        {
-          "name": "attivo",
-          "type": "BOOL"
-        }
+        { "name": "id", "type": "INT" },
+        { "name": "codice", "type": "TEXT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "tipo", "type": "TEXT" },
+        { "name": "colore", "type": "TEXT" },
+        { "name": "immagine_1", "type": "TEXT" },
+        { "name": "immagine_2", "type": "TEXT" },
+        { "name": "immagine_3", "type": "TEXT" },
+        { "name": "attivo", "type": "BOOL" }
       ],
-      "rows": [
-        [
-          1,
-          "OMB",
-          "Ombrellone",
-          true,
-          "☂",
-          "#4a90c8",
-          true
-        ],
-        [
-          2,
-          "HWA",
-          "Hawaiana",
-          true,
-          "🏖",
-          "#48bbb0",
-          true
-        ],
-        [
-          3,
-          "CAB",
-          "Cabina",
-          true,
-          "🏠",
-          "#8b6914",
-          true
-        ],
-        [
-          4,
-          "TEN",
-          "Tenda",
-          true,
-          "⛺",
-          "#e8a838",
-          true
-        ],
-        [
-          5,
-          "PAS",
-          "Pasarela",
-          false,
-          "═",
-          "#8b6914",
-          true
-        ]
-      ]
+      "rows": []
     },
     "settori": {
       "columns": [
@@ -2821,54 +2756,78 @@
     },
     "utenti": {
       "columns": [
-        {
-          "name": "id",
-          "type": "INT"
-        },
-        {
-          "name": "username",
-          "type": "TEXT"
-        },
-        {
-          "name": "email",
-          "type": "TEXT"
-        },
-        {
-          "name": "ruolo",
-          "type": "TEXT"
-        },
-        {
-          "name": "ultimo_accesso",
-          "type": "TEXT"
-        },
-        {
-          "name": "attivo",
-          "type": "BOOL"
-        },
-        {
-          "name": "password_hash",
-          "type": "TEXT"
-        }
+        { "name": "id", "type": "INT" },
+        { "name": "username", "type": "TEXT" },
+        { "name": "email", "type": "TEXT" },
+        { "name": "ruolo", "type": "TEXT" },
+        { "name": "livello", "type": "INT" },
+        { "name": "ultimo_accesso", "type": "TEXT" },
+        { "name": "attivo", "type": "BOOL" },
+        { "name": "password_hash", "type": "TEXT" }
       ],
       "rows": [
-        [
-          1,
-          "admin",
-          "admin@winbeach.it",
-          "Amministratore",
-          "2026-06-30T08:00:00",
-          true,
-          "34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960"
-        ],
-        [
-          2,
-          "reception",
-          "cassa@winbeach.it",
-          "Operatore",
-          "2026-06-30T09:00:00",
-          true,
-          "139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c"
-        ]
+        [1, "admin", "admin@winbeach.it", "Amministratore", 0, "2026-06-30T08:00:00", true, "34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960"],
+        [2, "reception", "cassa@winbeach.it", "Operatore", 1, "2026-06-30T09:00:00", true, "139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c"]
+      ]
+    },
+    "livelli": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "descrizione", "type": "TEXT" }
+      ],
+      "rows": [
+        [0, "Amministratore", "Accesso completo a tutte le procedure"],
+        [1, "Operatore", "Accesso alle operazioni standard"],
+        [2, "Visualizzatore", "Solo lettura"]
+      ]
+    },
+    "permessi": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "livello_id", "type": "INT" },
+        { "name": "procedura", "type": "TEXT" },
+        { "name": "permesso", "type": "TEXT" }
+      ],
+      "rows": [
+        [1, 1, "dashboard", "scrittura"],
+        [2, 1, "spiaggia", "scrittura"],
+        [3, 1, "struttura", "scrittura"],
+        [4, 1, "booking", "scrittura"],
+        [5, 1, "clienti", "scrittura"],
+        [6, 1, "cassa", "scrittura"],
+        [7, 1, "ristorante", "scrittura"],
+        [8, 1, "planner", "scrittura"],
+        [9, 1, "arrivi", "scrittura"],
+        [10, 1, "statistiche", "scrittura"],
+        [11, 1, "pagamenti", "scrittura"],
+        [12, 1, "log", "scrittura"],
+        [13, 1, "contatori", "scrittura"],
+        [14, 1, "impostazioni", "scrittura"],
+        [15, 1, "magazzino", "scrittura"],
+        [16, 1, "utenti", "scrittura"],
+        [17, 1, "export", "scrittura"],
+        [18, 1, "qr", "scrittura"],
+        [19, 1, "guida", "lettura"],
+        [20, 2, "dashboard", "lettura"],
+        [21, 2, "spiaggia", "lettura"],
+        [22, 2, "booking", "scrittura"],
+        [23, 2, "clienti", "scrittura"],
+        [24, 2, "cassa", "scrittura"],
+        [25, 2, "ristorante", "scrittura"],
+        [26, 2, "arrivi", "scrittura"],
+        [27, 2, "statistiche", "lettura"],
+        [28, 2, "log", "lettura"],
+        [29, 2, "export", "lettura"],
+        [30, 2, "qr", "lettura"],
+        [31, 2, "guida", "lettura"],
+        [32, 3, "dashboard", "lettura"],
+        [33, 3, "spiaggia", "lettura"],
+        [34, 3, "booking", "lettura"],
+        [35, 3, "clienti", "lettura"],
+        [36, 3, "statistiche", "lettura"],
+        [37, 3, "guida", "lettura"],
+        [38, 3, "qr", "lettura"]
       ]
     },
     "capitaneria": {
@@ -3143,6 +3102,73 @@
           "2 arrivi"
         ]
       ]
+    },
+    "impostazioni_ristorante": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "chiave", "type": "TEXT" },
+        { "name": "valore", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "sale": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "tavoli": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "salaId", "type": "INT" },
+        { "name": "numero", "type": "TEXT" },
+        { "name": "posti", "type": "INT" },
+        { "name": "posizione", "type": "TEXT" },
+        { "name": "stato", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "categorie": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "stampante", "type": "TEXT" },
+        { "name": "immagine", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "prodotti": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "prezzo", "type": "REAL" },
+        { "name": "categoriaId", "type": "INT" },
+        { "name": "attivo", "type": "BOOL" },
+        { "name": "immagine", "type": "TEXT" },
+        { "name": "varianti", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "settings": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "chiave", "type": "TEXT" },
+        { "name": "valore", "type": "TEXT" }
+      ],
+      "rows": [
+        [1, "lang", "it"],
+        [2, "theme", "light"]
+      ]
+    },
+    "pos_state": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "tavolo_id", "type": "INT" },
+        { "name": "chiave", "type": "TEXT" },
+        { "name": "valore", "type": "TEXT" }
+      ],
+      "rows": []
     }
   }
 }

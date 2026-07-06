@@ -1,6 +1,7 @@
 /**
  * Autenticación WinBeach — solo usuarios identificados pueden escribir.
  * Valida contra tabla utenti en githubDB (password_hash SHA-256).
+ * Login multi-stabilimento: cerca l'utente in tutti i profili disponibili.
  */
 import { t } from './app-i18n.js';
 
@@ -46,7 +47,7 @@ export function isAdmin() {
   return s && (s.ruolo === 'Amministratore' || s.ruolo === 'Administratore');
 }
 
-function saveSession(user) {
+function saveSession(user, profileId, profileName) {
   const session = {
     id: user.id,
     username: user.username,
@@ -54,6 +55,8 @@ function saveSession(user) {
     email: user.email || '',
     attivo: user.attivo !== false,
     loginAt: Date.now(),
+    profileId: profileId || null,
+    profileName: profileName || '',
   };
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
   broadcastAuthChange();
@@ -87,28 +90,61 @@ export function onAuthChange(callback) {
 }
 
 /**
- * @returns {Promise<{ok:boolean, session?:object, error?:string}>}
+ * Carica la tabella utenti da un profilo specifico senza modify il profilo attivo.
+ */
+async function loadTableFromProfile(profile, tableName) {
+  const { GithubDB } = await import('./githubdb/client.js');
+  const tokens = (() => {
+    try { return JSON.parse(localStorage.getItem('winbeach_profile_tokens') || '{}'); } catch { return {}; }
+  })();
+  const db = new GithubDB({
+    owner: profile.owner,
+    repo: profile.repo,
+    branch: profile.branch,
+    token: tokens[profile.id] || null,
+  });
+  await db.refresh(profile.database);
+  return (await db.table(profile.database, tableName)).objects();
+}
+
+/**
+ * Login multi-stabilimento: cerca l'utente in tutti i profili disponibili.
+ * Se trovato, imposta automaticamente il profilo attivo.
+ * @returns {Promise<{ok:boolean, session?:object, profileName?:string, error?:string, errorKey?:string}>}
  */
 export async function login(username, password) {
   const user = String(username || '').trim();
   const pass = String(password || '');
   if (!user || !pass) return { ok: false, errorKey: 'auth.loginMissing', error: t('auth.loginMissing') };
 
-  const { loadTable } = await import('./winbeach-db.js');
-  const res = await loadTable('utenti');
-  if (!res.ok) return { ok: false, errorKey: 'auth.usersLoadFailed', error: res.error || t('auth.usersLoadFailed') };
+  const { getProfiles, setActiveProfile } = await import('./winbeach-db.js');
+  const profiles = getProfiles();
+  if (!profiles.length) return { ok: false, errorKey: 'auth.usersLoadFailed', error: t('auth.usersLoadFailed') };
 
   const hash = await hashPassword(user, pass);
-  const found = res.data.find(
-    (u) => String(u.username).toLowerCase() === user.toLowerCase() && u.attivo !== false
-  );
 
-  if (!found) return { ok: false, errorKey: 'auth.invalidCredentials', error: t('auth.invalidCredentials') };
-  if (!found.password_hash) return { ok: false, errorKey: 'auth.noCredentials', error: t('auth.noCredentials') };
-  if (found.password_hash !== hash) return { ok: false, errorKey: 'auth.invalidCredentials', error: t('auth.invalidCredentials') };
+  for (const profile of profiles) {
+    try {
+      const rows = await loadTableFromProfile(profile, 'utenti');
+      const found = rows.find(
+        (u) => String(u.username).toLowerCase() === user.toLowerCase() && u.attivo !== false
+      );
 
-  const session = saveSession(found);
-  return { ok: true, session };
+      if (!found) continue;
+      if (!found.password_hash) return { ok: false, errorKey: 'auth.noCredentials', error: t('auth.noCredentials') };
+      if (found.password_hash !== hash) return { ok: false, errorKey: 'auth.invalidCredentials', error: t('auth.invalidCredentials') };
+
+      // Utente trovato e autenticato in questo profilo
+      setActiveProfile(profile.id);
+      const session = saveSession(found, profile.id, profile.name);
+      return { ok: true, session, profileName: profile.name };
+    } catch {
+      // Profilo non accessibile, prova il prossimo
+      continue;
+    }
+  }
+
+  return { ok: false, errorKey: 'auth.invalidCredentials', error: t('auth.invalidCredentials') };
 }
 
 /** Mensaje si no puede escribir; null si OK */

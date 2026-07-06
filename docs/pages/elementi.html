@@ -20,17 +20,42 @@
   </div>
   <div class="db-bar"><span><i class="fa-solid fa-database"></i> <span data-i18n="common.db">Base dati</span></span><div id="db-status" class="db-status idle">…</div></div>
   <div class="filters"><input type="search" id="search-input" data-i18n-placeholder="common.search" placeholder="Cerca…"></div>
-  <div class="table-scroll"><table><thead><tr><th>Codice</th><th>Elemento</th><th>Alquilabile</th><th>Icona</th><th>Colore</th><th>Azioni</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
+  <div class="table-scroll"><table><thead><tr><th>Codice</th><th>Elemento</th><th>Tipo</th><th>Colore</th><th>Immagine</th><th>Azioni</th></tr></thead><tbody id="data-tbody"></tbody></table></div>
   <div id="empty-state" class="empty-state" style="display:none"><p data-i18n="common.noRecords">Nessun record.</p></div>
   <div class="modal-overlay" id="data-modal">
     <div class="modal">
       <div class="modal-header"><h3 id="modal-title">Nuovo</h3><button type="button" class="modal-close" id="modal-close" data-i18n-aria="common.close" aria-label="Chiudi">&times;</button></div>
-      <form id="data-form"><div class="modal-body"><div class="form-grid"><div class="form-group"><label for="f-codice">Codice</label><input type="text" id="f-codice"></div>
-            <div class="form-group"><label for="f-nome">Nome *</label><input type="text" id="f-nome"></div>
-            <div class="form-group"><label><input type="checkbox" id="f-alquilabile"> Alquilabile</label></div>
-            <div class="form-group"><label for="f-icona">Icona</label><input type="text" id="f-icona"></div>
-            <div class="form-group"><label for="f-colore">Colore</label><input type="text" id="f-colore"></div>
-            <div class="form-group"><label><input type="checkbox" id="f-attivo"> Attivo</label></div></div></div>
+      <form id="data-form"><div class="modal-body"><div class="form-grid">
+        <div class="form-group"><label for="f-codice">Codice</label><input type="text" id="f-codice"></div>
+        <div class="form-group"><label for="f-nome">Nome *</label><input type="text" id="f-nome"></div>
+        <div class="form-group"><label for="f-tipo">Tipo</label><select id="f-tipo"><option value="attivo">Attivo (Alquilabile)</option><option value="passivo">Passivo (Statico)</option></select></div>
+        <div class="form-group"><label for="f-colore">Colore</label><input type="color" id="f-colore" style="height:38px"></div>
+        <div class="form-group"><label for="f-immagine-1">Immagine 1</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="f-immagine-1" placeholder="URL immagine" style="flex:1">
+            <label for="f-immagine-1-file" class="btn btn-secondary btn-sm" style="cursor:pointer;margin:0"><i class="fa-solid fa-upload"></i></label>
+            <input type="file" id="f-immagine-1-file" accept="image/*" style="display:none">
+          </div>
+          <div id="f-immagine-1-preview" style="margin-top:8px"></div>
+        </div>
+        <div class="form-group" id="img2-group"><label for="f-immagine-2">Immagine 2</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="f-immagine-2" placeholder="URL immagine" style="flex:1">
+            <label for="f-immagine-2-file" class="btn btn-secondary btn-sm" style="cursor:pointer;margin:0"><i class="fa-solid fa-upload"></i></label>
+            <input type="file" id="f-immagine-2-file" accept="image/*" style="display:none">
+          </div>
+          <div id="f-immagine-2-preview" style="margin-top:8px"></div>
+        </div>
+        <div class="form-group" id="img3-group"><label for="f-immagine-3">Immagine 3</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="f-immagine-3" placeholder="URL immagine" style="flex:1">
+            <label for="f-immagine-3-file" class="btn btn-secondary btn-sm" style="cursor:pointer;margin:0"><i class="fa-solid fa-upload"></i></label>
+            <input type="file" id="f-immagine-3-file" accept="image/*" style="display:none">
+          </div>
+          <div id="f-immagine-3-preview" style="margin-top:8px"></div>
+        </div>
+        <div class="form-group"><label><input type="checkbox" id="f-attivo"> Attivo</label></div>
+      </div></div>
         <div class="modal-footer"><button type="button" class="btn btn-secondary" id="btn-cancel" data-i18n="common.cancel">Annulla</button><button type="submit" class="btn btn-primary" id="btn-save" data-i18n="common.save">Salva</button></div>
       </form>
     </div>

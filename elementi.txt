@@ -1,0 +1,9 @@
+dobbiamo fare una modifica nelle impostazioni sezione "elementi" 
+devono essere memorizzati sull'archivio e non posti di default 
+ogni elemento deve avere codice, nome elemento,attivo/passivo,immagine,colore 
+per quanto riguarda l'immagine gli elementi attivi devono avere fino a tre immagini 
+mentre gli elenti passivi solo un immagine , 
+l'utente deve avere la possibilità di caricare l'immagine 
+e la procedura deve salvare le immagini in assets/elementi 
+ un elemento attivo vuol dire che può essere noleggiato , 
+un elemento passivo vuol dire che è statico non può essere noleggiato. 

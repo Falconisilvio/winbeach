@@ -1,12 +1,27 @@
 /**
  * Tema claro/oscuro — persistencia, toggle, sync iframes.
  */
+import { getTheme as getSettingsTheme, setTheme as setSettingsTheme, syncSettingsFromDb } from './winbeach-settings.js';
+
 export const THEME_KEY = 'winbeach_theme';
 
+let cachedTheme = null;
+
 export function getTheme() {
+  if (cachedTheme) return cachedTheme;
   const t = document.documentElement.getAttribute('data-theme');
-  return t === 'dark' ? 'dark' : 'light';
+  const settingsTheme = getSettingsTheme();
+  cachedTheme = settingsTheme || (t === 'dark' ? 'dark' : 'light');
+  return cachedTheme;
 }
+
+syncSettingsFromDb().then(() => {
+  const newTheme = getSettingsTheme();
+  if (newTheme && newTheme !== cachedTheme) {
+    cachedTheme = newTheme;
+    document.documentElement.setAttribute('data-theme', newTheme);
+  }
+}).catch(() => {});
 
 function updateMetaThemeColor() {
   const dark = getTheme() === 'dark';
@@ -25,13 +40,18 @@ function broadcastTheme(theme) {
   });
 }
 
-export function setTheme(theme, { broadcast = true } = {}) {
+export async function setTheme(theme, { broadcast = true } = {}) {
   const next = theme === 'dark' ? 'dark' : 'light';
+  cachedTheme = next;
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem(THEME_KEY, next);
   updateMetaThemeColor();
   updateToggleUi();
   if (broadcast) broadcastTheme(next);
+  
+  try {
+    await setSettingsTheme(next);
+  } catch { /* ignore */ }
 }
 
 export function toggleTheme() {

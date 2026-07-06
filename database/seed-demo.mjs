@@ -133,10 +133,24 @@ function seedDb(db, cfg) {
   if (!utentiCols.includes('password_hash')) {
     db.tables.utenti.columns.push({ name: 'password_hash', type: 'TEXT' });
   }
-  db.tables.utenti.rows = [
-    [1, 'admin', 'admin@winbeach.it', 'Amministratore', TODAY + 'T08:00:00', true, '34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960'],
-    [2, 'reception', 'cassa@winbeach.it', 'Operatore', TODAY + 'T09:00:00', true, '139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c'],
-  ];
+
+  // Utenti demo: admin esiste in tutti gli stabilimenti, poi uno specifico per ogni stabilimento
+  const utentiPerDb = {
+    'winbeach.json': [
+      [1, 'admin', 'admin@winbeach.it', 'Amministratore', TODAY + 'T08:00:00', true, '34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960'],
+      [2, 'reception', 'cassa@winbeach.it', 'Operatore', TODAY + 'T09:00:00', true, '139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c'],
+    ],
+    'winbeach-lido-sud.json': [
+      [1, 'admin', 'admin@winbeach.it', 'Amministratore', TODAY + 'T08:00:00', true, '34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960'],
+      [2, 'lidosud', 'lidosud@winbeach.it', 'Operatore', TODAY + 'T09:00:00', true, '139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c'],
+    ],
+    'winbeach-lido-europa.json': [
+      [1, 'admin', 'admin@winbeach.it', 'Amministratore', TODAY + 'T08:00:00', true, '34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960'],
+      [2, 'lidoeuropa', 'lidoeuropa@winbeach.it', 'Operatore', TODAY + 'T09:00:00', true, '139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c'],
+    ],
+  };
+
+  db.tables.utenti.rows = utentiPerDb[cfg.file] || utentiPerDb['winbeach.json'];
 
   const attive = prenotazioni.filter((p) => p[5] !== 'cancellata');
   return {

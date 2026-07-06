@@ -5,11 +5,13 @@ import {
   deleteClienteFromDb,
 } from './winbeach-db.js';
 import { applyReadOnlyMode, onAuthChange } from './winbeach-auth.js';
+import { checkPermission } from './winbeach-permessi.js';
 import { t } from './app-i18n.js';
 import { $, escapeHtml, initModule, updateDbBar } from './winbeach-module.js';
 
 let clienti = [];
 let editingId = null;
+let canEdit = false;
 
 function fullName(c) {
   return [c.nome, c.cognome].filter(Boolean).join(' ').trim() || '—';
@@ -44,20 +46,24 @@ function renderTable() {
       <td>${c.telefono || '—'}</td>
       <td>${c.note ? `<span class="badge badge-blue">${escapeHtml(c.note)}</span>` : `<span class="badge badge-green">${t('badge.attivo')}</span>`}</td>
       <td class="actions-cell">
-        <button type="button" class="btn btn-secondary btn-sm" data-edit="${c.id}"><i class="fa-solid fa-pen"></i></button>
-        <button type="button" class="btn btn-danger btn-sm" data-delete="${c.id}"><i class="fa-solid fa-trash"></i></button>
+        ${canEdit ? `
+          <button type="button" class="btn btn-secondary btn-sm" data-edit="${c.id}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="btn btn-danger btn-sm" data-delete="${c.id}"><i class="fa-solid fa-trash"></i></button>
+        ` : ''}
       </td>
     </tr>
   `).join('');
 
   $('stat-total').textContent = clienti.length;
 
-  tbody.querySelectorAll('[data-edit]').forEach((btn) => {
-    btn.addEventListener('click', () => openModal(Number(btn.dataset.edit)));
-  });
-  tbody.querySelectorAll('[data-delete]').forEach((btn) => {
-    btn.addEventListener('click', () => removeCliente(Number(btn.dataset.delete)));
-  });
+  if (canEdit) {
+    tbody.querySelectorAll('[data-edit]').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(Number(btn.dataset.edit)));
+    });
+    tbody.querySelectorAll('[data-delete]').forEach((btn) => {
+      btn.addEventListener('click', () => removeCliente(Number(btn.dataset.delete)));
+    });
+  }
 }
 
 function openModal(id = null) {
@@ -173,6 +179,21 @@ function bindEvents() {
 }
 
 initModule(async () => {
+  const { allowed, permesso, message } = await checkPermission('clienti', true);
+  
+  if (!allowed) {
+    alert(message);
+    window.location.href = '../index.html';
+    return;
+  }
+  
+  canEdit = permesso === 'scrittura';
+  
+  if (!canEdit) {
+    $('btn-nuovo').style.display = 'none';
+    $('btn-reload').style.display = 'none';
+  }
+  
   bindEvents();
   onAuthChange(() => { applyReadOnlyMode(); });
   applyReadOnlyMode();

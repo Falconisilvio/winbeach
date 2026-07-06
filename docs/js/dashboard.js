@@ -1,4 +1,17 @@
-window.addEventListener("load", function () {
+window.addEventListener("load", async function () {
+    // Verifica autenticazione: se non loggato, redirect a login
+    try {
+        const { getSession } = await import('./winbeach-auth.js');
+        if (!getSession()) {
+            window.location.replace('login.html');
+            return;
+        }
+    } catch {
+        // Modulo auth non disponibile — redirect a login
+        window.location.replace('login.html');
+        return;
+    }
+
     // Inizializza i grafici e le animazioni della dashboard
     createPaymentChart();
     createChannelChart();

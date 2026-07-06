@@ -1,12 +1,23 @@
+import { 
+  getPosState, setPosState, getTavoloSelezionato, setTavoloSelezionato,
+  getTavoloSelezionatoId, setTavoloSelezionatoId, getAzioneRichiesta,
+  setAzioneRichiesta, getCarrello, setCarrello, getCoperti, setCoperti,
+  getOraApertura, setOraApertura, clearTavoloState, startPosSync,
+  loadPosStateFromDb
+} from './winbeach-pos-state.js';
+
 let dbRistorante = { sale: [], tavoli: [], categorie: [], prodotti: [] };
 let carrello = [];
 let categoriaAttiva = "";
 
 function wbT(key) { return (window.__wbT && window.__wbT(key)) || key; }
 
-window.addEventListener('pageshow', function () {
-  const tbl = localStorage.getItem('tavoloSelezionato') || wbT('pos.counter');
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+window.addEventListener('pageshow', async function () {
+  await loadPosStateFromDb();
+  startPosSync();
+  
+  const tbl = getTavoloSelezionato() || wbT('pos.counter');
+  const tavoloId = getTavoloSelezionatoId();
   
   // 1. Aggiorna etichetta del tavolo
   const lblTavolo = document.getElementById('lbl-tavolo') || document.querySelector('.badge-tavolo-blu');
@@ -45,14 +56,15 @@ window.addEventListener('pageshow', function () {
   }
   
   // 4. Carica archivio e carrello
-  const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+  const datiSalvati = getPosState('winbeach_archivio_ristorante');
   if (datiSalvati) {
-    dbRistorante = JSON.parse(datiSalvati);
+    try {
+      dbRistorante = JSON.parse(datiSalvati);
+    } catch {}
   }
   
   if (tavoloId) {
-    const carrelloSalvato = localStorage.getItem(`carrello_tavolo_${tavoloId}`);
-    carrello = carrelloSalvato ? JSON.parse(carrelloSalvato) : [];
+    carrello = getCarrello(tavoloId);
   } else {
     carrello = [];
   }
@@ -72,7 +84,7 @@ function disegnaCopertiCassa(tavoloId) {
   }
   
   boxCoperti.style.display = 'flex';
-  let numCoperti = parseInt(localStorage.getItem(`coperti_tavolo_${tavoloId}`) || "1", 10);
+  let numCoperti = getCoperti(tavoloId);
   
   boxCoperti.innerHTML = `
     <span>Coperti:</span>
@@ -84,14 +96,14 @@ function disegnaCopertiCassa(tavoloId) {
   document.getElementById('btn-coperti-meno').onclick = function() {
     if (numCoperti > 1) {
       numCoperti--;
-      localStorage.setItem(`coperti_tavolo_${tavoloId}`, numCoperti.toString());
+      setCoperti(tavoloId, numCoperti);
       document.getElementById('lbl-valore-coperti').innerText = numCoperti;
     }
   };
   
   document.getElementById('btn-coperti-piu').onclick = function() {
     numCoperti++;
-    localStorage.setItem(`coperti_tavolo_${tavoloId}`, numCoperti.toString());
+    setCoperti(tavoloId, numCoperti);
     document.getElementById('lbl-valore-coperti').innerText = numCoperti;
   };
 }
@@ -182,18 +194,18 @@ function aggiungiProdotto(nome, prezzo) {
   if (item) item.qta++;
   else carrello.push({ nome, qta: 1, prezzo });
   
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  const tavoloId = getTavoloSelezionatoId();
   if (tavoloId) {
-    localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello));
+    setCarrello(tavoloId, carrello);
   }
   aggiornaXBrowse();
 }
 
 function rimuoviProdotto(idx) {
   carrello.splice(idx, 1);
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  const tavoloId = getTavoloSelezionatoId();
   if (tavoloId) {
-    localStorage.setItem(`carrello_tavolo_${tavoloId}`, JSON.stringify(carrello));
+    setCarrello(tavoloId, carrello);
   }
   aggiornaXBrowse();
 }
@@ -231,16 +243,21 @@ function apriDialogCambioTavoloRapido() {
   if (!select) return;
   select.innerHTML = '';
   
-  const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+  const datiSalvati = getPosState('winbeach_archivio_ristorante');
   if (!datiSalvati) return alert("Nessun tavolo configurato.");
   
-  const db = JSON.parse(datiSalvati);
+  let db;
+  try {
+    db = JSON.parse(datiSalvati);
+  } catch {
+    return alert("Errore nel caricamento dati.");
+  }
   if (!db.tavoli || db.tavoli.length === 0) return alert("Nessun tavolo trovato.");
   
   db.tavoli.sort((a, b) => Number(a.numero) - Number(b.numero));
 
   db.tavoli.forEach(t => {
-    const orarioApertura = localStorage.getItem(`ora_apertura_tavolo_${t.id}`);
+    const orarioApertura = getOraApertura(t.id);
     const isOccupato = t.stato === 'occupato' || orarioApertura !== null;
     const stato = isOccupato ? `(Occupato - ${orarioApertura || 'In corso'})` : '(Libero)';
     
@@ -248,7 +265,7 @@ function apriDialogCambioTavoloRapido() {
     opt.value = t.id;
     opt.setAttribute('data-numero', t.numero);
     opt.innerText = `Tavolo ${t.numero} ${stato}`;
-    if (String(t.id) === String(localStorage.getItem('tavoloSelezionatoId'))) opt.selected = true;
+    if (String(t.id) === String(getTavoloSelezionatoId())) opt.selected = true;
     select.appendChild(opt);
   });
   
@@ -263,26 +280,31 @@ function confermaCambioTavoloRapido() {
   const opt = select.options[select.selectedIndex];
   const numeroTavolo = opt.getAttribute('data-numero');
 
-  const vecchioTavoloId = localStorage.getItem('tavoloSelezionatoId');
+  const vecchioTavoloId = getTavoloSelezionatoId();
   if (vecchioTavoloId) {
-    localStorage.setItem(`carrello_tavolo_${vecchioTavoloId}`, JSON.stringify(carrello));
+    setCarrello(vecchioTavoloId, carrello);
   }
 
-  const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+  const datiSalvati = getPosState('winbeach_archivio_ristorante');
   if (datiSalvati) {
-    let db = JSON.parse(datiSalvati);
-    let target = db.tavoli.find(t => String(t.id) === String(idSelezionato));
-    if (target && target.stato !== 'occupato') {
-      localStorage.setItem(`ora_apertura_tavolo_${idSelezionato}`, new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
-      localStorage.setItem(`coperti_tavolo_${idSelezionato}`, "1");
-      target.stato = 'occupato';
-      localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+    let db;
+    try {
+      db = JSON.parse(datiSalvati);
+    } catch {}
+    if (db) {
+      let target = db.tavoli.find(t => String(t.id) === String(idSelezionato));
+      if (target && target.stato !== 'occupato') {
+        setOraApertura(idSelezionato, new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
+        setCoperti(idSelezionato, 1);
+        target.stato = 'occupato';
+        setPosState('winbeach_archivio_ristorante', JSON.stringify(db));
+      }
     }
   }
 
-  localStorage.setItem('tavoloSelezionato', `Tavolo ${numeroTavolo}`);
-  localStorage.setItem('tavoloSelezionatoId', idSelezionato);
-  localStorage.setItem('pos_azione_richiesta', 'ordinazione');
+  setTavoloSelezionato(`Tavolo ${numeroTavolo}`);
+  setTavoloSelezionatoId(idSelezionato);
+  setAzioneRichiesta('ordinazione');
 
   document.getElementById('dialog-cambio-tavolo-rapido').close();
   window.dispatchEvent(new Event('pageshow'));
@@ -291,7 +313,7 @@ function confermaCambioTavoloRapido() {
 function inviaComanda() {
   if (carrello.length === 0) return alert(wbT('pos.empty'));
   
-  const azioneRichiesta = localStorage.getItem('pos_azione_richiesta');
+  const azioneRichiesta = getAzioneRichiesta();
   if (azioneRichiesta === 'pagamento') {
     completaPagamentoESvotaTavolo();
   } else {
@@ -302,26 +324,28 @@ function inviaComanda() {
 }
 
 function completaPagamentoESvotaTavolo() {
-  const tavoloId = localStorage.getItem('tavoloSelezionatoId');
+  const tavoloId = getTavoloSelezionatoId();
   if (tavoloId) {
-    localStorage.removeItem(`ora_apertura_tavolo_${tavoloId}`);
-    localStorage.removeItem(`coperti_tavolo_${tavoloId}`);
-    localStorage.removeItem(`carrello_tavolo_${tavoloId}`);
-    localStorage.removeItem(`tavoli_uniti_a_${tavoloId}`);
+    clearTavoloState(tavoloId);
     
-    const datiSalvati = localStorage.getItem('winbeach_archivio_ristorante');
+    const datiSalvati = getPosState('winbeach_archivio_ristorante');
     if (datiSalvati) {
-      let db = JSON.parse(datiSalvati);
-      db.tavoli = db.tavoli.map(t => String(t.id) === String(tavoloId) ? { ...t, stato: 'libero' } : t);
-      localStorage.setItem('winbeach_archivio_ristorante', JSON.stringify(db));
+      let db;
+      try {
+        db = JSON.parse(datiSalvati);
+      } catch {}
+      if (db) {
+        db.tavoli = db.tavoli.map(t => String(t.id) === String(tavoloId) ? { ...t, stato: 'libero' } : t);
+        setPosState('winbeach_archivio_ristorante', JSON.stringify(db));
+      }
     }
   }
   
   alert("Pagamento registrato con successo! Il tavolo è stato liberato.");
   carrello = [];
-  localStorage.removeItem('tavoloSelezionato');
-  localStorage.removeItem('tavoloSelezionatoId');
-  localStorage.removeItem('pos_azione_richiesta');
+  setPosState('tavoloSelezionato', null);
+  setPosState('tavoloSelezionatoId', null);
+  setPosState('pos_azione_richiesta', null);
   
   if (window.parent && window.parent !== window) {
     window.parent.postMessage({ comando: 'cambiaPagina', target: 'ristorante' }, '*');

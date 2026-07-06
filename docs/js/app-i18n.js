@@ -1,11 +1,27 @@
 import { APP_I18N, APP_LANGS } from './i18n/app.js';
+import { getLang as getSettingsLang, setLang as setSettingsLang, syncSettingsFromDb } from './winbeach-settings.js';
 
 const STORAGE_KEY = 'winbeach-app-lang';
 const langListeners = new Set();
 
+let cachedLang = null;
+
 export function getAppLang() {
-  return localStorage.getItem(STORAGE_KEY) || 'it';
+  if (cachedLang) return cachedLang;
+  const settingsLang = getSettingsLang();
+  cachedLang = settingsLang || localStorage.getItem(STORAGE_KEY) || 'it';
+  return cachedLang;
 }
+
+syncSettingsFromDb().then(() => {
+  const newLang = getSettingsLang();
+  if (newLang && newLang !== cachedLang) {
+    cachedLang = newLang;
+    document.documentElement.lang = newLang;
+    applyI18n(document);
+    syncLangButtonLabels(newLang);
+  }
+}).catch(() => {});
 
 export function t(key, params) {
   const lang = getAppLang();
@@ -49,8 +65,9 @@ function syncLangButtonLabels(code = getAppLang()) {
   });
 }
 
-export function setAppLang(code) {
+export async function setAppLang(code) {
   if (!APP_I18N[code]) return;
+  cachedLang = code;
   localStorage.setItem(STORAGE_KEY, code);
   document.documentElement.lang = code;
   applyI18n(document);
@@ -58,6 +75,10 @@ export function setAppLang(code) {
   applyPageI18nAsync();
   broadcastLang(code);
   langListeners.forEach((fn) => { try { fn(code); } catch { /* ignore */ } });
+  
+  try {
+    await setSettingsLang(code);
+  } catch { /* ignore */ }
 }
 
 export function onLangChange(fn) {

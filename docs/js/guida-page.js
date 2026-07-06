@@ -1,4 +1,5 @@
 import { GUIDE_I18N, GUIDE_LANGS } from './guida/index.js';
+import { getLang as getAppLang, setLang as setAppLang, getGuideLang, setGuideLang } from './winbeach-settings.js';
 
 const STORAGE_KEY = 'winbeach-guide-lang';
 const APP_LANG_KEY = 'winbeach-app-lang';
@@ -10,15 +11,18 @@ function getLangFromUrl() {
 
 function getLang() {
   return getLangFromUrl()
+    || getGuideLang()
     || localStorage.getItem(APP_LANG_KEY)
     || localStorage.getItem(STORAGE_KEY)
     || 'it';
 }
 
-function setLang(lang) {
+async function setLang(lang) {
   if (!GUIDE_I18N[lang]) return;
   localStorage.setItem(STORAGE_KEY, lang);
   localStorage.setItem(APP_LANG_KEY, lang);
+  await setGuideLang(lang);
+  await setAppLang(lang);
   render(lang);
   document.querySelectorAll('.guide-lang-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
