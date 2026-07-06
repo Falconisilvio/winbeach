@@ -10,7 +10,17 @@ import { t, onLangChange } from './app-i18n.js';
 function renderSwitcher() {
   const nameEl = document.getElementById('active-profile-name');
   const dropdown = document.getElementById('profile-dropdown');
+  const profileSwitcher = document.getElementById('profile-switcher');
   const active = getActiveProfile();
+
+  // Nascondi lo switcher per utenti non-admin
+  if (profileSwitcher) {
+    import('./winbeach-auth.js').then(({ isAdmin }) => {
+      profileSwitcher.hidden = !isAdmin();
+    }).catch(() => {
+      profileSwitcher.hidden = false;
+    });
+  }
 
   if (nameEl) {
     nameEl.textContent = active ? profileDisplayName(active) : t('profile.defaultName');

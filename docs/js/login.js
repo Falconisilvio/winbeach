@@ -47,7 +47,13 @@ form.addEventListener('submit', async (e) => {
   resetSubmitLabel();
 
   if (res.ok) {
-    window.location.replace(redirect);
+    if (res.profileName) {
+      errorEl.textContent = `${t('login.loginOk')} ${res.profileName}`;
+      errorEl.className = 'login-error show';
+      errorEl.style.background = '#f0fff4';
+      errorEl.style.color = '#276749';
+    }
+    setTimeout(() => { window.location.replace(redirect); }, res.profileName ? 800 : 0);
     return;
   }
 

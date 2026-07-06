@@ -564,7 +564,7 @@
       document.getElementById('badge-modifica-tavoli').style.display = 'inline-block';
     }
 
-    function自由eliminaVoce(tipo, id) {
+    function eliminaVoce(tipo, id) {
       if (confirm("Vuoi eliminare definitivamente questo elemento?")) {
         dbRistorante[tipo] = dbRistorante[tipo].filter(x => x.id !== id);
         salvaNelStorage();
