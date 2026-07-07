@@ -68,11 +68,11 @@
   </div>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-logistica')"><i class="fa-solid fa-layer-group"></i> 1. Sale e Tavoli</button>
-    <button class="tab-btn" onclick="switchTab('tab-categorie')"><i class="fa-solid fa-tags"></i> 2. Registro Categorie</button>
-    <button class="tab-btn" onclick="switchTab('tab-registro')"><i class="fa-solid fa-utensils"></i> 3. Registro Prodotti</button>
-    <button class="tab-btn" onclick="switchTab('tab-impostazioni')"><i class="fa-solid fa-sliders"></i> 4. Impostazioni Generali</button>
-    <button class="tab-btn" onclick="switchTab('tab-pos')"><i class="fa-solid fa-credit-card"></i> 5. Hardware & POS</button>
+    <button class="tab-btn active" onclick="switchTab('tab-logistica', this)"><i class="fa-solid fa-layer-group"></i> 1. Sale e Tavoli</button>
+    <button class="tab-btn" onclick="switchTab('tab-categorie', this)"><i class="fa-solid fa-tags"></i> 2. Registro Categorie</button>
+    <button class="tab-btn" onclick="switchTab('tab-registro', this)"><i class="fa-solid fa-utensils"></i> 3. Registro Prodotti</button>
+    <button class="tab-btn" onclick="switchTab('tab-impostazioni', this)"><i class="fa-solid fa-sliders"></i> 4. Impostazioni Generali</button>
+    <button class="tab-btn" onclick="switchTab('tab-pos', this)"><i class="fa-solid fa-credit-card"></i> 5. Hardware & POS</button>
   </div>
 
   <!-- TAB 1: LOGISTICA -->
@@ -388,12 +388,12 @@
       renderRegistroTabella();
     }
 
-    function switchTab(tabId) {
+    function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      if(window.event && window.event.currentTarget) {
-        window.event.currentTarget.classList.add('active');
+      if(btn) {
+        btn.classList.add('active');
       }
     }
 
@@ -581,9 +581,11 @@
         document.getElementById('edit-sala-id').value = '';
         document.getElementById('btn-submit-sala').innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi Sala';
         document.getElementById('badge-modifica-sale').style.display = 'none';
+        alert('Sala aggiornata con successo!');
       } else {
         const nuovoId = dbRistorante.sale.length > 0 ? Math.max(...dbRistorante.sale.map(s => s.id)) + 1 : 1;
-        dbRistorante.sale.push({ id: nuevoId, nome: nome });
+        dbRistorante.sale.push({ id: nuovoId, nome: nome });
+        alert('Sala "' + nome + '" aggiunta con successo!');
       }
       document.getElementById('nome-sala').value = '';
       salvaNelStorage();
@@ -624,9 +626,11 @@
       
       if(editId) {
         dbRistorante.categorie = dbRistorante.categorie.map(c => c.id === Number(editId) ? { ...c, nome: nome, stampante: stampante, immagine: nomeImmagine } : c);
+        alert('Categoria aggiornata con successo!');
       } else {
         const nuovoId = dbRistorante.categorie.length > 0 ? Math.max(...dbRistorante.categorie.map(c => c.id)) + 1 : 1;
-        dbRistorante.categorie.push({ id: nuevoId, nome: nome, stampante: stampante, immagine: nomeImmagine });
+        dbRistorante.categorie.push({ id: nuovoId, nome: nome, stampante: stampante, immagine: nomeImmagine });
+        alert('Categoria "' + nome + '" aggiunta con successo!');
       }
       chiudiModale();
       salvaNelStorage();
