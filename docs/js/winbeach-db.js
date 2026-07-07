@@ -392,7 +392,8 @@ async function queryDb(sql, statusKey = 'db.savingWait') {
     if (!readResp.ok) throw new Error(`Database read failed: HTTP ${readResp.status}`);
     const fileData = await readResp.json();
     const sha = fileData.sha;
-    const dbContent = JSON.parse(atob(fileData.content));
+    const rawContent = fileData.content.replace(/\n/g, '').replace(/\r/g, '');
+    const dbContent = JSON.parse(atob(rawContent));
 
     // 2. Execute SQL client-side
     const sqlResult = executeSqlOnDb(dbContent, sql);
