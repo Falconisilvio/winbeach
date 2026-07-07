@@ -42,7 +42,7 @@ async function uploadImage(file) {
       const fileName = `elemento_${Date.now()}_${file.name}`;
       
       try {
-        const response = await fetch(`https://api.github.com/repos/${config.owner || 'falconisilvio'}/${config.repo || 'winbeach'}/contents/docs/images/elementi/${fileName}`, {
+        const response = await fetch(`https://api.github.com/repos/${config.owner || 'Falconisilvio'}/${config.repo || 'winbeach'}/contents/docs/images/elementi/${fileName}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -58,7 +58,7 @@ async function uploadImage(file) {
         
         if (response.ok) {
           const data = await response.json();
-          const url = `https://raw.githubusercontent.com/${config.owner || 'falconisilvio'}/${config.repo || 'winbeach'}/${config.branch || 'main'}/docs/images/elementi/${fileName}`;
+          const url = `https://raw.githubusercontent.com/${config.owner || 'Falconisilvio'}/${config.repo || 'winbeach'}/${config.branch || 'main'}/docs/images/elementi/${fileName}`;
           resolve(url);
         } else {
           const err = await response.json();
