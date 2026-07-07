@@ -11,8 +11,8 @@ const TOKENS_KEY = 'winbeach_profile_tokens';
 const LEGACY_TOKEN_KEY = 'winbeach_github_token';
 
 const DEFAULT_CONNECTION = {
-  owner: 'FiveTechSoft',
-  repo: 'githubdb',
+  owner: 'Falconisilvio',
+  repo: 'winbeach',
   branch: 'main',
   database: 'winbeach',
 };
