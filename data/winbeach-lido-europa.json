@@ -1,0 +1,4182 @@
+{
+  "githubdb": 1,
+  "tables": {
+    "config": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "rows",
+          "type": "INT"
+        },
+        {
+          "name": "cols",
+          "type": "INT"
+        },
+        {
+          "name": "walkway_col",
+          "type": "INT"
+        },
+        {
+          "name": "prossimo",
+          "type": "INT"
+        },
+        {
+          "name": "stagione_inizio",
+          "type": "TEXT"
+        },
+        {
+          "name": "stagione_fine",
+          "type": "TEXT"
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          12,
+          20,
+          10,
+          191,
+          "2026-06-01",
+          "2026-09-15",
+          "2026-06-30T10:51:48.968Z"
+        ]
+      ]
+    },
+    "azienda": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "ragione_sociale",
+          "type": "TEXT"
+        },
+        {
+          "name": "piva",
+          "type": "TEXT"
+        },
+        {
+          "name": "indirizzo",
+          "type": "TEXT"
+        },
+        {
+          "name": "email",
+          "type": "TEXT"
+        },
+        {
+          "name": "telefono",
+          "type": "TEXT"
+        },
+        {
+          "name": "stagione",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Lido Europa Beach Club",
+          "IT12345678901",
+          "Lungomare Europa, 1",
+          "info@winbeach.it",
+          "+39 080 1234567",
+          "01/06 — 15/09"
+        ]
+      ]
+    },
+    "celle": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "cella",
+          "type": "INT"
+        },
+        {
+          "name": "x",
+          "type": "INT"
+        },
+        {
+          "name": "y",
+          "type": "INT"
+        },
+        {
+          "name": "elemento",
+          "type": "TEXT"
+        },
+        {
+          "name": "desc",
+          "type": "TEXT"
+        },
+        {
+          "name": "settore",
+          "type": "TEXT"
+        },
+        {
+          "name": "attivo",
+          "type": "BOOL"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          0,
+          1,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          2,
+          0,
+          2,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          3,
+          0,
+          3,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          4,
+          0,
+          4,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          5,
+          0,
+          5,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          6,
+          0,
+          6,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          7,
+          0,
+          7,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          8,
+          0,
+          8,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          9,
+          0,
+          9,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          10,
+          0,
+          10,
+          1,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          11,
+          0,
+          11,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          12,
+          0,
+          12,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          13,
+          0,
+          13,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          14,
+          0,
+          14,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          15,
+          0,
+          15,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          16,
+          0,
+          16,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          17,
+          0,
+          17,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          18,
+          0,
+          18,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          19,
+          0,
+          19,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          20,
+          0,
+          20,
+          1,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          21,
+          0,
+          1,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          22,
+          0,
+          2,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          23,
+          0,
+          3,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          24,
+          0,
+          4,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          25,
+          0,
+          5,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          26,
+          0,
+          6,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          27,
+          0,
+          7,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          28,
+          0,
+          8,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          29,
+          0,
+          9,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          30,
+          0,
+          10,
+          2,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          31,
+          0,
+          11,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          32,
+          0,
+          12,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          33,
+          0,
+          13,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          34,
+          0,
+          14,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          35,
+          0,
+          15,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          36,
+          0,
+          16,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          37,
+          0,
+          17,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          38,
+          0,
+          18,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          39,
+          0,
+          19,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          40,
+          0,
+          20,
+          2,
+          "Mare",
+          "",
+          null,
+          false
+        ],
+        [
+          41,
+          1,
+          1,
+          3,
+          "Ombrellone",
+          "Ombrellone 1",
+          "A",
+          true
+        ],
+        [
+          42,
+          2,
+          2,
+          3,
+          "Hawaiana",
+          "Hawaiana 2",
+          "A",
+          true
+        ],
+        [
+          43,
+          3,
+          3,
+          3,
+          "Ombrellone",
+          "Ombrellone 3",
+          "A",
+          true
+        ],
+        [
+          44,
+          4,
+          4,
+          3,
+          "Cabina",
+          "Cabina 4",
+          "A",
+          true
+        ],
+        [
+          45,
+          5,
+          5,
+          3,
+          "Ombrellone",
+          "Ombrellone 5",
+          "A",
+          true
+        ],
+        [
+          46,
+          6,
+          6,
+          3,
+          "Ombrellone",
+          "Ombrellone 6",
+          "A",
+          true
+        ],
+        [
+          47,
+          7,
+          7,
+          3,
+          "Hawaiana",
+          "Hawaiana 7",
+          "A",
+          true
+        ],
+        [
+          48,
+          8,
+          8,
+          3,
+          "Ombrellone",
+          "Ombrellone 8",
+          "A",
+          true
+        ],
+        [
+          49,
+          9,
+          9,
+          3,
+          "Ombrellone",
+          "Ombrellone 9",
+          "A",
+          true
+        ],
+        [
+          50,
+          0,
+          10,
+          3,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          51,
+          10,
+          11,
+          3,
+          "Cabina",
+          "Cabina 10",
+          "A",
+          true
+        ],
+        [
+          52,
+          11,
+          12,
+          3,
+          "Hawaiana",
+          "Hawaiana 11",
+          "A",
+          true
+        ],
+        [
+          53,
+          12,
+          13,
+          3,
+          "Ombrellone",
+          "Ombrellone 12",
+          "A",
+          true
+        ],
+        [
+          54,
+          13,
+          14,
+          3,
+          "Ombrellone",
+          "Ombrellone 13",
+          "A",
+          true
+        ],
+        [
+          55,
+          14,
+          15,
+          3,
+          "Ombrellone",
+          "Ombrellone 14",
+          "A",
+          true
+        ],
+        [
+          56,
+          15,
+          16,
+          3,
+          "Ombrellone",
+          "Ombrellone 15",
+          "A",
+          true
+        ],
+        [
+          57,
+          16,
+          17,
+          3,
+          "Hawaiana",
+          "Hawaiana 16",
+          "A",
+          true
+        ],
+        [
+          58,
+          17,
+          18,
+          3,
+          "Cabina",
+          "Cabina 17",
+          "A",
+          true
+        ],
+        [
+          59,
+          18,
+          19,
+          3,
+          "Ombrellone",
+          "Ombrellone 18",
+          "A",
+          true
+        ],
+        [
+          60,
+          19,
+          20,
+          3,
+          "Ombrellone",
+          "Ombrellone 19",
+          "A",
+          true
+        ],
+        [
+          61,
+          20,
+          1,
+          4,
+          "Hawaiana",
+          "Hawaiana 20",
+          "A",
+          true
+        ],
+        [
+          62,
+          21,
+          2,
+          4,
+          "Ombrellone",
+          "Ombrellone 21",
+          "A",
+          true
+        ],
+        [
+          63,
+          22,
+          3,
+          4,
+          "Cabina",
+          "Cabina 22",
+          "A",
+          true
+        ],
+        [
+          64,
+          23,
+          4,
+          4,
+          "Ombrellone",
+          "Ombrellone 23",
+          "A",
+          true
+        ],
+        [
+          65,
+          24,
+          5,
+          4,
+          "Ombrellone",
+          "Ombrellone 24",
+          "A",
+          true
+        ],
+        [
+          66,
+          25,
+          6,
+          4,
+          "Hawaiana",
+          "Hawaiana 25",
+          "A",
+          true
+        ],
+        [
+          67,
+          26,
+          7,
+          4,
+          "Ombrellone",
+          "Ombrellone 26",
+          "A",
+          true
+        ],
+        [
+          68,
+          27,
+          8,
+          4,
+          "Ombrellone",
+          "Ombrellone 27",
+          "A",
+          true
+        ],
+        [
+          69,
+          28,
+          9,
+          4,
+          "Ombrellone",
+          "Ombrellone 28",
+          "A",
+          true
+        ],
+        [
+          70,
+          0,
+          10,
+          4,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          71,
+          29,
+          11,
+          4,
+          "Hawaiana",
+          "Hawaiana 29",
+          "A",
+          true
+        ],
+        [
+          72,
+          30,
+          12,
+          4,
+          "Ombrellone",
+          "Ombrellone 30",
+          "A",
+          true
+        ],
+        [
+          73,
+          31,
+          13,
+          4,
+          "Ombrellone",
+          "Ombrellone 31",
+          "A",
+          true
+        ],
+        [
+          74,
+          32,
+          14,
+          4,
+          "Ombrellone",
+          "Ombrellone 32",
+          "A",
+          true
+        ],
+        [
+          75,
+          33,
+          15,
+          4,
+          "Ombrellone",
+          "Ombrellone 33",
+          "A",
+          true
+        ],
+        [
+          76,
+          34,
+          16,
+          4,
+          "Hawaiana",
+          "Hawaiana 34",
+          "A",
+          true
+        ],
+        [
+          77,
+          35,
+          17,
+          4,
+          "Cabina",
+          "Cabina 35",
+          "A",
+          true
+        ],
+        [
+          78,
+          36,
+          18,
+          4,
+          "Ombrellone",
+          "Ombrellone 36",
+          "A",
+          true
+        ],
+        [
+          79,
+          37,
+          19,
+          4,
+          "Ombrellone",
+          "Ombrellone 37",
+          "A",
+          true
+        ],
+        [
+          80,
+          38,
+          20,
+          4,
+          "Ombrellone",
+          "Ombrellone 38",
+          "A",
+          true
+        ],
+        [
+          81,
+          39,
+          1,
+          5,
+          "Ombrellone",
+          "Ombrellone 39",
+          "A",
+          true
+        ],
+        [
+          82,
+          40,
+          2,
+          5,
+          "Cabina",
+          "Cabina 40",
+          "A",
+          true
+        ],
+        [
+          83,
+          41,
+          3,
+          5,
+          "Ombrellone",
+          "Ombrellone 41",
+          "A",
+          true
+        ],
+        [
+          84,
+          42,
+          4,
+          5,
+          "Ombrellone",
+          "Ombrellone 42",
+          "A",
+          true
+        ],
+        [
+          85,
+          43,
+          5,
+          5,
+          "Hawaiana",
+          "Hawaiana 43",
+          "A",
+          true
+        ],
+        [
+          86,
+          44,
+          6,
+          5,
+          "Ombrellone",
+          "Ombrellone 44",
+          "A",
+          true
+        ],
+        [
+          87,
+          45,
+          7,
+          5,
+          "Ombrellone",
+          "Ombrellone 45",
+          "A",
+          true
+        ],
+        [
+          88,
+          46,
+          8,
+          5,
+          "Ombrellone",
+          "Ombrellone 46",
+          "A",
+          true
+        ],
+        [
+          89,
+          47,
+          9,
+          5,
+          "Cabina",
+          "Cabina 47",
+          "A",
+          true
+        ],
+        [
+          90,
+          0,
+          10,
+          5,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          91,
+          48,
+          11,
+          5,
+          "Ombrellone",
+          "Ombrellone 48",
+          "A",
+          true
+        ],
+        [
+          92,
+          49,
+          12,
+          5,
+          "Ombrellone",
+          "Ombrellone 49",
+          "A",
+          true
+        ],
+        [
+          93,
+          50,
+          13,
+          5,
+          "Ombrellone",
+          "Ombrellone 50",
+          "A",
+          true
+        ],
+        [
+          94,
+          51,
+          14,
+          5,
+          "Ombrellone",
+          "Ombrellone 51",
+          "A",
+          true
+        ],
+        [
+          95,
+          52,
+          15,
+          5,
+          "Hawaiana",
+          "Hawaiana 52",
+          "A",
+          true
+        ],
+        [
+          96,
+          53,
+          16,
+          5,
+          "Cabina",
+          "Cabina 53",
+          "A",
+          true
+        ],
+        [
+          97,
+          54,
+          17,
+          5,
+          "Ombrellone",
+          "Ombrellone 54",
+          "A",
+          true
+        ],
+        [
+          98,
+          55,
+          18,
+          5,
+          "Ombrellone",
+          "Ombrellone 55",
+          "A",
+          true
+        ],
+        [
+          99,
+          56,
+          19,
+          5,
+          "Ombrellone",
+          "Ombrellone 56",
+          "A",
+          true
+        ],
+        [
+          100,
+          57,
+          20,
+          5,
+          "Hawaiana",
+          "Hawaiana 57",
+          "A",
+          true
+        ],
+        [
+          101,
+          58,
+          1,
+          6,
+          "Cabina",
+          "Cabina 58",
+          "B",
+          true
+        ],
+        [
+          102,
+          59,
+          2,
+          6,
+          "Ombrellone",
+          "Ombrellone 59",
+          "B",
+          true
+        ],
+        [
+          103,
+          60,
+          3,
+          6,
+          "Ombrellone",
+          "Ombrellone 60",
+          "B",
+          true
+        ],
+        [
+          104,
+          61,
+          4,
+          6,
+          "Hawaiana",
+          "Hawaiana 61",
+          "B",
+          true
+        ],
+        [
+          105,
+          62,
+          5,
+          6,
+          "Ombrellone",
+          "Ombrellone 62",
+          "B",
+          true
+        ],
+        [
+          106,
+          63,
+          6,
+          6,
+          "Ombrellone",
+          "Ombrellone 63",
+          "B",
+          true
+        ],
+        [
+          107,
+          64,
+          7,
+          6,
+          "Ombrellone",
+          "Ombrellone 64",
+          "B",
+          true
+        ],
+        [
+          108,
+          65,
+          8,
+          6,
+          "Cabina",
+          "Cabina 65",
+          "B",
+          true
+        ],
+        [
+          109,
+          66,
+          9,
+          6,
+          "Hawaiana",
+          "Hawaiana 66",
+          "B",
+          true
+        ],
+        [
+          110,
+          0,
+          10,
+          6,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          111,
+          67,
+          11,
+          6,
+          "Ombrellone",
+          "Ombrellone 67",
+          "B",
+          true
+        ],
+        [
+          112,
+          68,
+          12,
+          6,
+          "Ombrellone",
+          "Ombrellone 68",
+          "B",
+          true
+        ],
+        [
+          113,
+          69,
+          13,
+          6,
+          "Ombrellone",
+          "Ombrellone 69",
+          "B",
+          true
+        ],
+        [
+          114,
+          70,
+          14,
+          6,
+          "Hawaiana",
+          "Hawaiana 70",
+          "B",
+          true
+        ],
+        [
+          115,
+          71,
+          15,
+          6,
+          "Cabina",
+          "Cabina 71",
+          "B",
+          true
+        ],
+        [
+          116,
+          72,
+          16,
+          6,
+          "Ombrellone",
+          "Ombrellone 72",
+          "B",
+          true
+        ],
+        [
+          117,
+          73,
+          17,
+          6,
+          "Ombrellone",
+          "Ombrellone 73",
+          "B",
+          true
+        ],
+        [
+          118,
+          74,
+          18,
+          6,
+          "Ombrellone",
+          "Ombrellone 74",
+          "B",
+          true
+        ],
+        [
+          119,
+          75,
+          19,
+          6,
+          "Hawaiana",
+          "Hawaiana 75",
+          "B",
+          true
+        ],
+        [
+          120,
+          76,
+          20,
+          6,
+          "Ombrellone",
+          "Ombrellone 76",
+          "B",
+          true
+        ],
+        [
+          121,
+          77,
+          1,
+          7,
+          "Ombrellone",
+          "Ombrellone 77",
+          "B",
+          true
+        ],
+        [
+          122,
+          78,
+          2,
+          7,
+          "Ombrellone",
+          "Ombrellone 78",
+          "B",
+          true
+        ],
+        [
+          123,
+          79,
+          3,
+          7,
+          "Hawaiana",
+          "Hawaiana 79",
+          "B",
+          true
+        ],
+        [
+          124,
+          80,
+          4,
+          7,
+          "Ombrellone",
+          "Ombrellone 80",
+          "B",
+          true
+        ],
+        [
+          125,
+          81,
+          5,
+          7,
+          "Ombrellone",
+          "Ombrellone 81",
+          "B",
+          true
+        ],
+        [
+          126,
+          82,
+          6,
+          7,
+          "Ombrellone",
+          "Ombrellone 82",
+          "B",
+          true
+        ],
+        [
+          127,
+          83,
+          7,
+          7,
+          "Cabina",
+          "Cabina 83",
+          "B",
+          true
+        ],
+        [
+          128,
+          84,
+          8,
+          7,
+          "Hawaiana",
+          "Hawaiana 84",
+          "B",
+          true
+        ],
+        [
+          129,
+          85,
+          9,
+          7,
+          "Ombrellone",
+          "Ombrellone 85",
+          "B",
+          true
+        ],
+        [
+          130,
+          0,
+          10,
+          7,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          131,
+          86,
+          11,
+          7,
+          "Ombrellone",
+          "Ombrellone 86",
+          "B",
+          true
+        ],
+        [
+          132,
+          87,
+          12,
+          7,
+          "Ombrellone",
+          "Ombrellone 87",
+          "B",
+          true
+        ],
+        [
+          133,
+          88,
+          13,
+          7,
+          "Hawaiana",
+          "Hawaiana 88",
+          "B",
+          true
+        ],
+        [
+          134,
+          89,
+          14,
+          7,
+          "Cabina",
+          "Cabina 89",
+          "B",
+          true
+        ],
+        [
+          135,
+          90,
+          15,
+          7,
+          "Ombrellone",
+          "Ombrellone 90",
+          "B",
+          true
+        ],
+        [
+          136,
+          91,
+          16,
+          7,
+          "Ombrellone",
+          "Ombrellone 91",
+          "B",
+          true
+        ],
+        [
+          137,
+          92,
+          17,
+          7,
+          "Ombrellone",
+          "Ombrellone 92",
+          "B",
+          true
+        ],
+        [
+          138,
+          93,
+          18,
+          7,
+          "Hawaiana",
+          "Hawaiana 93",
+          "B",
+          true
+        ],
+        [
+          139,
+          94,
+          19,
+          7,
+          "Ombrellone",
+          "Ombrellone 94",
+          "B",
+          true
+        ],
+        [
+          140,
+          95,
+          20,
+          7,
+          "Ombrellone",
+          "Ombrellone 95",
+          "B",
+          true
+        ],
+        [
+          141,
+          96,
+          1,
+          8,
+          "Ombrellone",
+          "Ombrellone 96",
+          "B",
+          true
+        ],
+        [
+          142,
+          97,
+          2,
+          8,
+          "Hawaiana",
+          "Hawaiana 97",
+          "B",
+          true
+        ],
+        [
+          143,
+          98,
+          3,
+          8,
+          "Ombrellone",
+          "Ombrellone 98",
+          "B",
+          true
+        ],
+        [
+          144,
+          99,
+          4,
+          8,
+          "Ombrellone",
+          "Ombrellone 99",
+          "B",
+          true
+        ],
+        [
+          145,
+          100,
+          5,
+          8,
+          "Ombrellone",
+          "Ombrellone 100",
+          "B",
+          true
+        ],
+        [
+          146,
+          101,
+          6,
+          8,
+          "Cabina",
+          "Cabina 101",
+          "B",
+          true
+        ],
+        [
+          147,
+          102,
+          7,
+          8,
+          "Hawaiana",
+          "Hawaiana 102",
+          "B",
+          true
+        ],
+        [
+          148,
+          103,
+          8,
+          8,
+          "Ombrellone",
+          "Ombrellone 103",
+          "B",
+          true
+        ],
+        [
+          149,
+          104,
+          9,
+          8,
+          "Ombrellone",
+          "Ombrellone 104",
+          "B",
+          true
+        ],
+        [
+          150,
+          0,
+          10,
+          8,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          151,
+          105,
+          11,
+          8,
+          "Ombrellone",
+          "Ombrellone 105",
+          "B",
+          true
+        ],
+        [
+          152,
+          106,
+          12,
+          8,
+          "Hawaiana",
+          "Hawaiana 106",
+          "B",
+          true
+        ],
+        [
+          153,
+          107,
+          13,
+          8,
+          "Cabina",
+          "Cabina 107",
+          "B",
+          true
+        ],
+        [
+          154,
+          108,
+          14,
+          8,
+          "Ombrellone",
+          "Ombrellone 108",
+          "B",
+          true
+        ],
+        [
+          155,
+          109,
+          15,
+          8,
+          "Ombrellone",
+          "Ombrellone 109",
+          "B",
+          true
+        ],
+        [
+          156,
+          110,
+          16,
+          8,
+          "Ombrellone",
+          "Ombrellone 110",
+          "B",
+          true
+        ],
+        [
+          157,
+          111,
+          17,
+          8,
+          "Hawaiana",
+          "Hawaiana 111",
+          "B",
+          true
+        ],
+        [
+          158,
+          112,
+          18,
+          8,
+          "Ombrellone",
+          "Ombrellone 112",
+          "B",
+          true
+        ],
+        [
+          159,
+          113,
+          19,
+          8,
+          "Ombrellone",
+          "Ombrellone 113",
+          "B",
+          true
+        ],
+        [
+          160,
+          114,
+          20,
+          8,
+          "Cabina",
+          "Cabina 114",
+          "B",
+          true
+        ],
+        [
+          161,
+          115,
+          1,
+          9,
+          "Hawaiana",
+          "Hawaiana 115",
+          "C",
+          true
+        ],
+        [
+          162,
+          116,
+          2,
+          9,
+          "Ombrellone",
+          "Ombrellone 116",
+          "C",
+          true
+        ],
+        [
+          163,
+          117,
+          3,
+          9,
+          "Ombrellone",
+          "Ombrellone 117",
+          "C",
+          true
+        ],
+        [
+          164,
+          118,
+          4,
+          9,
+          "Ombrellone",
+          "Ombrellone 118",
+          "C",
+          true
+        ],
+        [
+          165,
+          119,
+          5,
+          9,
+          "Cabina",
+          "Cabina 119",
+          "C",
+          true
+        ],
+        [
+          166,
+          120,
+          6,
+          9,
+          "Hawaiana",
+          "Hawaiana 120",
+          "C",
+          true
+        ],
+        [
+          167,
+          121,
+          7,
+          9,
+          "Ombrellone",
+          "Ombrellone 121",
+          "C",
+          true
+        ],
+        [
+          168,
+          122,
+          8,
+          9,
+          "Ombrellone",
+          "Ombrellone 122",
+          "C",
+          true
+        ],
+        [
+          169,
+          123,
+          9,
+          9,
+          "Ombrellone",
+          "Ombrellone 123",
+          "C",
+          true
+        ],
+        [
+          170,
+          0,
+          10,
+          9,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          171,
+          124,
+          11,
+          9,
+          "Hawaiana",
+          "Hawaiana 124",
+          "C",
+          true
+        ],
+        [
+          172,
+          125,
+          12,
+          9,
+          "Cabina",
+          "Cabina 125",
+          "C",
+          true
+        ],
+        [
+          173,
+          126,
+          13,
+          9,
+          "Ombrellone",
+          "Ombrellone 126",
+          "C",
+          true
+        ],
+        [
+          174,
+          127,
+          14,
+          9,
+          "Ombrellone",
+          "Ombrellone 127",
+          "C",
+          true
+        ],
+        [
+          175,
+          128,
+          15,
+          9,
+          "Ombrellone",
+          "Ombrellone 128",
+          "C",
+          true
+        ],
+        [
+          176,
+          129,
+          16,
+          9,
+          "Hawaiana",
+          "Hawaiana 129",
+          "C",
+          true
+        ],
+        [
+          177,
+          130,
+          17,
+          9,
+          "Ombrellone",
+          "Ombrellone 130",
+          "C",
+          true
+        ],
+        [
+          178,
+          131,
+          18,
+          9,
+          "Ombrellone",
+          "Ombrellone 131",
+          "C",
+          true
+        ],
+        [
+          179,
+          132,
+          19,
+          9,
+          "Cabina",
+          "Cabina 132",
+          "C",
+          true
+        ],
+        [
+          180,
+          133,
+          20,
+          9,
+          "Ombrellone",
+          "Ombrellone 133",
+          "C",
+          true
+        ],
+        [
+          181,
+          134,
+          1,
+          10,
+          "Ombrellone",
+          "Ombrellone 134",
+          "C",
+          true
+        ],
+        [
+          182,
+          135,
+          2,
+          10,
+          "Ombrellone",
+          "Ombrellone 135",
+          "C",
+          true
+        ],
+        [
+          183,
+          136,
+          3,
+          10,
+          "Ombrellone",
+          "Ombrellone 136",
+          "C",
+          true
+        ],
+        [
+          184,
+          137,
+          4,
+          10,
+          "Cabina",
+          "Cabina 137",
+          "C",
+          true
+        ],
+        [
+          185,
+          138,
+          5,
+          10,
+          "Hawaiana",
+          "Hawaiana 138",
+          "C",
+          true
+        ],
+        [
+          186,
+          139,
+          6,
+          10,
+          "Ombrellone",
+          "Ombrellone 139",
+          "C",
+          true
+        ],
+        [
+          187,
+          140,
+          7,
+          10,
+          "Ombrellone",
+          "Ombrellone 140",
+          "C",
+          true
+        ],
+        [
+          188,
+          141,
+          8,
+          10,
+          "Ombrellone",
+          "Ombrellone 141",
+          "C",
+          true
+        ],
+        [
+          189,
+          142,
+          9,
+          10,
+          "Ombrellone",
+          "Ombrellone 142",
+          "C",
+          true
+        ],
+        [
+          190,
+          0,
+          10,
+          10,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          191,
+          143,
+          11,
+          10,
+          "Cabina",
+          "Cabina 143",
+          "C",
+          true
+        ],
+        [
+          192,
+          144,
+          12,
+          10,
+          "Ombrellone",
+          "Ombrellone 144",
+          "C",
+          true
+        ],
+        [
+          193,
+          145,
+          13,
+          10,
+          "Ombrellone",
+          "Ombrellone 145",
+          "C",
+          true
+        ],
+        [
+          194,
+          146,
+          14,
+          10,
+          "Ombrellone",
+          "Ombrellone 146",
+          "C",
+          true
+        ],
+        [
+          195,
+          147,
+          15,
+          10,
+          "Hawaiana",
+          "Hawaiana 147",
+          "C",
+          true
+        ],
+        [
+          196,
+          148,
+          16,
+          10,
+          "Ombrellone",
+          "Ombrellone 148",
+          "C",
+          true
+        ],
+        [
+          197,
+          149,
+          17,
+          10,
+          "Ombrellone",
+          "Ombrellone 149",
+          "C",
+          true
+        ],
+        [
+          198,
+          150,
+          18,
+          10,
+          "Cabina",
+          "Cabina 150",
+          "C",
+          true
+        ],
+        [
+          199,
+          151,
+          19,
+          10,
+          "Ombrellone",
+          "Ombrellone 151",
+          "C",
+          true
+        ],
+        [
+          200,
+          152,
+          20,
+          10,
+          "Hawaiana",
+          "Hawaiana 152",
+          "C",
+          true
+        ],
+        [
+          201,
+          153,
+          1,
+          11,
+          "Ombrellone",
+          "Ombrellone 153",
+          "C",
+          true
+        ],
+        [
+          202,
+          154,
+          2,
+          11,
+          "Ombrellone",
+          "Ombrellone 154",
+          "C",
+          true
+        ],
+        [
+          203,
+          155,
+          3,
+          11,
+          "Cabina",
+          "Cabina 155",
+          "C",
+          true
+        ],
+        [
+          204,
+          156,
+          4,
+          11,
+          "Hawaiana",
+          "Hawaiana 156",
+          "C",
+          true
+        ],
+        [
+          205,
+          157,
+          5,
+          11,
+          "Ombrellone",
+          "Ombrellone 157",
+          "C",
+          true
+        ],
+        [
+          206,
+          158,
+          6,
+          11,
+          "Ombrellone",
+          "Ombrellone 158",
+          "C",
+          true
+        ],
+        [
+          207,
+          159,
+          7,
+          11,
+          "Ombrellone",
+          "Ombrellone 159",
+          "C",
+          true
+        ],
+        [
+          208,
+          160,
+          8,
+          11,
+          "Ombrellone",
+          "Ombrellone 160",
+          "C",
+          true
+        ],
+        [
+          209,
+          161,
+          9,
+          11,
+          "Hawaiana",
+          "Hawaiana 161",
+          "C",
+          true
+        ],
+        [
+          210,
+          0,
+          10,
+          11,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          211,
+          162,
+          11,
+          11,
+          "Ombrellone",
+          "Ombrellone 162",
+          "C",
+          true
+        ],
+        [
+          212,
+          163,
+          12,
+          11,
+          "Ombrellone",
+          "Ombrellone 163",
+          "C",
+          true
+        ],
+        [
+          213,
+          164,
+          13,
+          11,
+          "Ombrellone",
+          "Ombrellone 164",
+          "C",
+          true
+        ],
+        [
+          214,
+          165,
+          14,
+          11,
+          "Hawaiana",
+          "Hawaiana 165",
+          "C",
+          true
+        ],
+        [
+          215,
+          166,
+          15,
+          11,
+          "Ombrellone",
+          "Ombrellone 166",
+          "C",
+          true
+        ],
+        [
+          216,
+          167,
+          16,
+          11,
+          "Ombrellone",
+          "Ombrellone 167",
+          "C",
+          true
+        ],
+        [
+          217,
+          168,
+          17,
+          11,
+          "Cabina",
+          "Cabina 168",
+          "C",
+          true
+        ],
+        [
+          218,
+          169,
+          18,
+          11,
+          "Ombrellone",
+          "Ombrellone 169",
+          "C",
+          true
+        ],
+        [
+          219,
+          170,
+          19,
+          11,
+          "Hawaiana",
+          "Hawaiana 170",
+          "C",
+          true
+        ],
+        [
+          220,
+          171,
+          20,
+          11,
+          "Ombrellone",
+          "Ombrellone 171",
+          "C",
+          true
+        ],
+        [
+          221,
+          172,
+          1,
+          12,
+          "Ombrellone",
+          "Ombrellone 172",
+          "C",
+          true
+        ],
+        [
+          222,
+          173,
+          2,
+          12,
+          "Cabina",
+          "Cabina 173",
+          "C",
+          true
+        ],
+        [
+          223,
+          174,
+          3,
+          12,
+          "Hawaiana",
+          "Hawaiana 174",
+          "C",
+          true
+        ],
+        [
+          224,
+          175,
+          4,
+          12,
+          "Ombrellone",
+          "Ombrellone 175",
+          "C",
+          true
+        ],
+        [
+          225,
+          176,
+          5,
+          12,
+          "Ombrellone",
+          "Ombrellone 176",
+          "C",
+          true
+        ],
+        [
+          226,
+          177,
+          6,
+          12,
+          "Ombrellone",
+          "Ombrellone 177",
+          "C",
+          true
+        ],
+        [
+          227,
+          178,
+          7,
+          12,
+          "Ombrellone",
+          "Ombrellone 178",
+          "C",
+          true
+        ],
+        [
+          228,
+          179,
+          8,
+          12,
+          "Hawaiana",
+          "Hawaiana 179",
+          "C",
+          true
+        ],
+        [
+          229,
+          180,
+          9,
+          12,
+          "Cabina",
+          "Cabina 180",
+          "C",
+          true
+        ],
+        [
+          230,
+          0,
+          10,
+          12,
+          "Pasarela",
+          "",
+          null,
+          false
+        ],
+        [
+          231,
+          181,
+          11,
+          12,
+          "Ombrellone",
+          "Ombrellone 181",
+          "C",
+          true
+        ],
+        [
+          232,
+          182,
+          12,
+          12,
+          "Ombrellone",
+          "Ombrellone 182",
+          "C",
+          true
+        ],
+        [
+          233,
+          183,
+          13,
+          12,
+          "Hawaiana",
+          "Hawaiana 183",
+          "C",
+          true
+        ],
+        [
+          234,
+          184,
+          14,
+          12,
+          "Ombrellone",
+          "Ombrellone 184",
+          "C",
+          true
+        ],
+        [
+          235,
+          185,
+          15,
+          12,
+          "Ombrellone",
+          "Ombrellone 185",
+          "C",
+          true
+        ],
+        [
+          236,
+          186,
+          16,
+          12,
+          "Cabina",
+          "Cabina 186",
+          "C",
+          true
+        ],
+        [
+          237,
+          187,
+          17,
+          12,
+          "Ombrellone",
+          "Ombrellone 187",
+          "C",
+          true
+        ],
+        [
+          238,
+          188,
+          18,
+          12,
+          "Hawaiana",
+          "Hawaiana 188",
+          "C",
+          true
+        ],
+        [
+          239,
+          189,
+          19,
+          12,
+          "Ombrellone",
+          "Ombrellone 189",
+          "C",
+          true
+        ],
+        [
+          240,
+          190,
+          20,
+          12,
+          "Ombrellone",
+          "Ombrellone 190",
+          "C",
+          true
+        ]
+      ]
+    },
+    "elementi": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "codice", "type": "TEXT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "tipo", "type": "TEXT" },
+        { "name": "colore", "type": "TEXT" },
+        { "name": "immagine_1", "type": "TEXT" },
+        { "name": "immagine_2", "type": "TEXT" },
+        { "name": "immagine_3", "type": "TEXT" },
+        { "name": "attivo", "type": "BOOL" }
+      ],
+      "rows": []
+    },
+    "settori": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "codice",
+          "type": "TEXT"
+        },
+        {
+          "name": "nome",
+          "type": "TEXT"
+        },
+        {
+          "name": "postazioni",
+          "type": "INT"
+        },
+        {
+          "name": "tassa",
+          "type": "TEXT"
+        },
+        {
+          "name": "descrizione",
+          "type": "TEXT"
+        },
+        {
+          "name": "attivo",
+          "type": "BOOL"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "A",
+          "Prima fila",
+          40,
+          "Premium",
+          "Vista mare diretta",
+          true
+        ],
+        [
+          2,
+          "B",
+          "Centrale",
+          60,
+          "Standard",
+          "Zona principale",
+          true
+        ],
+        [
+          3,
+          "C",
+          "Piscina",
+          30,
+          "Economy",
+          "Vicino piscina",
+          true
+        ]
+      ]
+    },
+    "listini": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "nome",
+          "type": "TEXT"
+        },
+        {
+          "name": "validita",
+          "type": "TEXT"
+        },
+        {
+          "name": "settori",
+          "type": "TEXT"
+        },
+        {
+          "name": "stato",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Estivo 2026",
+          "01/06 — 15/09",
+          "A, B, C",
+          "attivo"
+        ],
+        [
+          2,
+          "Weekend",
+          "Sab-Dom",
+          "A, B",
+          "attivo"
+        ]
+      ]
+    },
+    "tariffe": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "tassa",
+          "type": "TEXT"
+        },
+        {
+          "name": "giornaliero",
+          "type": "FLOAT"
+        },
+        {
+          "name": "settimanale",
+          "type": "FLOAT"
+        },
+        {
+          "name": "quindicinale",
+          "type": "FLOAT"
+        },
+        {
+          "name": "mensile",
+          "type": "FLOAT"
+        },
+        {
+          "name": "listino_id",
+          "type": "INT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "A",
+          35,
+          210,
+          380,
+          650,
+          1
+        ],
+        [
+          2,
+          "B",
+          28,
+          170,
+          300,
+          520,
+          1
+        ],
+        [
+          3,
+          "C",
+          22,
+          130,
+          240,
+          400,
+          1
+        ]
+      ]
+    },
+    "clienti": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "nome",
+          "type": "TEXT"
+        },
+        {
+          "name": "cognome",
+          "type": "TEXT"
+        },
+        {
+          "name": "email",
+          "type": "TEXT"
+        },
+        {
+          "name": "telefono",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Marco",
+          "Russo",
+          "lido-europa.marco@email.it",
+          "+39 333 1000000",
+          "Cliente VIP"
+        ],
+        [
+          2,
+          "Giulia",
+          "Ferrari",
+          "lido-europa.giulia@email.it",
+          "+39 333 1000001",
+          ""
+        ],
+        [
+          3,
+          "Luca",
+          "Colombo",
+          "lido-europa.luca@email.it",
+          "+39 333 1000002",
+          ""
+        ],
+        [
+          4,
+          "Sofia",
+          "Ricci",
+          "lido-europa.sofia@email.it",
+          "+39 333 1000003",
+          ""
+        ],
+        [
+          5,
+          "Andrea",
+          "Marino",
+          "lido-europa.andrea@email.it",
+          "+39 333 1000004",
+          ""
+        ],
+        [
+          6,
+          "Elena",
+          "Greco",
+          "lido-europa.elena@email.it",
+          "+39 333 1000005",
+          ""
+        ],
+        [
+          7,
+          "Paolo",
+          "Bruno",
+          "lido-europa.paolo@email.it",
+          "+39 333 1000006",
+          ""
+        ],
+        [
+          8,
+          "Francesca",
+          "Rossi",
+          "lido-europa.francesca@email.it",
+          "+39 333 1000007",
+          ""
+        ],
+        [
+          9,
+          "Davide",
+          "Bianchi",
+          "lido-europa.davide@email.it",
+          "+39 333 1000008",
+          ""
+        ],
+        [
+          10,
+          "Chiara",
+          "Verdi",
+          "lido-europa.chiara@email.it",
+          "+39 333 1000009",
+          ""
+        ],
+        [
+          11,
+          "Marco",
+          "Russo",
+          "lido-europa.marco@email.it",
+          "+39 333 1000010",
+          ""
+        ],
+        [
+          12,
+          "Giulia",
+          "Ferrari",
+          "lido-europa.giulia@email.it",
+          "+39 333 1000011",
+          ""
+        ],
+        [
+          13,
+          "Luca",
+          "Colombo",
+          "lido-europa.luca@email.it",
+          "+39 333 1000012",
+          ""
+        ],
+        [
+          14,
+          "Sofia",
+          "Ricci",
+          "lido-europa.sofia@email.it",
+          "+39 333 1000013",
+          ""
+        ]
+      ]
+    },
+    "prenotazioni": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "cliente_id",
+          "type": "INT"
+        },
+        {
+          "name": "cella",
+          "type": "INT"
+        },
+        {
+          "name": "data_inizio",
+          "type": "TEXT"
+        },
+        {
+          "name": "data_fine",
+          "type": "TEXT"
+        },
+        {
+          "name": "stato",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "importo_pagato",
+          "type": "FLOAT"
+        },
+        {
+          "name": "canale",
+          "type": "TEXT"
+        },
+        {
+          "name": "stato_pagamento",
+          "type": "TEXT"
+        },
+        {
+          "name": "ora_arrivo",
+          "type": "TEXT"
+        },
+        {
+          "name": "check_in",
+          "type": "BOOL"
+        },
+        {
+          "name": "check_out",
+          "type": "BOOL"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          24,
+          "2026-06-30",
+          "2026-07-02",
+          "cancellata",
+          "",
+          35,
+          0,
+          "offline",
+          "saldato",
+          "09:00",
+          true,
+          false
+        ],
+        [
+          2,
+          2,
+          31,
+          "2026-07-01",
+          "2026-07-04",
+          "confermata",
+          "",
+          63,
+          25,
+          "widget",
+          "parziale",
+          "",
+          false,
+          false
+        ],
+        [
+          3,
+          3,
+          38,
+          "2026-07-02",
+          "2026-07-06",
+          "confermata",
+          "",
+          91,
+          0,
+          "portale",
+          "da_saldare",
+          "",
+          false,
+          false
+        ],
+        [
+          4,
+          4,
+          45,
+          "2026-07-03",
+          "2026-07-08",
+          "confermata",
+          "",
+          119,
+          119,
+          "offline",
+          "saldato",
+          "",
+          false,
+          false
+        ],
+        [
+          5,
+          5,
+          52,
+          "2026-07-04",
+          "2026-07-10",
+          "confermata",
+          "",
+          147,
+          59,
+          "widget",
+          "parziale",
+          "",
+          false,
+          false
+        ],
+        [
+          6,
+          6,
+          59,
+          "2026-06-30",
+          "2026-07-07",
+          "confermata",
+          "",
+          175,
+          0,
+          "portale",
+          "da_saldare",
+          "09:00",
+          true,
+          false
+        ],
+        [
+          7,
+          7,
+          66,
+          "2026-07-01",
+          "2026-07-03",
+          "confermata",
+          "",
+          203,
+          203,
+          "offline",
+          "saldato",
+          "",
+          false,
+          false
+        ],
+        [
+          8,
+          8,
+          73,
+          "2026-07-02",
+          "2026-07-05",
+          "in_attesa",
+          "",
+          231,
+          92,
+          "widget",
+          "parziale",
+          "",
+          false,
+          false
+        ],
+        [
+          9,
+          9,
+          80,
+          "2026-07-03",
+          "2026-07-07",
+          "confermata",
+          "",
+          35,
+          0,
+          "portale",
+          "da_saldare",
+          "",
+          false,
+          false
+        ],
+        [
+          10,
+          10,
+          87,
+          "2026-07-04",
+          "2026-07-09",
+          "confermata",
+          "",
+          63,
+          63,
+          "offline",
+          "saldato",
+          "",
+          false,
+          false
+        ],
+        [
+          11,
+          11,
+          94,
+          "2026-06-30",
+          "2026-07-06",
+          "confermata",
+          "",
+          91,
+          36,
+          "widget",
+          "parziale",
+          "09:00",
+          true,
+          false
+        ],
+        [
+          12,
+          12,
+          101,
+          "2026-07-01",
+          "2026-07-08",
+          "cancellata",
+          "",
+          119,
+          0,
+          "portale",
+          "da_saldare",
+          "",
+          false,
+          false
+        ],
+        [
+          13,
+          13,
+          108,
+          "2026-07-02",
+          "2026-07-04",
+          "confermata",
+          "",
+          147,
+          147,
+          "offline",
+          "saldato",
+          "",
+          false,
+          false
+        ],
+        [
+          14,
+          14,
+          115,
+          "2026-07-03",
+          "2026-07-06",
+          "confermata",
+          "",
+          175,
+          70,
+          "widget",
+          "parziale",
+          "",
+          false,
+          false
+        ],
+        [
+          15,
+          1,
+          122,
+          "2026-07-04",
+          "2026-07-08",
+          "in_attesa",
+          "",
+          203,
+          0,
+          "portale",
+          "da_saldare",
+          "",
+          false,
+          false
+        ],
+        [
+          16,
+          2,
+          129,
+          "2026-06-30",
+          "2026-07-05",
+          "confermata",
+          "",
+          231,
+          231,
+          "offline",
+          "saldato",
+          "09:00",
+          true,
+          false
+        ],
+        [
+          17,
+          3,
+          136,
+          "2026-07-01",
+          "2026-07-07",
+          "confermata",
+          "",
+          35,
+          14,
+          "widget",
+          "parziale",
+          "",
+          false,
+          false
+        ],
+        [
+          18,
+          4,
+          143,
+          "2026-07-02",
+          "2026-07-09",
+          "confermata",
+          "",
+          63,
+          0,
+          "portale",
+          "da_saldare",
+          "",
+          false,
+          false
+        ],
+        [
+          19,
+          5,
+          150,
+          "2026-07-03",
+          "2026-07-05",
+          "confermata",
+          "",
+          91,
+          91,
+          "offline",
+          "saldato",
+          "",
+          false,
+          false
+        ],
+        [
+          20,
+          6,
+          157,
+          "2026-07-04",
+          "2026-07-07",
+          "confermata",
+          "",
+          119,
+          48,
+          "widget",
+          "parziale",
+          "",
+          false,
+          false
+        ],
+        [
+          21,
+          7,
+          164,
+          "2026-06-30",
+          "2026-07-04",
+          "confermata",
+          "",
+          147,
+          0,
+          "portale",
+          "da_saldare",
+          "09:00",
+          true,
+          false
+        ],
+        [
+          22,
+          8,
+          171,
+          "2026-07-01",
+          "2026-07-06",
+          "in_attesa",
+          "",
+          175,
+          175,
+          "offline",
+          "saldato",
+          "",
+          false,
+          false
+        ]
+      ]
+    },
+    "servizi": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "nome",
+          "type": "TEXT"
+        },
+        {
+          "name": "prezzo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "unita",
+          "type": "TEXT"
+        },
+        {
+          "name": "icona",
+          "type": "TEXT"
+        },
+        {
+          "name": "attivo",
+          "type": "BOOL"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Lettino aggiuntivo",
+          8,
+          "giorno",
+          "🛏",
+          true
+        ],
+        [
+          2,
+          "Sdraio",
+          5,
+          "giorno",
+          "🏖",
+          true
+        ],
+        [
+          3,
+          "Parcheggio",
+          10,
+          "giorno",
+          "🅿",
+          true
+        ]
+      ]
+    },
+    "movimenti_cassa": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "tipo",
+          "type": "TEXT"
+        },
+        {
+          "name": "descrizione",
+          "type": "TEXT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "metodo",
+          "type": "TEXT"
+        },
+        {
+          "name": "prenotazione_id",
+          "type": "INT"
+        },
+        {
+          "name": "operatore",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-30T9:00:00",
+          "entrata",
+          "Prenotazione #2",
+          25,
+          "contanti",
+          2,
+          "reception",
+          ""
+        ],
+        [
+          2,
+          "2026-06-30T10:00:00",
+          "entrata",
+          "Prenotazione #3",
+          91,
+          "contanti",
+          3,
+          "reception",
+          ""
+        ],
+        [
+          3,
+          "2026-06-30T11:00:00",
+          "entrata",
+          "Prenotazione #4",
+          119,
+          "contanti",
+          4,
+          "reception",
+          ""
+        ],
+        [
+          4,
+          "2026-06-30T12:00:00",
+          "entrata",
+          "Prenotazione #5",
+          59,
+          "contanti",
+          5,
+          "reception",
+          ""
+        ],
+        [
+          5,
+          "2026-06-30T13:00:00",
+          "entrata",
+          "Prenotazione #6",
+          175,
+          "contanti",
+          6,
+          "reception",
+          ""
+        ]
+      ]
+    },
+    "log_sconti": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "operatore",
+          "type": "TEXT"
+        },
+        {
+          "name": "cliente_id",
+          "type": "INT"
+        },
+        {
+          "name": "prenotazione_id",
+          "type": "INT"
+        },
+        {
+          "name": "sconto_pct",
+          "type": "FLOAT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "motivo",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-30T10:00:00",
+          "reception",
+          1,
+          1,
+          10,
+          24,
+          "Demo"
+        ]
+      ]
+    },
+    "log_cancellazioni": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "prenotazione_id",
+          "type": "INT"
+        },
+        {
+          "name": "cliente_id",
+          "type": "INT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "penale",
+          "type": "FLOAT"
+        },
+        {
+          "name": "motivo",
+          "type": "TEXT"
+        },
+        {
+          "name": "operatore",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-29T09:00:00",
+          1,
+          1,
+          35,
+          20,
+          "Demo",
+          "reception"
+        ],
+        [
+          2,
+          "2026-06-29T09:00:00",
+          12,
+          12,
+          119,
+          20,
+          "Demo",
+          "reception"
+        ]
+      ]
+    },
+    "log_modifiche": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "prenotazione_id",
+          "type": "INT"
+        },
+        {
+          "name": "cella_da",
+          "type": "INT"
+        },
+        {
+          "name": "cella_a",
+          "type": "INT"
+        },
+        {
+          "name": "operatore",
+          "type": "TEXT"
+        },
+        {
+          "name": "motivo",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-30T08:00:00",
+          6,
+          50,
+          52,
+          "reception",
+          "Upgrade settore B→A"
+        ],
+        [
+          2,
+          "2026-06-29T16:00:00",
+          10,
+          72,
+          78,
+          "reception",
+          "Spostamento per manutenzione"
+        ],
+        [
+          3,
+          "2026-06-26T11:00:00",
+          20,
+          70,
+          81,
+          "admin",
+          "Richiesta cliente"
+        ]
+      ]
+    },
+    "contatori_albergo": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "albergo",
+          "type": "TEXT"
+        },
+        {
+          "name": "codice",
+          "type": "TEXT"
+        },
+        {
+          "name": "totale",
+          "type": "INT"
+        },
+        {
+          "name": "utilizzato",
+          "type": "INT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Grand Hotel Europa",
+          "OMB-2026",
+          100,
+          22
+        ]
+      ]
+    },
+    "voucher": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "codice",
+          "type": "TEXT"
+        },
+        {
+          "name": "emessi",
+          "type": "INT"
+        },
+        {
+          "name": "utilizzati",
+          "type": "INT"
+        },
+        {
+          "name": "scadenza",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "SUMMER2026",
+          500,
+          87,
+          "2026-09-15"
+        ],
+        [
+          2,
+          "WELCOME10",
+          200,
+          42,
+          "2026-12-31"
+        ]
+      ]
+    },
+    "articoli": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "nome",
+          "type": "TEXT"
+        },
+        {
+          "name": "categoria",
+          "type": "TEXT"
+        },
+        {
+          "name": "giacenza",
+          "type": "INT"
+        },
+        {
+          "name": "scorta_min",
+          "type": "INT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Ombrellone standard",
+          "Attrezzatura",
+          45,
+          20
+        ],
+        [
+          2,
+          "Sdraio",
+          "Attrezzatura",
+          12,
+          30
+        ],
+        [
+          3,
+          "Teli mare",
+          "Consumabile",
+          180,
+          50
+        ]
+      ]
+    },
+    "movimenti_magazzino": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "articolo_id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "tipo",
+          "type": "TEXT"
+        },
+        {
+          "name": "quantita",
+          "type": "INT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "2026-06-30T07:00:00",
+          "uscita",
+          3,
+          "Setup mattutino"
+        ],
+        [
+          2,
+          2,
+          "2026-06-30T07:00:00",
+          "uscita",
+          6,
+          "Setup mattutino"
+        ],
+        [
+          3,
+          3,
+          "2026-06-29T18:00:00",
+          "uscita",
+          15,
+          "Vendita teli"
+        ],
+        [
+          4,
+          1,
+          "2026-06-23T09:00:00",
+          "entrata",
+          20,
+          "Rifornimento fornitore"
+        ]
+      ]
+    },
+    "utenti": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "username", "type": "TEXT" },
+        { "name": "email", "type": "TEXT" },
+        { "name": "ruolo", "type": "TEXT" },
+        { "name": "livello", "type": "INT" },
+        { "name": "ultimo_accesso", "type": "TEXT" },
+        { "name": "attivo", "type": "BOOL" },
+        { "name": "password_hash", "type": "TEXT" }
+      ],
+      "rows": [
+        [1, "admin", "admin@winbeach.it", "Amministratore", 0, "2026-06-30T08:00:00", true, "34750549a7ff3b67f9f198f6f9b47d576b695862f493bdab66d1fb2ca885e960"],
+        [2, "reception", "cassa@winbeach.it", "Operatore", 1, "2026-06-30T09:00:00", true, "139de5420069a8b3b8510a044edfbceb62b7a9fd84bdc3a57457eda42476b04c"]
+      ]
+    },
+    "livelli": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "descrizione", "type": "TEXT" }
+      ],
+      "rows": [
+        [0, "Amministratore", "Accesso completo a tutte le procedure"],
+        [1, "Operatore", "Accesso alle operazioni standard"],
+        [2, "Visualizzatore", "Solo lettura"]
+      ]
+    },
+    "permessi": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "livello_id", "type": "INT" },
+        { "name": "procedura", "type": "TEXT" },
+        { "name": "permesso", "type": "TEXT" }
+      ],
+      "rows": [
+        [1, 1, "dashboard", "scrittura"],
+        [2, 1, "spiaggia", "scrittura"],
+        [3, 1, "struttura", "scrittura"],
+        [4, 1, "booking", "scrittura"],
+        [5, 1, "clienti", "scrittura"],
+        [6, 1, "cassa", "scrittura"],
+        [7, 1, "ristorante", "scrittura"],
+        [8, 1, "planner", "scrittura"],
+        [9, 1, "arrivi", "scrittura"],
+        [10, 1, "statistiche", "scrittura"],
+        [11, 1, "pagamenti", "scrittura"],
+        [12, 1, "log", "scrittura"],
+        [13, 1, "contatori", "scrittura"],
+        [14, 1, "impostazioni", "scrittura"],
+        [15, 1, "magazzino", "scrittura"],
+        [16, 1, "utenti", "scrittura"],
+        [17, 1, "export", "scrittura"],
+        [18, 1, "qr", "scrittura"],
+        [19, 1, "guida", "lettura"],
+        [20, 2, "dashboard", "lettura"],
+        [21, 2, "spiaggia", "lettura"],
+        [22, 2, "booking", "scrittura"],
+        [23, 2, "clienti", "scrittura"],
+        [24, 2, "cassa", "scrittura"],
+        [25, 2, "ristorante", "scrittura"],
+        [26, 2, "arrivi", "scrittura"],
+        [27, 2, "statistiche", "lettura"],
+        [28, 2, "log", "lettura"],
+        [29, 2, "export", "lettura"],
+        [30, 2, "qr", "lettura"],
+        [31, 2, "guida", "lettura"],
+        [32, 3, "dashboard", "lettura"],
+        [33, 3, "spiaggia", "lettura"],
+        [34, 3, "booking", "lettura"],
+        [35, 3, "clienti", "lettura"],
+        [36, 3, "statistiche", "lettura"],
+        [37, 3, "guida", "lettura"],
+        [38, 3, "qr", "lettura"]
+      ]
+    },
+    "capitaneria": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "voce",
+          "type": "TEXT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "unita",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Tassa di soggiorno",
+          2.5,
+          "/persona/notte",
+          "Obbligatoria"
+        ],
+        [
+          2,
+          "Concessione demaniale",
+          12,
+          "% su incasso",
+          "Annuale"
+        ]
+      ]
+    },
+    "esercizi": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "nome",
+          "type": "TEXT"
+        },
+        {
+          "name": "tipo",
+          "type": "TEXT"
+        },
+        {
+          "name": "responsabile",
+          "type": "TEXT"
+        },
+        {
+          "name": "attivo",
+          "type": "BOOL"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "Bar Centrale",
+          "Bar",
+          "Marco R.",
+          true
+        ],
+        [
+          2,
+          "Chiosco Nord",
+          "Ristoro",
+          "Anna L.",
+          true
+        ],
+        [
+          3,
+          "Noleggio",
+          "Servizi",
+          "Paolo B.",
+          true
+        ]
+      ]
+    },
+    "pagamenti_stripe": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "cliente_id",
+          "type": "INT"
+        },
+        {
+          "name": "prenotazione_id",
+          "type": "INT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "metodo",
+          "type": "TEXT"
+        },
+        {
+          "name": "stripe_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stato",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-30T10:15:00",
+          2,
+          2,
+          200,
+          "card",
+          "pi_3NxDemo001",
+          "succeeded"
+        ],
+        [
+          2,
+          "2026-06-29T14:30:00",
+          10,
+          10,
+          210,
+          "card",
+          "pi_3NxDemo002",
+          "succeeded"
+        ],
+        [
+          3,
+          "2026-06-27T09:00:00",
+          16,
+          16,
+          50,
+          "card",
+          "pi_3NxDemo003",
+          "succeeded"
+        ],
+        [
+          4,
+          "2026-06-30T11:30:00",
+          3,
+          3,
+          84,
+          "card",
+          "pi_3NxDemo004",
+          "pending"
+        ]
+      ]
+    },
+    "trasferimenti_stripe": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "importo",
+          "type": "FLOAT"
+        },
+        {
+          "name": "conto",
+          "type": "TEXT"
+        },
+        {
+          "name": "stripe_payout_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stato",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-23T08:00:00",
+          2450,
+          "IT89X0501803200000012345678",
+          "po_1NxDemo001",
+          "paid"
+        ],
+        [
+          2,
+          "2026-06-29T08:00:00",
+          1890,
+          "IT89X0501803200000012345678",
+          "po_1NxDemo002",
+          "paid"
+        ]
+      ]
+    },
+    "attivita": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INT"
+        },
+        {
+          "name": "data",
+          "type": "TEXT"
+        },
+        {
+          "name": "titolo",
+          "type": "TEXT"
+        },
+        {
+          "name": "stato",
+          "type": "TEXT"
+        },
+        {
+          "name": "assegnato",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "2026-06-30T07:30:00",
+          "Apertura stabilimento",
+          "completata",
+          "Marco R.",
+          ""
+        ],
+        [
+          2,
+          "2026-06-30T08:00:00",
+          "Controllo postazioni settore A",
+          "in_corso",
+          "Anna L.",
+          ""
+        ],
+        [
+          3,
+          "2026-06-30T12:00:00",
+          "Pulizia servizi comuni",
+          "pianificata",
+          "Paolo B.",
+          ""
+        ],
+        [
+          4,
+          "2026-07-01T07:00:00",
+          "Preparazione arrivi domani",
+          "pianificata",
+          "reception",
+          "2 arrivi"
+        ]
+      ]
+    },
+    "impostazioni_ristorante": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "chiave", "type": "TEXT" },
+        { "name": "valore", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "sale": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "tavoli": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "salaId", "type": "INT" },
+        { "name": "numero", "type": "TEXT" },
+        { "name": "posti", "type": "INT" },
+        { "name": "posizione", "type": "TEXT" },
+        { "name": "stato", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "categorie": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "stampante", "type": "TEXT" },
+        { "name": "immagine", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "prodotti": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "nome", "type": "TEXT" },
+        { "name": "prezzo", "type": "REAL" },
+        { "name": "categoriaId", "type": "INT" },
+        { "name": "attivo", "type": "BOOL" },
+        { "name": "immagine", "type": "TEXT" },
+        { "name": "varianti", "type": "TEXT" }
+      ],
+      "rows": []
+    },
+    "settings": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "chiave", "type": "TEXT" },
+        { "name": "valore", "type": "TEXT" }
+      ],
+      "rows": [
+        [1, "lang", "it"],
+        [2, "theme", "light"]
+      ]
+    },
+    "pos_state": {
+      "columns": [
+        { "name": "id", "type": "INT" },
+        { "name": "tavolo_id", "type": "INT" },
+        { "name": "chiave", "type": "TEXT" },
+        { "name": "valore", "type": "TEXT" }
+      ],
+      "rows": []
+    }
+  }
+}

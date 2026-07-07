@@ -1,0 +1,59 @@
+
+
+La procedura delle impostazioni del ristorante non funziona correttamente  
+file config-ristorante.html
+
+MENU Gestione Sale / Zone
+se inserisco per esempio "Sala1" e salvo 
+non salva niente e conseguentemente non posso inserire i tavoli per quella sala  in "Inserimento Tavoli"
+
+MENU Registro Categorie 
+ho provato ad inserire una categoria ma poi non salva 
+e conseguentemente non posso inserire i prodotti pr quella categoria
+
+
+le categorie e i prodotti possono avere delle immagini le immagini dei prodotti e delle categorie 
+devono essere inserite in images/risto
+
+
+
+MENU Opzioni Generali e Servizio
+pare che salvi i dati inseriti
+
+MENU Indirizzi Fisici Stampanti di Reparto
+pare che salvi i dati inseriti
+
+
+
+Tabella elementi mi fa questo errore 
+
+Stabilimento principale · Failed to fetch database 'winbeach': HTTP 401
+
+mi dice di inserire un token ma non ho capito che cosa devo inserire nella procedura 
+io ho inserito "ghp_main" come token  ma mi fa errore  che cosa intende per token e dove lo prendo ? 
+
+
+ho provato a inserire un nuovo elemento  ma mi fa errore 
+la procedura deve caricare un immagine generalmente png e la deve salvare nella cartella corrispondente
+in questo caso gli elementi devono essere salvati della cartella Images/elementi
+
+
+
+
+In generale le immagini devono essere inserite in 
+
+winbeach/docs/images
+
+qui ci sono tre cartelle 
+
+risto      qui metteremo le immagini riguardanti il ristorante
+
+elementi   qui metteremo le immagini riguardanti gli elementi
+
+servizi     qui metteremo le immagini riguardanti  i servizi
+
+quidi magari ci vuole già un'impostazione tipo
+
+Path_images_risto
+Path_images_elementi
+Path_images_servizi 

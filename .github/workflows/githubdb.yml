@@ -1,0 +1,31 @@
+name: GitHubDB Query Executor
+
+on:
+  repository_dispatch:
+    types: [query]
+
+permissions:
+  contents: write
+
+jobs:
+  execute-query:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Execute SQL Query
+        env:
+          QUERY_ID: ${{ github.event.client_payload.id }}
+          DB_NAME: ${{ github.event.client_payload.db }}
+          SQL: ${{ github.event.client_payload.sql }}
+        run: node scripts/githubdb-query.js
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ results/
+          git diff --cached --quiet || git commit -m "GitHubDB query ${{ github.event.client_payload.id }}"
+          git push
