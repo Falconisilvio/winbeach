@@ -340,21 +340,6 @@ export async function loadStrutturaFromDb() {
 }
 
 export async function saveStrutturaToDb(struttura) {
-  const { assertCanWrite } = await import('./winbeach-auth.js');
-  const authErr = assertCanWrite();
-  if (authErr) {
-    setStatusRaw('error', authErr);
-    return { ok: false, error: authErr };
-  }
-  const token = getToken();
-  if (!token) {
-    setStatus('error', 'err.tokenSave');
-    return { ok: false, error: t('err.tokenSave') };
-  }
-
-  const cfg = getDbConfig();
-  setStatus('saving', 'db.savingWait');
-
   const now = new Date().toISOString();
   const cells = struttura.cells.filter((c) => c.elemento);
 
@@ -374,22 +359,12 @@ export async function saveStrutturaToDb(struttura) {
     );
   }
 
-  try {
-    const db = createClient();
-    const result = await db.query(cfg.database, sqlParts.join('; '));
-    if (!result.ok) {
-      const msg = result.error || 'Error SQL';
-      setStatusRaw('error', msg);
-      return { ok: false, error: msg };
-    }
-    await db.refresh(cfg.database);
+  const res = await queryDb(sqlParts.join('; '), 'db.savingWait');
+  if (res.ok) {
     setStatus('ok', 'db.structureSaved', { n: cells.length });
     return { ok: true, cells: cells.length };
-  } catch (err) {
-    const msg = err.message || String(err);
-    setStatusRaw('error', msg);
-    return { ok: false, error: msg };
   }
+  return res;
 }
 
 async function queryDb(sql, statusKey = 'db.savingWait') {
@@ -409,20 +384,151 @@ async function queryDb(sql, statusKey = 'db.savingWait') {
   setStatus('saving', statusKey);
 
   try {
-    const db = createClient();
-    const result = await db.query(cfg.database, sql);
-    if (!result.ok) {
-      const msg = result.error || 'Error SQL';
-      setStatusRaw('error', msg);
-      return { ok: false, error: msg };
+    // 1. Read current database via Contents API
+    const readUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/data/${cfg.database}.json?ref=${cfg.branch}`;
+    const readResp = await fetch(readUrl, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!readResp.ok) throw new Error(`Database read failed: HTTP ${readResp.status}`);
+    const fileData = await readResp.json();
+    const sha = fileData.sha;
+    const dbContent = JSON.parse(atob(fileData.content));
+
+    // 2. Execute SQL client-side
+    const sqlResult = executeSqlOnDb(dbContent, sql);
+    if (!sqlResult.ok) {
+      setStatusRaw('error', sqlResult.error);
+      return sqlResult;
     }
-    await db.refresh(cfg.database);
-    return { ok: true, result };
+
+    // 3. Write updated database via Contents API
+    const newContent = btoa(JSON.stringify(dbContent, null, 2));
+    const writeUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/data/${cfg.database}.json`;
+    const writeResp = await fetch(writeUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `WinBeach DB update: ${sql.substring(0, 80)}`,
+        content: newContent,
+        sha: sha,
+        branch: cfg.branch
+      })
+    });
+    if (!writeResp.ok) {
+      const err = await writeResp.json().catch(() => ({}));
+      throw new Error(`Database write failed: ${err.message || writeResp.statusText}`);
+    }
+
+    await createClient().refresh(cfg.database);
+    setStatus('ok', statusKey);
+    return { ok: true, result: sqlResult.result };
   } catch (err) {
     const msg = err.message || String(err);
     setStatusRaw('error', msg);
     return { ok: false, error: msg };
   }
+}
+
+function executeSqlOnDb(db, sql) {
+  try {
+    const statements = sql.split(';').map(s => s.trim()).filter(Boolean);
+    let lastResult = { ok: true, result: {} };
+    for (const stmt of statements) {
+      lastResult = executeSingleStatement(db, stmt);
+      if (!lastResult.ok) return lastResult;
+    }
+    return lastResult;
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+function executeSingleStatement(db, sql) {
+  const upper = sql.toUpperCase().trim();
+
+  if (upper.startsWith('INSERT INTO')) {
+    const m = sql.match(/INSERT INTO\s+(\w+)\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)/i);
+    if (!m) return { ok: false, error: `Invalid INSERT: ${sql}` };
+    const [, table, colsStr, valsStr] = m;
+    const cols = colsStr.split(',').map(c => c.trim());
+    const vals = valsStr.split(',').map(v => parseSqlVal(v.trim()));
+    if (!db.tables[table]) db.tables[table] = { columns: cols.map(c => ({ name: c, type: 'TEXT' })), rows: [] };
+    db.tables[table].rows.push(vals);
+    return { ok: true, result: { changes: 1 } };
+  }
+
+  if (upper.startsWith('UPDATE')) {
+    const m = sql.match(/UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?$/i);
+    if (!m) return { ok: false, error: `Invalid UPDATE: ${sql}` };
+    const [, table, setStr, whereStr] = m;
+    if (!db.tables[table]) return { ok: false, error: `Table '${table}' not found` };
+    const sets = {};
+    setStr.split(',').map(s => s.trim()).forEach(a => {
+      const [col, ...rest] = a.split('=');
+      sets[col.trim()] = parseSqlVal(rest.join('=').trim());
+    });
+    let changes = 0;
+    const t = db.tables[table];
+    for (let i = 0; i < t.rows.length; i++) {
+      if (whereStr && !matchWhere(t.columns, t.rows[i], whereStr)) continue;
+      for (const [col, val] of Object.entries(sets)) {
+        const ci = t.columns.findIndex(c => c.name === col);
+        if (ci >= 0) t.rows[i][ci] = val;
+      }
+      changes++;
+    }
+    return { ok: true, result: { changes } };
+  }
+
+  if (upper.startsWith('DELETE FROM')) {
+    const m = sql.match(/DELETE FROM\s+(\w+)(?:\s+WHERE\s+(.+))?$/i);
+    if (!m) return { ok: false, error: `Invalid DELETE: ${sql}` };
+    const [, table, whereStr] = m;
+    if (!db.tables[table]) return { ok: false, error: `Table '${table}' not found` };
+    const before = db.tables[table].rows.length;
+    if (whereStr) {
+      db.tables[table].rows = db.tables[table].rows.filter(row => !matchWhere(db.tables[table].columns, row, whereStr));
+    } else {
+      db.tables[table].rows = [];
+    }
+    return { ok: true, result: { changes: before - db.tables[table].rows.length } };
+  }
+
+  return { ok: false, error: `Unsupported SQL: ${sql}` };
+}
+
+function matchWhere(columns, row, whereStr) {
+  return whereStr.split(/AND/i).every(cond => {
+    const parts = cond.trim().split(/\s*(=|!=|<>|>=|<=|>|<)\s*/);
+    if (parts.length < 3) return true;
+    const [colName, op, valRaw] = parts;
+    const ci = columns.findIndex(c => c.name === colName.trim());
+    if (ci < 0) return false;
+    const rowVal = row[ci];
+    const val = parseSqlVal(valRaw);
+    switch (op) {
+      case '=': return rowVal == val;
+      case '!=': case '<>': return rowVal != val;
+      case '>=': return rowVal >= val;
+      case '<=': return rowVal <= val;
+      case '>': return rowVal > val;
+      case '<': return rowVal < val;
+      default: return true;
+    }
+  });
+}
+
+function parseSqlVal(v) {
+  if (v === 'NULL') return null;
+  if (v === 'TRUE') return true;
+  if (v === 'FALSE') return false;
+  if (v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
+  const n = Number(v);
+  return isNaN(n) ? v : n;
 }
 
 function nextId(rows) {

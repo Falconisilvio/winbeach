@@ -645,6 +645,10 @@
       const fileInput = document.getElementById('file-prodotto');
       const editId = document.getElementById('edit-prodotto-id').value;
 
+      if(!categoriaNome) { alert('Seleziona una Categoria!'); return; }
+      if(!nome) { alert('Inserisci il Nome del prodotto!'); return; }
+      if(!prezzo || prezzo <= 0) { alert('Inserisci un Prezzo valido!'); return; }
+
       let nomeImmagine = document.getElementById('edit-prodotto-img-salvata').value || "";
 
       if (fileInput.files && fileInput.files.length > 0) {
@@ -653,9 +657,11 @@
 
       if(editId) {
         dbRistorante.prodotti = dbRistorante.prodotti.map(p => p.id === Number(editId) ? { ...p, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine } : p);
+        alert('Prodotto aggiornato!');
       } else {
         const nuovoId = dbRistorante.prodotti.length > 0 ? Math.max(...dbRistorante.prodotti.map(p => p.id)) + 1 : 1;
-        dbRistorante.prodotti.push({ id: nuevoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine });
+        dbRistorante.prodotti.push({ id: nuovoId, nome: nome, prezzo: prezzo, categoriaId: categoriaNome, immagine: nomeImmagine });
+        alert('Prodotto "' + nome + '" aggiunto!');
       }
       chiudiModale();
       salvaNelStorage();
